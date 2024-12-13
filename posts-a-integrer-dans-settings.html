@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mes Posts</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@4.4.1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <style>
+        .post-item {
+            cursor: pointer;
+            padding: 15px;
+            background-color: #fff;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            margin-bottom: 10px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            transition: background-color 0.3s ease;
+        }
+
+        .post-item:hover {
+            background-color: #f1f1f1;
+        }
+
+        .post-title {
+            font-size: 18px;
+            font-weight: bold;
+        }
+
+        .post-date {
+            font-size: 14px;
+            color: #888;
+        }
+
+        .post-body {
+            font-size: 16px;
+            color: #333;
+        }
+
+        .post-actions {
+            margin-top: 10px;
+        }
+
+        .post-actions a {
+            color: #007bff;
+            text-decoration: none;
+        }
+
+        .post-actions a:hover {
+            text-decoration: underline;
+        }
+
+        .modal-body {
+            padding-bottom: 0;
+        }
+
+        .modal-footer {
+            justify-content: flex-start;
+        }
+
+        .response-box {
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container mt-5">
+    <div class="row">
+        <div class="col-md-12">
+            <h5>Mes Posts</h5>
+            <!-- List of Posts -->
+            <div class="list-group">
+                <!-- Example of post -->
+                <div class="list-group-item post-item" data-toggle="modal" data-target="#postModal" data-title="Meeting Request" data-body="Hi, I wanted to schedule a meeting with you next week. Let me know your availability." data-date="2024-12-10">
+                    <h5 class="post-title">Meeting Request</h5>
+                    <p class="post-date">2024-12-10</p>
+                    <p class="post-body">Hi, I wanted to schedule a meeting with you next week...</p>
+                    <div class="post-actions">
+                        <a href="#">Edit</a> | <a href="#">Delete</a>
+                    </div>
+                </div>
+
+                <!-- Another post -->
+                <div class="list-group-item post-item" data-toggle="modal" data-target="#postModal" data-title="Project Update" data-body="The project status has been updated. Please check the dashboard." data-date="2024-12-09">
+                    <h5 class="post-title">Project Update</h5>
+                    <p class="post-date">2024-12-09</p>
+                    <p class="post-body">The project status has been updated...</p>
+                    <div class="post-actions">
+                        <a href="#">Edit</a> | <a href="#">Delete</a>
+                    </div>
+                </div>
+
+                <!-- Add more posts as needed -->
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal to display post details -->
+<div class="modal fade" id="postModal" tabindex="-1" role="dialog" aria-labelledby="postModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="postModalLabel">Post Details</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div id="postContent">
+                    <h5 id="postTitle"></h5>
+                    <p id="postDate"></p>
+                    <p id="postBody"></p>
+                </div>
+
+                <!-- Form for responding to the post -->
+                <div class="response-box">
+                    <h6>Your Reply:</h6>
+                    <textarea id="responseText" class="form-control" rows="4" placeholder="Type your reply here..."></textarea>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary" id="replyButton">Reply</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Bootstrap JS & jQuery -->
+<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.4.1/dist/js/bootstrap.bundle.min.js"></script>
+
+<script>
+    $(document).ready(function() {
+        // When a post is clicked, update modal content
+        $('.post-item').click(function() {
+            var title = $(this).data('title');
+            var body = $(this).data('body');
+            var date = $(this).data('date');
+
+            $('#postTitle').text(title);
+            $('#postDate').text('Date: ' + date);
+            $('#postBody').text(body);
+        });
+
+        // Reply button functionality (currently just logs the reply content)
+        $('#replyButton').click(function() {
+            var replyMessage = $('#responseText').val();
+            if (replyMessage.trim() !== '') {
+                // Log the reply to the console (here you can send it to the backend)
+                console.log('Reply Sent:', replyMessage);
+                alert('Your reply has been sent!');
+                $('#responseText').val(''); // Clear the text area after sending
+            } else {
+                alert('Please type a reply before sending.');
+            }
+        });
+    });
+</script>
+
+</body>
+</html>
