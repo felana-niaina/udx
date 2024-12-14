@@ -3,6 +3,13 @@
 include_once 'classes/DatabaseConnector.php';
 include_once 'classes/UserRegistration.php';
 
+require 'phpmailer/src/Exception.php';
+require 'phpmailer/src/PHPMailer.php';
+require 'phpmailer/src/SMTP.php';
+
+use PHPMailer\PHPMailer\PHPMailer;
+use PHPMailer\PHPMailer\Exception;
+
 // Créer une instance de la classe DatabaseConnector
 $database = new DatabaseConnector();
 $con = $database->getConnection();
@@ -31,6 +38,44 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     // Inscription de l'utilisateur
     if ($user->registerUser($username, $email, $password)) {
+        // Envoi de l'email de confirmation avec PHPMailer
+        try {
+            $mail = new PHPMailer(true);
+
+            // Paramétrage SMTP
+            $mail->isSMTP();
+            $mail->Host = 'smtp.gmail.com';  // Hébergement du serveur SMTP
+            $mail->SMTPAuth = true;
+            $mail->Username = 'nirina.felananiaina@gmail.com';  // Votre email
+            $mail->Password = '';  // Mot de passe d'application
+            $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
+            $mail->Port = 587;
+
+            // Expéditeur et destinataire
+            $mail->setFrom('nirina.felananiaina@gmail.com', 'Underdex');  // L'email expéditeur
+            $mail->addAddress($email, $username);  // L'email destinataire de l'utilisateur
+
+            // Sujet et corps du message
+            $mail->Subject = 'Bienvenue sur Underdex !';
+
+            // Message HTML du mail
+            $mail->isHTML(true);
+            $mail->Body = "
+            <h2>Bienvenue sur Underdex !</h2>
+            <p>Ton compte est désormais créé :</p>
+            <p><strong>Nom d’utilisateur :</strong> $username</p>
+            <p><strong>Mot de passe :</strong> *********** (flooter)</p>
+            <p>Tu peux désormais utiliser notre Service et profiter de toutes les fonctionnalités membre. Tu peux également consulter l’espace FAQ pour te familiariser avec notre Service.</p>
+            <p>Cordialement,<br> L'équipe Underdex</p>
+            ";
+
+            // Envoi de l'email
+            $mail->send();
+        } catch (Exception $e) {
+            // Si l'envoi échoue, affichage de l'erreur
+            echo "Le message n'a pas pu être envoyé. Erreur: {$mail->ErrorInfo}";
+        }
+        
         echo "<script>
             document.addEventListener('DOMContentLoaded', function() {
                 Swal.fire({
