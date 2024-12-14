@@ -93,7 +93,7 @@
                             <li><a href="faq.php" class="nav-link" style="font-size: 15px;">Foire aux questions</a></li>			
                             <li class="active"><a href="about.html" class="nav-link">Démarrer</a></li>
                             <?php if(!$isUserConnected) : ?>
-                            <li><a href="login.html" class="nav-link" style="font-size: 15px;">Se connecter</a></li>
+                            <li><a href="login.php" class="nav-link" style="font-size: 15px;">Se connecter</a></li>
                             <li><a href="register.php" class="nav-link" style="font-size: 15px;">S'inscrire gratuitement</a></li>
                             <?php else : ?>
                             <li><a href="settings.php" class="nav-link" style="font-size: 15px;">Profil</a></li>
@@ -105,7 +105,7 @@
 							<li><a href="about.html" class="nav-link" style="font-size: 15px;">Mentions légales</a></li>
                             <li><a href="cgu.html" class="nav-link" style="font-size: 15px;">Conditions d'usages</a></li>
                             <?php if($isUserConnected) : ?>
-                            <li><a href="login.html" class="nav-link" style="font-size: 15px;">Se déconnecter</a></li>
+                            <li><a href="index.php" class="nav-link" style="font-size: 15px;">Se déconnecter</a></li>
                             <?php endif ?>
                         </ul>
                     </nav>
