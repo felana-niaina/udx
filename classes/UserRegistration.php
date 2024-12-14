@@ -36,6 +36,65 @@ class UserRegistration {
         }
     }
 
+    // Méthode pour se connecter
+    public function loginUser($username, $password) {
+        try {
+            $sql = "SELECT id, username, password FROM users WHERE username = :username LIMIT 1";
+            $stmt = $this->con->prepare($sql);
+            $stmt->bindParam(':username', $username, PDO::PARAM_STR);
+            $stmt->execute();
+
+            $user = $stmt->fetch(PDO::FETCH_ASSOC);
+
+            // Vérifier si l'utilisateur existe et si le mot de passe correspond
+            if ($user && password_verify($password, $user['password'])) {
+                // Initialisation de la session
+                session_start();
+                $_SESSION['user_id'] = $user['id'];
+                $_SESSION['user_username'] = $user['username'];
+
+                return true;
+            } else {
+                return false; // Identifiants incorrects
+            }
+        } catch (PDOException $e) {
+            echo "Erreur lors de la connexion : " . $e->getMessage();
+            return false;
+        }
+    }
+
+    // Méthode pour mettre à jour la photo de couverture de l'utilisateur
+    public function updateCoverPhoto($userId, $coverPhotoFile) {
+        try {
+            // Vérifier si le fichier est valide
+            if ($coverPhotoFile['error'] !== UPLOAD_ERR_OK) {
+                throw new Exception("Erreur lors du téléchargement du fichier.");
+            }
+
+            // Déplacer le fichier téléchargé dans le répertoire voulu
+            $uploadDir = 'uploads/';
+            $targetFile = $uploadDir . basename($coverPhotoFile['name']);
+            
+            if (!move_uploaded_file($coverPhotoFile['tmp_name'], $targetFile)) {
+                throw new Exception("Impossible de déplacer le fichier téléchargé.");
+            }
+
+            // Mettre à jour la photo de couverture dans la base de données
+            $sql = "UPDATE users SET cover_photo = :cover_photo WHERE user_id = :user_id";
+            $stmt = $this->con->prepare($sql);
+            $stmt->bindParam(':cover_photo', $targetFile);
+            $stmt->bindParam(':user_id', $userId);
+            $stmt->execute();
+
+            return true;
+
+        } catch (Exception $e) {
+            echo "Erreur : " . $e->getMessage();
+            return false;
+        }
+    }
+
+
     // Méthode pour récupérer les informations de l'utilisateur
     public function getUserInfo($userId) {
         try {

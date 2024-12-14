@@ -1,3 +1,42 @@
+<?php
+ session_start();
+include_once 'classes/DatabaseConnector.php';
+include_once 'classes/UserRegistration.php';
+
+// Créer une instance de la classe DatabaseConnector
+$database = new DatabaseConnector();
+$con = $database->getConnection();
+
+$userRegistration = new UserRegistration($con);
+$userId = $_SESSION['user_id']; // ID de l'utilisateur connecté
+
+// Vérifiez si un fichier est envoyé
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['cover_photo'])) {
+    // Appeler la méthode pour mettre à jour la photo
+    $coverPhotoFile = $_FILES['cover_photo'];
+    $result = $userRegistration->updateCoverPhoto($userId, $coverPhotoFile);
+
+    if ($result) {
+        echo "<script>
+                document.addEventListener('DOMContentLoaded', function() {
+                    Swal.fire({
+                        title: 'Succès',
+                        text: 'Photo de couverture mise à jour !',
+                        icon: 'success',
+                        confirmButtonText: 'OK'
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            window.location.href = 'profil.php';
+                        }
+                    });
+                });
+            </script>";
+    } else {
+        echo "Échec de la mise à jour de la photo de couverture.";
+    }
+}
+
+?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -159,6 +198,59 @@
             color: #007bff;
         }
 
+        .cover-photo {
+            width: 100%;
+            height: 100px;
+            background-size: cover;
+            background-position: center;
+            position: relative; /* Permet la position absolue des éléments enfants */
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        .edit-cover-photo {
+            position: absolute;
+            bottom: 10px;
+            right: 10px;
+            background-color: rgba(0, 0, 0, 0.6);
+            color: white;
+            border: none;
+            padding: 10px;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+            transition: background-color 0.3s;
+        }
+
+        .edit-cover-photo i {
+            font-size: 18px;
+        }
+
+        .edit-cover-photo:hover {
+            background-color: rgba(255, 255, 255, 0.8);
+            color: black;
+        }
+
+        .save-cover-photo-btn {
+            position: absolute;
+            bottom: 10px;
+            right: 70px;
+            background-color: rgba(0, 255, 0, 0.7);
+            color: white;
+            border: none;
+            padding: 8px 12px;
+            border-radius: 4px;
+            cursor: pointer;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+        }
+
+        .save-cover-photo-btn:hover {
+            background-color: rgba(0, 200, 0, 1);
+        }
+
         /* Responsive */
         @media (max-width: 768px) {
             .container {
@@ -201,7 +293,23 @@
             <div class="card">
                 <div class="card-header profile-header">
                     <!-- Cover photo -->
-                    <div class="cover-photo"></div>
+                    <div class="cover-photo" id="cover-photo" style="background-image: url('uploads/default_cover.jpg');">
+                        <!-- Input file caché -->
+                        <input type="file" id="cover-photo-input" accept="image/*" style="display: none;" name="cover_photo">
+
+                        <!-- Bouton de modification avec icône -->
+                        <button class="edit-cover-photo" id="edit-cover-photo-btn" type="button">
+                            <i class="fas fa-camera"></i>
+                        </button>
+
+                        <!-- Formulaire d'upload de la photo -->
+                        <form id="cover-photo-form" action="profil.php" method="POST" enctype="multipart/form-data" style="display: none;">
+                            <!-- Image de couverture -->
+                            <input type="file" id="cover-photo-input" name="cover_photo" accept="image/*">
+                            <!-- Bouton Enregistrer -->
+                            <button type="submit" id="save-cover-photo-btn" class="save-cover-photo-btn">Enregistrer</button>
+                        </form>
+                    </div>
 
                     <!-- Profile picture -->
                     <img src="https://via.placeholder.com/150" alt="User Profile Picture">
@@ -290,6 +398,8 @@
 
 <script src="https://code.jquery.com/jquery-1.10.2.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.4.1/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
 
 <script>
     function showPostForm() {
@@ -301,6 +411,27 @@
         document.getElementById('post-form').style.display = 'none';
         document.getElementById('sale-form').style.display = 'block';
     }
+    
+    // Lorsque l'utilisateur clique sur le bouton d'édition de la photo de couverture
+    document.getElementById("edit-cover-photo-btn").addEventListener("click", function () {
+        // Affiche l'input de téléchargement de photo
+        document.getElementById("cover-photo-input").click();
+    });
+
+    // Lorsque l'utilisateur sélectionne une nouvelle image
+    document.getElementById("cover-photo-input").addEventListener("change", function (event) {
+        const file = event.target.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = function (e) {
+                document.getElementById("cover-photo").style.backgroundImage = `url(${e.target.result})`;
+                // Afficher le bouton Enregistrer
+                document.getElementById("save-cover-photo-btn").style.display = "inline-block";
+                document.getElementById("cover-photo-form").style.display = "block";
+            };
+            reader.readAsDataURL(file);
+        }
+    });
 </script>
 
 </body>

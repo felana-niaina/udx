@@ -57,7 +57,7 @@ CREATE TABLE `marketplace` (
 INSERT INTO `marketplace` (`id`, `title`, `description`, `price`, `keywords`, `clicks`, `ads`, `userId`, `createdDate`) VALUES
 (1, 'iPhone 13', 'Bonjour je vends mon iphone 13 pas cher', 0, 'iphone', '', NULL, 0, '2024-12-14'),
 (2, 'iPhone 16', 'iPhone 16 a vendre sous emballage', 600, 'iphone', '', NULL, 10, '2024-12-14'),
-(3, 'Tiana dev web', 'Tiana dev web freelance', 100, 'freelance, tiana\'', '', 0, 10, '2024-12-14');
+(3, 'Tiana dev web', 'Tiana dev web freelance', 100, 'freelance', '', 0, 10, '2024-12-14');
 
 -- --------------------------------------------------------
 

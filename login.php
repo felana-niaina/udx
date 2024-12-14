@@ -1,3 +1,39 @@
+<?php
+session_start(); // Utilisé pour gérer les sessions utilisateur
+// Inclusion des classes nécessaires
+include_once 'classes/DatabaseConnector.php';
+include_once 'classes/UserRegistration.php';
+
+// Créer une instance de la classe DatabaseConnector
+$database = new DatabaseConnector();
+$con = $database->getConnection();
+
+$userRegistration = new UserRegistration($con);
+
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $username = trim($_POST['username'] ?? '');
+    $password = trim($_POST['password'] ?? '');
+
+    // Valider les entrées utilisateur
+    if (empty($username) || empty($password)) {
+        $errorMessage = "Nom d'utilisateur et mot de passe requis.";
+    } else {
+        try {
+            // Appeler la méthode de connexion
+            if ($userRegistration->loginUser($username, $password)) {
+                // Redirection en cas de succès
+                header('Location: settings.php');
+                exit;
+            } else {
+                // Erreur d'authentification
+                $errorMessage = "Nom d'utilisateur ou mot de passe incorrect.";
+            }
+        } catch (PDOException $e) {
+            $errorMessage = "Erreur de base de données : " . $e->getMessage();
+        }
+    }
+}
+?>
 <!DOCTYPE html>
 <html lang="fr">
 <head>
@@ -125,13 +161,13 @@
                 <!-- Nom d'utilisateur -->
                 <div class="form-group">
                     <label for="username">Nom d'utilisateur</label>
-                    <input type="text" class="form-control" id="username" placeholder="Entrez votre nom d'utilisateur" required>
+                    <input type="text" class="form-control" id="username" placeholder="Entrez votre nom d'utilisateur" name="username" required>
                 </div>
 
                 <!-- Mot de passe -->
                 <div class="form-group">
                     <label for="password">Mot de passe</label>
-                    <input type="password" class="form-control" id="password" placeholder="Entrez votre mot de passe" required>
+                    <input type="password" class="form-control" id="password" placeholder="Entrez votre mot de passe" name="password" required>
                 </div>
 
                 <!-- Case à cocher pour accepter les CGU et CGV -->
