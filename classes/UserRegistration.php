@@ -7,14 +7,14 @@ class UserRegistration {
     }
 
     // Méthode pour l'inscription d'un utilisateur
-    public function registerUser($fullName, $email, $password) {
+    public function registerUser($username, $email, $password) {
         try {
             // Hacher le mot de passe
             $hashedPassword = password_hash($password, PASSWORD_DEFAULT);
 
-            $sql = "INSERT INTO users (fullname, email, password) VALUES (:fullName, :email, :password)";
+            $sql = "INSERT INTO users (username, email, password) VALUES (:username, :email, :password)";
             $stmt = $this->con->prepare($sql);
-            $stmt->bindParam(':fullName', $fullName);
+            $stmt->bindParam(':username', $username);
             $stmt->bindParam(':email', $email);
             $stmt->bindParam(':password', $hashedPassword);
             $stmt->execute();
@@ -24,7 +24,7 @@ class UserRegistration {
             if ($userId) {
                 session_start();
                 $_SESSION['user_id'] = $userId;
-                $_SESSION['user_fullname'] = $fullName;
+                $_SESSION['user_username'] = $username;
 
                 return true;
             }
@@ -58,13 +58,14 @@ class UserRegistration {
     }
 
     // Méthode pour mettre à jour les informations du profil utilisateur
-    public function updateUserProfile($userId, $profileTitle, $bio, $url, $phone, $location) {
+    public function updateUserProfile($userId,$fullname, $profileTitle, $bio, $url, $phone, $location) {
         try {
             $sql = "UPDATE users 
-                    SET profileTitle = :profileTitle, bio = :bio, url = :url, phone = :phone, location = :location
+                    SET fullname = :fullname, profileTitle = :profileTitle, bio = :bio, url = :url, phone = :phone, location = :location
                     WHERE id = :userId";
             $stmt = $this->con->prepare($sql);
 
+            $stmt->bindParam(':fullname', $fullname);
             $stmt->bindParam(':profileTitle', $profileTitle);
             $stmt->bindParam(':bio', $bio);
             $stmt->bindParam(':url', $url);

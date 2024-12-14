@@ -10,12 +10,12 @@ $con = $database->getConnection();
 // Vérifier si le formulaire a été soumis
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     // Récupérer les données du formulaire
-    $fullName = htmlspecialchars(trim($_POST['fullName'] ?? ''));
+    $username = htmlspecialchars(trim($_POST['username'] ?? ''));
     $email = htmlspecialchars(trim($_POST['email'] ?? ''));
     $password = htmlspecialchars(trim($_POST['password'] ?? ''));
 
     // Vérifier si tous les champs sont remplis
-    if (empty($fullName) || empty($email) || empty($password)) {
+    if (empty($username) || empty($email) || empty($password)) {
         echo "Tous les champs sont obligatoires.";
         exit;
     }
@@ -30,7 +30,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $user = new UserRegistration($con);
 
     // Inscription de l'utilisateur
-    if ($user->registerUser($fullName, $email, $password)) {
+    if ($user->registerUser($username, $email, $password)) {
         echo "<script>
             document.addEventListener('DOMContentLoaded', function() {
                 Swal.fire({
@@ -213,8 +213,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     <form action="register.php" method="POST">
                         <!-- Nom -->
                         <div class="form-group">
-                            <label for="fullName">Nom d'utilisateur</label>
-                            <input type="text" class="form-control" id="fullName" name="fullName" placeholder="Entrez votre nom d'utilisateur" required>
+                            <label for="username">Nom d'utilisateur</label>
+                            <input type="text" class="form-control" id="username" name="username" placeholder="Entrez votre nom d'utilisateur" required>
                             <small class="form-text">Votre pseudonyme sera visible auprès des autres utilisateurs.</small>
                         </div>
 

@@ -58,6 +58,7 @@
 
     // Traitement du formulaire pour la mise à jour du profil
     if ($formId === 'update_profile') {
+      $fullname = $_POST['fullname'] ?? '';
       $profileTitle = $_POST['profileTitle'] ?? '';
       $bio = $_POST['bio'] ?? '';
       $url = $_POST['url'] ?? '';
@@ -65,11 +66,11 @@
       $location = $_POST['location'] ?? '';
 
       // Vérifier si toutes les informations nécessaires sont présentes
-      if ($userId && $profileTitle && $bio && $url && $phone && $location) {
+      if ($userId && $fullname && $profileTitle && $bio && $url && $phone && $location) {
           $userRegistration = new UserRegistration($con);
 
           // Appeler la méthode pour mettre à jour le profil de l'utilisateur
-          if ($userRegistration->updateUserProfile($userId, $profileTitle, $bio, $url, $phone, $location)) {
+          if ($userRegistration->updateUserProfile($userId,$fullname ,$profileTitle, $bio, $url, $phone, $location)) {
             echo "<script>
                 document.addEventListener('DOMContentLoaded', function() {
                     Swal.fire({
@@ -270,7 +271,7 @@
                   <input type="hidden" name="form_id" value="update_profile">
                   <div class="form-group">
                     <label for="fullName">Nom Prénom</label>
-                    <input type="text" class="form-control" id="fullName" aria-describedby="fullNameHelp" placeholder="Enter your fullname" value="<?php echo htmlspecialchars($fullName); ?>">
+                    <input type="text" class="form-control" id="fullName" name="fullname" aria-describedby="fullNameHelp" placeholder="Enter your fullname" value="<?php echo htmlspecialchars($fullName); ?>">
                     <small id="fullNameHelp" class="form-text text-muted">Seul votre pseudonyme sera visible publiquement, votre nom et prénom resterons privé.</small>
                   </div>
 				          <div class="form-group">
