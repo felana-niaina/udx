@@ -32,6 +32,17 @@ $(document).ready(function() {
             return caption;
         }
     });
+
+    /* $(document).on('click', '.see-market-image', function(e){
+        let id = $(this).attr('id').split('-')[1];
+        console.log(e, id)
+      });
+
+      $(document).on('click', '.contact-product-owner', function(e){
+        let id = $(this).attr('id').split('-')[1];
+        console.log(e, id)
+      }); */
+
 })
 function loadImage(src, className){
     let image = $("<img>");
@@ -57,4 +68,29 @@ function increaseLinkClicks(linkId, url){
             }
             window.location.href = url;
         })
+}
+
+function getProductPictures(productId) {
+    $.post("ajax/productInfo.php", {productId: productId})
+    .done(function(result) {
+        if(result !== ""){
+            let product = JSON.parse(result);
+            console.log(product)
+            $("#productDetailTitle").text(product.title);
+            $("#productDetailPrice").text(product.price + " €");
+            $("#productDetailDescription").html(product.description);
+            $("#productDetailModal").modal('show');
+            return;
+        }
+    })
+}
+
+function contactProductOwner(ownerId) {
+    $.post("ajax/updateLinkCount.php", {ownerId: ownerId})
+    .done(function(result) {
+        if(result !== ""){
+            alert(result)
+            return;
+        }
+    })
 }

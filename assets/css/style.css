@@ -263,3 +263,25 @@ a .pageNumber {
         background-position: 200% center;
     }
 }
+
+li>a {
+    color: #919191;
+}
+.modal-title, #productDetailTitle {
+    font-size: 1.25rem;
+    color: #212529;
+    font-weight: 500;
+}
+#productDetailPrice {
+    font-size: 0.9rem;
+    color: #28a745;
+    font-weight: bold;
+}
+#productDetailDescription {
+    font-size: 0.9rem;
+    color: #212529;
+}
+.response-box>h6 {
+    font-size: 1.25rem;
+    color: #212529;
+}

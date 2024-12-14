@@ -88,6 +88,51 @@ class UserRegistration {
         }
     }
 
+    // Méthode pour mettre à jour le userName
+    public function updateUserName($userId, $userName){
+        try {
+            $sql = "UPDATE users 
+                    SET username = :username 
+                    WHERE id = :userId";
+            $stmt = $this->con->prepare($sql);
+
+            $stmt->bindParam(':username', $userName);
+            $stmt->bindParam(':userId', $userId);
+
+            // Exécuter la requête d'update
+            $stmt->execute();
+            // Vérifier si des lignes ont été mises à jour
+            if ($stmt->rowCount() > 0) {
+                return true;
+            }
+            return false;
+        } catch (PDOException $e) {
+            echo "Erreur lors de la mise à jour du nom d'utilisateur : " . $e->getMessage();
+            return false;
+        }
+    }
+
+    // Méthode pour supprimer un utilisateur
+    public function removeUser($userId){
+        try {
+            $sql = "DELETE from users 
+                    WHERE id = :userId";
+            $stmt = $this->con->prepare($sql);
+            $stmt->bindParam(':userId', $userId);
+
+            // Exécuter la requête de suppression
+            $stmt->execute();
+            // Vérifier si des lignes ont été mises à jour
+            if ($stmt->rowCount() > 0) {
+                return true;
+            }
+            return false;
+        } catch (PDOException $e) {
+            echo "Erreur lors de la suppression du compte : " . $e->getMessage();
+            return false;
+        }
+    }
+
     function resetProfileInfo($userId) {
         try {
             $sql = "UPDATE users SET profileTitle = '', bio = '', url = '', phone = '', location = '' WHERE id = :userId";
@@ -100,5 +145,6 @@ class UserRegistration {
             echo "Erreur lors de la réinitialisation du profil : " . $e->getMessage();
         }
     }
+    
 }
 ?>
