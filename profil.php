@@ -13,13 +13,15 @@ $userRegistration = new UserRegistration($con);
 $PostsResultsProvider = new PostsResultsProvider($con);
 $userId = $_SESSION['user_id']; // ID de l'utilisateur connecté
 $userInfo = $userRegistration->getUserInfo($userId);
+$coverPhoto = is_null($userInfo['cover_photo']) ? 'uploads/default_cover.jpg' : $userInfo['cover_photo'];
+$coverPhoto = 'http://'.$_SERVER['SERVER_NAME'] .'/udx/'. $coverPhoto;
 
 // Vérifiez si un fichier est envoyé
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     // Vérifier quel formulaire a été soumis
     $formId = $_POST['form_id'] ?? '';
 
-    if (isset($_FILES['cover_photo'])) {
+    if (isset($_FILES['cover_photo']) ) {
         // Appeler la méthode pour mettre à jour la photo
         $coverPhotoFile = $_FILES['cover_photo'];
         $result = $userRegistration->updateCoverPhoto($userId, $coverPhotoFile);
@@ -347,10 +349,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             <div class="card">
                 <div class="card-header profile-header">
                     <!-- Cover photo -->
-                    <div class="cover-photo" id="cover-photo" style="background-image: url('uploads/default_cover.jpg');">
-                        <!-- Input file caché -->
-                        <input type="file" id="cover-photo-input" accept="image/*" style="display: none;" name="cover_photo">
-
+                    <div class="cover-photo" id="cover-photo" style='background-image: url(<?php echo $coverPhoto ?>);'>
                         <!-- Bouton de modification avec icône -->
                         <button class="edit-cover-photo" id="edit-cover-photo-btn" type="button">
                             <i class="fas fa-camera"></i>
@@ -516,6 +515,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             };
             reader.readAsDataURL(file);
         }
+        document.getElementById("cover-photo-form").style.display = "block";
     });
 </script>
 
