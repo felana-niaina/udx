@@ -161,5 +161,26 @@ class MarketplaceResultsProvider {
             return 0;
         }
     }
+
+    public function createProduct($userId, $name, $description, $price, $tags){
+        try {
+            $sql = "INSERT INTO marketplace (title, description, price, keywords, userId) VALUES (:title, :description, :price, :keywords, :userId)";
+            $stmt = $this->con->prepare($sql);
+            $stmt->bindParam(':title', $name);
+            $stmt->bindParam(':description', $description);
+            $stmt->bindParam(':price', $price);
+            $stmt->bindParam(':keywords', $tags);
+            $stmt->bindParam(':userId', $userId);
+            $stmt->execute();
+            $productId = $this->con->lastInsertId();
+            if ($productId) {
+                return true;
+            }
+            return false;
+        } catch (PDOException $e) {
+            echo "Erreur lors de l'enregistrement : " . $e->getMessage();
+            return false;
+        }
+    }
 }
 ?>

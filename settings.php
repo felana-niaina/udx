@@ -45,6 +45,7 @@
   if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     // Vérifier quel formulaire a été soumis
     $formId = $_POST['form_id'] ?? '';
+    // var_dump($_POST); die();
 
     if (isset($_POST['reset_changes'])) {
         // Si le bouton "Reset Changes" a été soumis, gérer la réinitialisation
@@ -68,30 +69,50 @@
       $location = $_POST['location'] ?? '';
 
       // Vérifier si toutes les informations nécessaires sont présentes
-      // if ($userId && $fullname && $profileTitle && $bio && $url && $phone && $location) {
-          $userRegistration = new UserRegistration($con);
-          // Appeler la méthode pour mettre à jour le profil de l'utilisateur
-          if ($userRegistration->updateUserProfile($userId,$fullname ,$profileTitle, $bio, $url, $phone, $location)) {
-            echo "<script>
-                document.addEventListener('DOMContentLoaded', function() {
-                    Swal.fire({
-                        title: 'Succès',
-                        text: 'Profil mis à jour !',
-                        icon: 'success',
-                        confirmButtonText: 'OK'
-                    }).then((result) => {
-                        if (result.isConfirmed) {
-                            window.location.href = 'settings.php';
-                        }
-                    });
+      $userRegistration = new UserRegistration($con);
+      // Appeler la méthode pour mettre à jour le profil de l'utilisateur
+      if ($userRegistration->updateUserProfile($userId,$fullname ,$profileTitle, $bio, $url, $phone, $location)) {
+        echo "<script>
+            document.addEventListener('DOMContentLoaded', function() {
+                Swal.fire({
+                    title: 'Succès',
+                    text: 'Profil mis à jour !',
+                    icon: 'success',
+                    confirmButtonText: 'OK'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        window.location.href = 'settings.php';
+                    }
                 });
-            </script>";
-          } else {
-              echo "Échec de la mise à jour du profil.";
-          }
-      // }
+            });
+        </script>";
+      } else {
+          echo "Échec de la mise à jour du profil.";
+      }
+    }
+
+    elseif ($formId === 'newProduct') {
+      if($userId && $_POST['productName'] && $_POST['productDescription'] && $_POST['productPrice'] && $_POST['productTags']) {
+        $MarketplaceResultsProvider = new MarketplaceResultsProvider($con);
+        if ($MarketplaceResultsProvider->createProduct($userId,$_POST['productName'], $_POST['productDescription'], $_POST['productPrice'], $_POST['productTags'])) {
+          echo "<script>
+              document.addEventListener('DOMContentLoaded', function() {
+                  Swal.fire({
+                      title: 'Succès',
+                      text: 'Nouveau produit ajouté',
+                      icon: 'success',
+                      confirmButtonText: 'OK'
+                  }).then((result) => {
+                      if (result.isConfirmed) {
+                          window.location.href = 'settings.php';
+                      }
+                  });
+              });
+          </script>";
+        }
+      }
+    }
   }
-}
 
 ?>
 
@@ -659,7 +680,7 @@
           </div>
       </div>
 
-      <!-- Modal pour poster une nouvelle annonce -->
+      <!-- Modal pour poster un nouveau produit -->
       <div class="modal fade" id="postProductModal" tabindex="-1" role="dialog" aria-labelledby="postProductModalLabel" aria-hidden="true">
         <div class="modal-dialog" role="document">
           <div class="modal-content">
@@ -671,29 +692,29 @@
             </div>
             <div class="modal-body">
               <form id="postProductForm" method="post" enctype="multipart/form-data">
-                <input type="hidden" name="newProduct">
+                <input type="hidden" name="form_id" value="newProduct">
                 <!-- Titre -->
                 <div class="form-group">
                     <label for="title">Titre</label>
-                    <input type="text" class="form-control" id="title" placeholder="Titre de l'annonce" required>
+                    <input type="text" class="form-control" id="title" placeholder="Titre de l'annonce" name="productName" required>
                 </div>
 
                 <!-- Description -->
                 <div class="form-group">
                     <label for="description">Description</label>
-                    <textarea class="form-control" id="description" rows="3" placeholder="Description de l'article" required></textarea>
+                    <textarea class="form-control" id="description" rows="3" placeholder="Description de l'article" name="productDescription" required></textarea>
                 </div>
 
                 <!-- Prix -->
                 <div class="form-group">
                     <label for="price">Prix</label>
-                    <input type="text" class="form-control" id="price" placeholder="Prix de l'article" required>
+                    <input type="text" class="form-control" id="price" placeholder="Prix de l'article" name="productPrice" required>
                 </div>
 
                 <!-- Mots-clés -->
                 <div class="form-group">
                     <label for="keywords">Mots-clés</label>
-                    <input type="text" class="form-control" id="keywords" placeholder="Mots-clés pour l'article" required>
+                    <input type="text" class="form-control" id="keywords" placeholder="Mots-clés pour l'article" name="productTags" required>
                 </div>
 
                 <button type="submit" class="btn btn-primary">Poster l'annonce</button>
@@ -827,13 +848,6 @@
         $('#productDescription').text(description);
         $('#productDate').text(date);
         $('#productImage').attr('src', image);
-      });
-
-      $('#postProductForm').submit(function(e) {
-        e.preventDefault(); // Empêcher la soumission réelle du formulaire
-        var data = new FormData($("#postProductForm")[0]);
-        console.log(data)
-        // $('#postProductModal').modal('hide'); // Fermer le modal après soumission
       });
 
       $(document).on('click', '.post-item', function(e){
