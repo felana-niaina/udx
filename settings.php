@@ -567,7 +567,7 @@
               <h6>SECURITY SETTINGS</h6>
               <hr>
               <form  method="post">
-              <input type="hidden" name="form_id" value="changePassword">
+                <input type="hidden" name="form_id" value="changePassword">
                 <div class="form-group">
                   <label class="d-block">Change Password</label>
                   <input type="password" class="form-control" name="currentPassword" placeholder="Enter your old password" required>

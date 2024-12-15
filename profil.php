@@ -2,37 +2,91 @@
  session_start();
 include_once 'classes/DatabaseConnector.php';
 include_once 'classes/UserRegistration.php';
+include_once 'classes/MarketplaceResultsProvider.php';
+include_once 'classes/PostsResultsProvider.php';
 
 // Créer une instance de la classe DatabaseConnector
 $database = new DatabaseConnector();
 $con = $database->getConnection();
 
 $userRegistration = new UserRegistration($con);
+$PostsResultsProvider = new PostsResultsProvider($con);
 $userId = $_SESSION['user_id']; // ID de l'utilisateur connecté
+$userInfo = $userRegistration->getUserInfo($userId);
 
 // Vérifiez si un fichier est envoyé
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['cover_photo'])) {
-    // Appeler la méthode pour mettre à jour la photo
-    $coverPhotoFile = $_FILES['cover_photo'];
-    $result = $userRegistration->updateCoverPhoto($userId, $coverPhotoFile);
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    // Vérifier quel formulaire a été soumis
+    $formId = $_POST['form_id'] ?? '';
 
-    if ($result) {
-        echo "<script>
-                document.addEventListener('DOMContentLoaded', function() {
-                    Swal.fire({
-                        title: 'Succès',
-                        text: 'Photo de couverture mise à jour !',
-                        icon: 'success',
-                        confirmButtonText: 'OK'
-                    }).then((result) => {
-                        if (result.isConfirmed) {
-                            window.location.href = 'profil.php';
-                        }
+    if (isset($_FILES['cover_photo'])) {
+        // Appeler la méthode pour mettre à jour la photo
+        $coverPhotoFile = $_FILES['cover_photo'];
+        $result = $userRegistration->updateCoverPhoto($userId, $coverPhotoFile);
+
+        if ($result) {
+            echo "<script>
+                    document.addEventListener('DOMContentLoaded', function() {
+                        Swal.fire({
+                            title: 'Succès',
+                            text: 'Photo de couverture mise à jour !',
+                            icon: 'success',
+                            confirmButtonText: 'OK'
+                        }).then((result) => {
+                            if (result.isConfirmed) {
+                                window.location.href = 'profil.php';
+                            }
+                        });
                     });
-                });
-            </script>";
-    } else {
-        echo "Échec de la mise à jour de la photo de couverture.";
+                </script>";
+        } else {
+            echo "Échec de la mise à jour de la photo de couverture.";
+        }
+    }
+
+    // Publication d'un nouveau post
+    elseif ($formId === 'publishPost') {
+        if($userId && $_POST['postTitle'] && $_POST['postDescription'] && $_POST['postCategory']) {
+            if ($PostsResultsProvider->createPost($userId,$_POST['postTitle'], $_POST['postDescription'], $_POST['postCategory'])) {
+              echo "<script>
+                  document.addEventListener('DOMContentLoaded', function() {
+                      Swal.fire({
+                          title: 'Succès',
+                          text: 'Nouveau post ajouté',
+                          icon: 'success',
+                          confirmButtonText: 'OK'
+                      }).then((result) => {
+                          if (result.isConfirmed) {
+                              window.location.href = 'profil.php';
+                          }
+                      });
+                  });
+              </script>";
+            }
+        }
+    }
+
+    // Publication d'un nouveau produit
+    elseif ($formId === 'publishProduct') {
+        if($userId && $_POST['productName'] && $_POST['productDescription'] && $_POST['productPrice'] && $_POST['productTags']) {
+            $MarketplaceResultsProvider = new MarketplaceResultsProvider($con);
+            if ($MarketplaceResultsProvider->createProduct($userId,$_POST['productName'], $_POST['productDescription'], $_POST['productPrice'], $_POST['productTags'])) {
+              echo "<script>
+                  document.addEventListener('DOMContentLoaded', function() {
+                      Swal.fire({
+                          title: 'Succès',
+                          text: 'Nouveau produit ajouté',
+                          icon: 'success',
+                          confirmButtonText: 'OK'
+                      }).then((result) => {
+                          if (result.isConfirmed) {
+                              window.location.href = 'settings.php';
+                          }
+                      });
+                  });
+              </script>";
+            }
+        }
     }
 }
 
@@ -313,8 +367,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['cover_photo'])) {
 
                     <!-- Profile picture -->
                     <img src="https://via.placeholder.com/150" alt="User Profile Picture">
-                    <h3>Pseudo</h3><br>
-                    <p>A front-end developer focused on user interface design</p>
+                    <h3><?php echo $userInfo['username']; ?></h3><br>
+                    <p><?php echo $userInfo['profileTitle']; ?></p>
 
                     <!-- Buttons Container (Send Message & Follow) -->
                     <div class="buttons-container">
@@ -330,32 +384,63 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['cover_photo'])) {
                 <!-- Formulaires pour Poster un message et Vendre un article juste avant la Biographie -->
                 <div id="post-form" class="form-group" style="display:none;">
                     <h4>Publier un post</h4>
-					 <input type="text" class="form-control" placeholder="Titre du post" id="post-title">
-                    <textarea class="form-control" rows="4" placeholder="Description du post"></textarea>
-                    <button class="btn btn-primary mt-2">Publier</button>
+                    <form action="profil.php" method="post">
+                        <input type="hidden" name="form_id" value="publishPost">
+                        <div class="form-group">
+                            <input type="text" class="form-control" placeholder="Titre du post" id="post-title" name="postTitle" required>
+                        </div>
+                        <div class="form-group">
+                            <textarea class="form-control" rows="4" placeholder="Description du post" name="postDescription" required></textarea>
+                        </div>
+                        <div class="form-group row">
+                            <label for="postCategory" class="col-sm-2 col-form-label">Catégorie du post</label>
+                            <div class="col-sm-10">
+                                <select id="postCategory" class="form-control" name="postCategory" required>
+                                    <?php foreach ($PostsResultsProvider->getPostCategories() as $key => $value) { ?>
+                                        <option value="<?php echo $value['id'] ?>"><?php echo $value['title'] ?></option>
+                                    <?php } ?>
+                                </select>
+                            </div>
+                        </div>
+                        <button type="submit" class="btn btn-primary mt-2">Publier</button>
+                    </form>
                 </div>
 
                 <div id="sale-form" class="form-group" style="display:none;">
                     <h4>Vendre un produit</h4>
-                    <input type="text" class="form-control" placeholder="Titre du produit" id="item-title">
-                    <textarea class="form-control mt-2" rows="4" placeholder="Description du produit" id="item-description"></textarea>
-                    <input type="number" class="form-control mt-2" id="item-price" placeholder="Prix">
-                    <input type="file" class="form-control-file mt-2" id="item-image">
-                    <button class="btn btn-success mt-2">Publier</button>
+                    <form action="profil.php" method="post">
+                        <input type="hidden" name="form_id" value="publishProduct">
+                        <div class="form-group">
+                            <input type="text" class="form-control" placeholder="Titre du produit" name="productName" required>
+                        </div>
+                        <div class="form-group">
+                            <textarea class="form-control mt-2" rows="4" placeholder="Description du produit" name="productDescription"  required></textarea>
+                        </div>
+                        <div class="form-group">
+                            <input type="number" class="form-control mt-2" placeholder="Prix" name="productPrice"  required>
+                        </div>
+                        <div class="form-group">
+                            <input type="text" class="form-control mt-2" placeholder="Tags" name="productTags"  required>
+                        </div>
+                        <div class="form-group">
+                            <input type="file" class="form-control-file mt-2" name="productPicture" required>
+                        </div>
+                        <button class="btn btn-success mt-2">Publier</button>
+                    </form>
                 </div>
 
                 <div class="card-body profile-info">
                     <div class="info-item">
                         <h6>Biography</h6>
-                        <p>A front-end developer who specializes in creating engaging user interfaces and seamless user experiences. Passionate about building intuitive and accessible web applications.</p>
+                        <p><?php echo $userInfo['bio']; ?></p>
                     </div>
                     <div class="info-item">
                         <h6>Location</h6>
-                        <p>Bay Area, San Francisco, CA</p>
+                        <p><?php echo $userInfo['location']; ?></p>
                     </div>
                     <div class="info-item">
                         <h6>Website</h6>
-                        <p><a href="http://benije.ke/pozzivkij" target="_blank">benije.ke/pozzivkij</a></p>
+                        <p><a href="<?php echo $userInfo['url']; ?>" target="_blank"><?php echo $userInfo['url']; ?></a></p>
                     </div>
 
                     <!-- Followers Section -->

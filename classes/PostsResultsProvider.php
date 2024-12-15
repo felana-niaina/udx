@@ -146,5 +146,36 @@ class PostsResultsProvider {
         $dots = strlen($string) > $characterLimit ? "..." : "";
         return substr($string, 0, $characterLimit) . $dots;
     }
+
+    public function createPost($userId, $postTitle, $postDescription, $postCategory){
+        try {
+            $sql = "INSERT INTO posts (title, description, userId, categoryId) VALUES (:title, :description, :userId, :categoryId)";
+            $stmt = $this->con->prepare($sql);
+            $stmt->bindParam(':title', $postTitle);
+            $stmt->bindParam(':description', $postDescription);
+            $stmt->bindParam(':userId', $userId);
+            $stmt->bindParam(':categoryId', $postCategory);
+            $stmt->execute();
+            $postId = $this->con->lastInsertId();
+            if ($postId) {
+                return true;
+            }
+            return false;
+        } catch (PDOException $e) {
+            echo "Erreur lors de l'enregistrement : " . $e->getMessage();
+            return false;
+        }
+    }
+
+    public function getPostCategories(){
+        try {
+            $query = $this->con->prepare("SELECT * FROM category");
+            $query->execute();
+            return $query->fetchAll();
+        } catch (PDOException $e) {
+            echo "Erreur lors de la récupération des catégories : " . $e->getMessage();
+            return [];
+        }
+    }
 }
 ?>
