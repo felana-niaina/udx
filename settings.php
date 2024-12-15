@@ -94,8 +94,9 @@
     // Ajout nouveau produit dans marketplace
     elseif ($formId === 'newProduct') {
       if($userId && $_POST['productName'] && $_POST['productDescription'] && $_POST['productPrice'] && $_POST['productTags']) {
+        $productPicture = isset($_FILES['productPicture']) ? $_FILES['productPicture'] : NULL;
         $MarketplaceResultsProvider = new MarketplaceResultsProvider($con);
-        if ($MarketplaceResultsProvider->createProduct($userId,$_POST['productName'], $_POST['productDescription'], $_POST['productPrice'], $_POST['productTags'])) {
+        if ($MarketplaceResultsProvider->createProduct($userId,$_POST['productName'], $_POST['productDescription'], $_POST['productPrice'], $_POST['productTags'], $productPicture)) {
           echo "<script>
               document.addEventListener('DOMContentLoaded', function() {
                   Swal.fire({
@@ -781,7 +782,9 @@
                     <label for="keywords">Mots-clés</label>
                     <input type="text" class="form-control" id="keywords" placeholder="Mots-clés pour l'article" name="productTags" required>
                 </div>
-
+                <div class="form-group">
+                  <input type="file" class="form-control-file mt-2" name="productPicture"  accept="image/*" required>
+                </div>
                 <button type="submit" class="btn btn-primary">Poster l'annonce</button>
               </form>
             </div>

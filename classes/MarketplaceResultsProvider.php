@@ -125,6 +125,7 @@ class MarketplaceResultsProvider {
             $query->execute([
                 'userId' => $userId
             ]);
+            $siteUrl = 'http://'.$_SERVER['SERVER_NAME'] .'/udx/';
 
             $resultsHtml = "<div class='row'>";
             while ($row = $query->fetch(PDO::FETCH_ASSOC)) {
@@ -132,7 +133,7 @@ class MarketplaceResultsProvider {
                 $title = $row["title"];
                 $description = $row["description"];
                 $price = $row["price"] . " €";
-                $image = "https://via.placeholder.com/150";
+                $image = is_null($row['picture']) || $row['picture'] == '' ? "https://via.placeholder.com/150" : $siteUrl. $row['picture'];
                 $date = $row["createdDate"];
 
                 // Truncation des champs title et description si nécessaire
@@ -162,14 +163,31 @@ class MarketplaceResultsProvider {
         }
     }
 
-    public function createProduct($userId, $name, $description, $price, $tags){
+    public function createProduct($userId, $name, $description, $price, $tags, $picture = NULL){
         try {
-            $sql = "INSERT INTO marketplace (title, description, price, keywords, userId) VALUES (:title, :description, :price, :keywords, :userId)";
+            $targetFile = '';
+            if(!is_null($picture)) {
+                if ($picture['error'] !== UPLOAD_ERR_OK) {
+                    throw new Exception("Erreur lors du téléchargement du fichier.");
+                }
+                $newImageName = time() . '_' . uniqid() . '.' . pathinfo($picture['name'], PATHINFO_EXTENSION);
+    
+                // Déplacer le fichier téléchargé dans le répertoire voulu
+                $uploadDir = 'uploads/';
+                $targetFile = $uploadDir . $newImageName;
+                
+                if (!move_uploaded_file($picture['tmp_name'], $targetFile)) {
+                    throw new Exception("Impossible de déplacer le fichier téléchargé.");
+                }
+            }
+
+            $sql = "INSERT INTO marketplace (title, description, price, keywords, picture ,userId) VALUES (:title, :description, :price, :keywords, :picture, :userId)";
             $stmt = $this->con->prepare($sql);
             $stmt->bindParam(':title', $name);
             $stmt->bindParam(':description', $description);
             $stmt->bindParam(':price', $price);
             $stmt->bindParam(':keywords', $tags);
+            $stmt->bindParam(':picture', $targetFile);
             $stmt->bindParam(':userId', $userId);
             $stmt->execute();
             $productId = $this->con->lastInsertId();

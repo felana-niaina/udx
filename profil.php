@@ -21,6 +21,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     // Vérifier quel formulaire a été soumis
     $formId = $_POST['form_id'] ?? '';
 
+    /* echo "<pre>";
+    print_r($_POST);
+    print_r($_FILES);
+    echo "</pre>"; die(); */
+
     if (isset($_FILES['cover_photo']) ) {
         // Appeler la méthode pour mettre à jour la photo
         $coverPhotoFile = $_FILES['cover_photo'];
@@ -71,8 +76,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     // Publication d'un nouveau produit
     elseif ($formId === 'publishProduct') {
         if($userId && $_POST['productName'] && $_POST['productDescription'] && $_POST['productPrice'] && $_POST['productTags']) {
+            $productPicture = isset($_FILES['productPicture']) ? $_FILES['productPicture'] : NULL;
             $MarketplaceResultsProvider = new MarketplaceResultsProvider($con);
-            if ($MarketplaceResultsProvider->createProduct($userId,$_POST['productName'], $_POST['productDescription'], $_POST['productPrice'], $_POST['productTags'])) {
+            if ($MarketplaceResultsProvider->createProduct($userId,$_POST['productName'], $_POST['productDescription'], $_POST['productPrice'], $_POST['productTags'], $productPicture)) {
               echo "<script>
                   document.addEventListener('DOMContentLoaded', function() {
                       Swal.fire({
@@ -407,7 +413,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
                 <div id="sale-form" class="form-group" style="display:none;">
                     <h4>Vendre un produit</h4>
-                    <form action="profil.php" method="post">
+                    <form action="profil.php" method="post" enctype="multipart/form-data">
                         <input type="hidden" name="form_id" value="publishProduct">
                         <div class="form-group">
                             <input type="text" class="form-control" placeholder="Titre du produit" name="productName" required>
@@ -422,7 +428,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                             <input type="text" class="form-control mt-2" placeholder="Tags" name="productTags"  required>
                         </div>
                         <div class="form-group">
-                            <input type="file" class="form-control-file mt-2" name="productPicture" required>
+                            <input type="file" class="form-control-file mt-2" name="productPicture"  accept="image/*" required>
                         </div>
                         <button class="btn btn-success mt-2">Publier</button>
                     </form>
