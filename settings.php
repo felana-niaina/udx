@@ -68,9 +68,8 @@
       $location = $_POST['location'] ?? '';
 
       // Vérifier si toutes les informations nécessaires sont présentes
-      if ($userId && $fullname && $profileTitle && $bio && $url && $phone && $location) {
+      // if ($userId && $fullname && $profileTitle && $bio && $url && $phone && $location) {
           $userRegistration = new UserRegistration($con);
-
           // Appeler la méthode pour mettre à jour le profil de l'utilisateur
           if ($userRegistration->updateUserProfile($userId,$fullname ,$profileTitle, $bio, $url, $phone, $location)) {
             echo "<script>
@@ -90,7 +89,7 @@
           } else {
               echo "Échec de la mise à jour du profil.";
           }
-      }
+      // }
   }
 }
 

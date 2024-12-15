@@ -105,7 +105,7 @@
 							<li><a href="about.html" class="nav-link" style="font-size: 15px;">Mentions légales</a></li>
                             <li><a href="cgu.html" class="nav-link" style="font-size: 15px;">Conditions d'usages</a></li>
                             <?php if($isUserConnected) : ?>
-                            <li><a href="index.php" class="nav-link" style="font-size: 15px;">Se déconnecter</a></li>
+                            <li><a href="logout.php" class="nav-link" style="font-size: 15px;">Se déconnecter</a></li>
                             <?php endif ?>
                         </ul>
                     </nav>
