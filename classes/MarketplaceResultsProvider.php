@@ -141,13 +141,13 @@ class MarketplaceResultsProvider {
 
                 // Ajouter le résultat au HTML
 				$resultsHtml .= "<div class='col-md-6'>
-                <div class='product-item' data-toggle='modal' data-target='#productModal' data-title='$title' data-description='$description.' data-price='$price' data-image='$image' data-date='$date' data-id='$id'>
+                <div class='product-item'>
                     <img src='$image' alt='$title' class='product-image'>
                     <h5 class='product-title'>$title</h5>
                     <p class='product-price'>$price</p>
                     <p class='product-description'>$description</p>
-                    <div class='product-actions'>
-                        <a href='#'>Modifier</a> | <a href='#'>Supprimer</a>
+                    <div class='product-actions' id='actionProduct-$id'>
+                        <a href='#' class='editProduct' data-toggle='modal' data-target='#productModal' data-title='$title' data-description='$description.' data-price='$price' data-image='$image' data-date='$date' data-id='$id'>Modifier</a> | <a href='#' class='removeProductButton' data-toggle='modal' data-target='#removeProductModal' data-title='$title' data-id='$id'>Supprimer</a>
                     </div>
                 </div>
               </div>";
@@ -180,6 +180,26 @@ class MarketplaceResultsProvider {
         } catch (PDOException $e) {
             echo "Erreur lors de l'enregistrement : " . $e->getMessage();
             return false;
+        }
+    }
+
+    public function removeProduct($userId, $productId) {
+        try {
+            $sql = "DELETE from marketplace 
+                    WHERE id = :productId AND userId = :userId ";
+            $stmt = $this->con->prepare($sql);
+            $stmt->bindParam(':productId', $productId);
+            $stmt->bindParam(':userId', $userId);
+
+            // Exécuter la requête de suppression
+            $stmt->execute();
+            // Vérifier si des lignes ont été mises à jour
+            if ($stmt->rowCount() > 0) {
+                return true;
+            }
+            return false;
+        } catch (PDOException $e) {
+            echo "Erreur lors de la suppression du compte : " . $e->getMessage();
         }
     }
 }

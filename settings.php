@@ -91,6 +91,7 @@
       }
     }
 
+    // Ajout nouveau produit dans marketplace
     elseif ($formId === 'newProduct') {
       if($userId && $_POST['productName'] && $_POST['productDescription'] && $_POST['productPrice'] && $_POST['productTags']) {
         $MarketplaceResultsProvider = new MarketplaceResultsProvider($con);
@@ -112,6 +113,26 @@
         }
       }
     }
+
+    // Supprimer produit dans marketplace
+    elseif ($formId === 'removeProduct') {
+      if($userId && $_POST['product_id'] > 0) {
+        $MarketplaceResultsProvider = new MarketplaceResultsProvider($con);
+        if($MarketplaceResultsProvider->removeProduct($userId, $_POST['product_id'])) {
+          echo "<script>
+              document.addEventListener('DOMContentLoaded', function() {
+                  Swal.fire({
+                      title: 'Succès',
+                      text: 'Produit supprimé avec succès',
+                      icon: 'success',
+                      confirmButtonText: 'OK'
+                  })
+              });
+          </script>";
+        }
+      }
+    }
+
   }
 
 ?>
@@ -469,18 +490,16 @@
                 $resultsProvider = new MarketplaceResultsProvider($con);
                 echo $resultsProvider->getProductsByUser($_SESSION['user_id']);
               ?>
-              <button class="btn btn-primary mt-4" data-toggle="modal" data-target="#postProductModal">Poster une annonce</button>
+              <button class="btn btn-primary mt-4" data-toggle="modal" data-target="#newProductModal">Ajouter un produit</button>
             </div>
 
             <div class="tab-pane" id="posts">
               <h6>POSTS</h6>
               <hr>
-              <div class="list-group">
-                <?php 
-                  $resultsProvider = new PostsResultsProvider($con);
-                  echo $resultsProvider->getPostsByUser($_SESSION['user_id']);
-                ?>
-              </div>
+              <?php 
+                $resultsProvider = new PostsResultsProvider($con);
+                echo $resultsProvider->getPostsByUser($_SESSION['user_id']);
+              ?>
             </div>
 
             <div class="tab-pane" id="messages">
@@ -681,7 +700,7 @@
       </div>
 
       <!-- Modal pour poster un nouveau produit -->
-      <div class="modal fade" id="postProductModal" tabindex="-1" role="dialog" aria-labelledby="postProductModalLabel" aria-hidden="true">
+      <div class="modal fade" id="newProductModal" tabindex="-1" role="dialog" aria-labelledby="postProductModalLabel" aria-hidden="true">
         <div class="modal-dialog" role="document">
           <div class="modal-content">
             <div class="modal-header">
@@ -718,6 +737,36 @@
                 </div>
 
                 <button type="submit" class="btn btn-primary">Poster l'annonce</button>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Modal pour supprimer un produit -->
+      <div class="modal fade" id="removeProductModal" tabindex="-1" role="dialog" aria-labelledby="removeProductModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title" id="removeProductModalTitle"></h5>
+              <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+              </button>
+            </div>
+            <div class="modal-body">
+              <form id="removeProductForm" method="post">
+                <input type="hidden" name="form_id" value="removeProduct">
+                <input type="hidden" name="product_id" id="productIdValue" value="">
+                <!-- Titre -->
+                <div class="form-group text-center">
+                    <label for="title">Voulez-vous vraiment supprimer ce produit ?</label>
+                </div>
+
+                <!-- Mots-clés -->
+                <div class="form-group text-center">
+                <button type="button" data-dismiss="modal" class="btn btn-primary">Annuler</button>
+                <button type="submit" class="btn btn-danger">Confirmer</button>
+                </div>
               </form>
             </div>
           </div>
@@ -836,7 +885,7 @@
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
   <script>
     $(function(){
-      $(document).on('click', '.product-item', function(e){
+      $(document).on('click', '.editProduct', function(e){
         var title = $(this).data('title');
         var description = $(this).data('description');
         var price = $(this).data('price');
@@ -902,6 +951,14 @@
             });
           }
         });
+      });
+
+      $(document).on('click', '.removeProductButton', function(e){
+        var title = $(this).data('title');
+        var id = $(this).data('id');
+
+        $('#productIdValue').val(id);
+        $('#removeProductModalTitle').text(title);
       });
       
     })
