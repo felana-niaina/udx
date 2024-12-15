@@ -133,6 +133,48 @@
       }
     }
 
+    elseif ($formId === 'changePassword') {
+      if($userId && $_POST['currentPassword'] && $_POST['newPassword'] && $_POST['newPasswordConf'] ) {
+        if($_POST['newPassword'] !== $_POST['newPasswordConf']) {
+          echo "<script>
+              document.addEventListener('DOMContentLoaded', function() {
+                Swal.fire({
+                  icon: 'warning',
+                  title: 'Les nouveaux mots de passe ne correspondent pas',
+                  showConfirmButton: false,
+                  timer: 1500
+                });
+              });
+          </script>";
+        } else {
+          $userRegistration = new UserRegistration($con);
+          if($userRegistration->updatePassword($userId, $_SESSION['user_username'], $_POST['currentPassword'], $_POST['newPassword'])) {
+            echo "<script>
+                document.addEventListener('DOMContentLoaded', function() {
+                  Swal.fire({
+                    icon: 'success',
+                    title: 'Mot de passe modifié avec succès',
+                    showConfirmButton: false,
+                    timer: 1500
+                  });
+                });
+            </script>";
+          } else {
+            echo "<script>
+                document.addEventListener('DOMContentLoaded', function() {
+                  Swal.fire({
+                    icon: 'warning',
+                    title: 'Le mot de passe saisi est incorrect',
+                    showConfirmButton: false,
+                    timer: 1500
+                  });
+                });
+            </script>";
+          }
+        }
+      }
+    }
+
   }
 
 ?>
@@ -524,12 +566,16 @@
             <div class="tab-pane" id="security">
               <h6>SECURITY SETTINGS</h6>
               <hr>
-              <form>
+              <form  method="post">
+              <input type="hidden" name="form_id" value="changePassword">
                 <div class="form-group">
                   <label class="d-block">Change Password</label>
-                  <input type="text" class="form-control" placeholder="Enter your old password">
-                  <input type="text" class="form-control mt-1" placeholder="New password">
-                  <input type="text" class="form-control mt-1" placeholder="Confirm new password">
+                  <input type="password" class="form-control" name="currentPassword" placeholder="Enter your old password" required>
+                  <input type="password" class="form-control mt-1" name="newPassword" placeholder="New password" required>
+                  <input type="password" class="form-control mt-1" name="newPasswordConf" placeholder="Confirm new password" required>
+                </div>
+                <div class="form-group text-right">
+                  <button type="submit" class="btn btn-primary">Save</button>
                 </div>
               </form>
               <hr>

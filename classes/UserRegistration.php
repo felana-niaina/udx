@@ -204,6 +204,35 @@ class UserRegistration {
             echo "Erreur lors de la réinitialisation du profil : " . $e->getMessage();
         }
     }
+
+    public function updatePassword($userId, $username ,$currentPassword, $newPassword){
+        try {
+            $sql = "SELECT id, username, password FROM users WHERE id =:id LIMIT 1";
+            $stmt = $this->con->prepare($sql);
+            $stmt->bindParam(':id', $userId);
+            $stmt->execute();
+
+            $user = $stmt->fetch(PDO::FETCH_ASSOC);
+
+            // Vérifier si l'utilisateur existe et si le mot de passe correspond
+            if ($user && password_verify($currentPassword, $user['password']) && $user['username'] == $username ) {
+                $sql = "UPDATE users SET password = :password WHERE id = :userId";
+                $stmt = $this->con->prepare($sql);
+
+                $stmt->bindParam(':password', password_hash($newPassword, PASSWORD_DEFAULT));
+                $stmt->bindParam(':userId', $userId);
+
+                // Exécuter la requête d'update
+                $stmt->execute();
+                return true;
+            } else {
+                return false; // password incorrect
+            }
+        } catch (PDOException $e) {
+            echo "Erreur lors de la connexion : " . $e->getMessage();
+            return false;
+        }
+    }
     
 }
 ?>
