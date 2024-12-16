@@ -56,7 +56,7 @@ CREATE TABLE `marketplace` (
   `ads` tinyint(1) DEFAULT NULL,
   `picture` text NOT NULL,
   `userId` int(11) NOT NULL,
-  `createdDate` date NOT NULL DEFAULT current_timestamp()
+  `createdDate` datetime NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
@@ -73,7 +73,7 @@ CREATE TABLE `posts` (
   `clicks` int(30) NOT NULL,
   `userId` int(40) NOT NULL,
   `categoryId` int(2) NOT NULL,
-  `createdDate` date NOT NULL DEFAULT current_timestamp()
+  `createdDate` datetime NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
