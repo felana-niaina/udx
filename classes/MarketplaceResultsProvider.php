@@ -220,5 +220,39 @@ class MarketplaceResultsProvider {
             echo "Erreur lors de la suppression du compte : " . $e->getMessage();
         }
     }
+
+    public function getProductList($userId) {
+        try {
+            $query = $this->con->prepare("SELECT * 
+                                          FROM marketplace
+                                          WHERE userId = :userId
+                                        ");
+            $query->execute([
+                'userId' => $userId
+            ]);
+            return $query->fetchAll();
+
+        } catch (PDOException $e) {
+            echo "Erreur dans la requête : " . $e->getMessage();
+            return 0;
+        }
+    }
+
+    public function getProductById($productId) {
+        try {
+            $query = $this->con->prepare("SELECT * 
+                                          FROM marketplace
+                                          WHERE id = :productId
+                                        ");
+            $query->execute([
+                'productId' => $productId
+            ]);
+            return $query->fetchObject();
+
+        } catch (PDOException $e) {
+            echo "Erreur dans la requête : " . $e->getMessage();
+            return 0;
+        }
+    }
 }
 ?>

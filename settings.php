@@ -7,11 +7,13 @@
   include_once 'classes/MarketplaceResultsProvider.php';
   include_once 'classes/PostsResultsProvider.php';
   include_once 'classes/BillingResultsProvider.php'; 
+  include_once 'classes/AdsResultsProvider.php';
 
   // Créer une instance de la classe DatabaseConnector
   $database = new DatabaseConnector();
   $con = $database->getConnection();
 
+  $AdsProvider = new AdsResultsProvider($con);
   // Vérifier si l'utilisateur est connecté
   if (!isset($_SESSION['user_id'])) {
       // Si l'utilisateur n'est pas connecté, rediriger vers la page de connexion
@@ -557,8 +559,8 @@
               <h6>MARKETPLACE</h6>
               <hr>
               <?php 
-                $resultsProvider = new MarketplaceResultsProvider($con);
-                echo $resultsProvider->getProductsByUser($_SESSION['user_id']);
+                $marketPlaceProvider = new MarketplaceResultsProvider($con);
+                echo $marketPlaceProvider->getProductsByUser($_SESSION['user_id']);
               ?>
               <button class="btn btn-primary mt-4" data-toggle="modal" data-target="#newProductModal">Ajouter un produit</button>
             </div>
@@ -567,8 +569,8 @@
               <h6>POSTS</h6>
               <hr>
               <?php 
-                $resultsProvider = new PostsResultsProvider($con);
-                echo $resultsProvider->getPostsByUser($_SESSION['user_id']);
+                $postsProvider = new PostsResultsProvider($con);
+                echo $postsProvider->getPostsByUser($_SESSION['user_id']);
               ?>
             </div>
 
@@ -704,23 +706,23 @@
               <form>
                 <div class="form-group">
                   <label for="adType">Type de publicité</label>
-                  <select class="form-control" id="adType">
-                      <option value="display">Publicité Search</option>
-                      <option value="video">Publicité Marketplace</option>
+                  <select class="form-control" id="adType" name="adsTypeId">
+                    <?php foreach ($AdsProvider->getAdsType() as $key => $value) { ?>
+                      <option value="<?php echo $value['id'] ?>"><?php echo $value['title'] ?></option>
+                    <?php } ?>
                   </select>
                   <small id="adTypeHelp" class="form-text text-muted">Sélectionnez le type de publicité que vous souhaitez utiliser.</small>
                 </div>
                 <div class="form-group">
                   <label for="targeting">Contenue</label>
-                  <select class="form-control" id="targeting">
-                      <option value="location">Mon annonce marketplace</option>
-                      <option value="age">Mon site internet</option>
+                  <select class="form-control" id="targeting" name="contentId">
+                      <option value="">-</option>
                   </select>
                   <small id="targetingHelp" class="form-text text-muted">Sélectionnez votre méthode de ciblage.</small>
                 </div>
                 <div class="form-group">
                   <label for="dailyBudget">Budget quotidien</label>
-                  <select class="form-control" id="dailyBudget">
+                  <select class="form-control" id="dailyBudget" name="budget">
                       <option value="10">10€</option>
                       <option value="20">20€</option>
                       <option value="50">50€</option>
@@ -1037,6 +1039,16 @@
         $('#productIdValue').val(id);
         $('#removeProductModalTitle').text(title);
       });
+
+      $(document).on('change', '#adType', function(e){
+        let url = ($(this).val() == 1) ? "ajax/postInfo.php" : "ajax/productInfo.php";
+        $.post(url, {
+          listProduct: true
+        }).done(function(result){
+          let data = JSON.parse(result);
+          
+        });
+      })
       
     })
   </script>
