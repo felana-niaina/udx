@@ -59,7 +59,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                   document.addEventListener('DOMContentLoaded', function() {
                       Swal.fire({
                           title: 'Succès',
-                          text: 'Nouveau post ajouté',
+                          text: 'Votre post a bien été publié !',
                           icon: 'success',
                           confirmButtonText: 'OK'
                       }).then((result) => {
@@ -83,7 +83,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                   document.addEventListener('DOMContentLoaded', function() {
                       Swal.fire({
                           title: 'Succès',
-                          text: 'Nouveau produit ajouté',
+                          text: 'Votre produit a bien été publié !',
                           icon: 'success',
                           confirmButtonText: 'OK'
                       }).then((result) => {

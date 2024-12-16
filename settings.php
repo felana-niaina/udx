@@ -5,7 +5,8 @@
   include_once 'classes/DatabaseConnector.php';
   include_once 'classes/UserRegistration.php';
   include_once 'classes/MarketplaceResultsProvider.php';
-  include_once 'classes/PostsResultsProvider.php'; 
+  include_once 'classes/PostsResultsProvider.php';
+  include_once 'classes/BillingResultsProvider.php'; 
 
   // Créer une instance de la classe DatabaseConnector
   $database = new DatabaseConnector();
@@ -101,7 +102,7 @@
               document.addEventListener('DOMContentLoaded', function() {
                   Swal.fire({
                       title: 'Succès',
-                      text: 'Nouveau produit ajouté',
+                      text: 'Votre produit a bien été publié !',
                       icon: 'success',
                       confirmButtonText: 'OK'
                   }).then((result) => {
@@ -134,6 +135,7 @@
       }
     }
 
+    // Security, change password
     elseif ($formId === 'changePassword') {
       if($userId && $_POST['currentPassword'] && $_POST['newPassword'] && $_POST['newPasswordConf'] ) {
         if($_POST['newPassword'] !== $_POST['newPasswordConf']) {
@@ -172,6 +174,31 @@
                 });
             </script>";
           }
+        }
+      }
+    }
+
+    // Add billing method
+    elseif ($formId === 'billingMethod') {
+      if($userId && $_POST['cardHolder'] && $_POST['cardNumber'] && $_POST['expirationDate'] && $_POST['cvv']) {
+        $BillingResultsProvider = new BillingResultsProvider($con);
+        $expirationDate = new DateTime($_POST['expirationDate']);
+        $expirationDate->modify('last day of this month');
+        if ($BillingResultsProvider->createBillingMethohd($userId,$_POST['cardHolder'], $_POST['cardNumber'], $expirationDate->format('Y-m-d'), $_POST['cvv'])) {
+          echo "<script>
+              document.addEventListener('DOMContentLoaded', function() {
+                  Swal.fire({
+                      title: 'Succès',
+                      text: 'Votre méthode de paiement a bien été ajoutée !',
+                      icon: 'success',
+                      confirmButtonText: 'OK'
+                  }).then((result) => {
+                      if (result.isConfirmed) {
+                          window.location.href = 'settings.php';
+                      }
+                  });
+              });
+          </script>";
         }
       }
     }
@@ -864,30 +891,31 @@
               </button>
             </div>
             <div class="modal-body">
-              <form>
+              <form method="post">
+                <input type="hidden" name="form_id" value="billingMethod">
                 <div class="form-group">
                   <label for="cardHolder">Titulaire de la carte</label>
-                  <input type="text" class="form-control" id="cardHolder" placeholder="Nom du titulaire" required>
+                  <input type="text" class="form-control" id="cardHolder" placeholder="Nom du titulaire" name="cardHolder" required>
                 </div>
                 <div class="form-group">
                   <label for="cardNumber">Numéro de la carte</label>
-                  <input type="text" class="form-control" id="cardNumber" placeholder="Numéro de carte" maxlength="16" required>
+                  <input type="text" class="form-control" id="cardNumber" placeholder="Numéro de carte" name="cardNumber" maxlength="16" required>
                 </div>
                 <div class="form-row">
                   <div class="form-group col-md-6">
                     <label for="expirationDate">Date d'expiration</label>
-                    <input type="month" class="form-control" id="expirationDate" required>
+                    <input type="month" class="form-control" id="expirationDate" name="expirationDate" required>
                   </div>
                   <div class="form-group col-md-6">
                     <label for="cvv">Cryptogramme visuel</label>
-                    <input type="text" class="form-control" id="cvv" maxlength="3" placeholder="CVV" required>
+                    <input type="text" class="form-control" id="cvv" maxlength="3" placeholder="CVV" name="cvv" required>
                   </div>
                 </div>
+                <div class="modal-footer">
+                  <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                  <button type="submit" class="btn btn-primary">Save Payment Method</button>
+                </div>
               </form>
-            </div>
-            <div class="modal-footer">
-              <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
-              <button type="submit" class="btn btn-primary">Save Payment Method</button>
             </div>
           </div>
         </div>
