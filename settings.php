@@ -13,7 +13,6 @@
   $database = new DatabaseConnector();
   $con = $database->getConnection();
 
-  $AdsProvider = new AdsResultsProvider($con);
   // Vérifier si l'utilisateur est connecté
   if (!isset($_SESSION['user_id'])) {
       // Si l'utilisateur n'est pas connecté, rediriger vers la page de connexion
@@ -23,12 +22,30 @@
 
   // Créer une instance de la classe UserRegistration
   $userRegistration = new UserRegistration($con);
+  $AdsProvider = new AdsResultsProvider($con);
+  $marketPlaceProvider = new MarketplaceResultsProvider($con);
+  $postsProvider = new PostsResultsProvider($con);
+  
 
   // Récupérer l'ID utilisateur à partir de la session
   $userId = $_SESSION['user_id'];
 
   // Récupérer les informations de l'utilisateur
   $userInfo = $userRegistration->getUserInfo($userId);
+  $userAd = $AdsProvider->getUserAd($userId);
+  if($userAd) {
+    // find ads type $userAd->adsTypeId
+    $adType = $AdsProvider->getAdType($userAd->adsTypeId);
+    if($adType->contentTable == 'posts') {
+      //get post by user
+      $contentList = $postsProvider->getPostList($userId);
+    } elseif ($adType->contentTable == 'marketplace') {
+      // get marketplace by user
+      $contentList = $marketPlaceProvider->getProductList($userId);
+    }
+  }
+
+  $userProducts = $marketPlaceProvider->getProductsByUser($_SESSION['user_id']);
 
   // Si l'utilisateur existe, on affiche les informations, sinon un message d'erreur
   if ($userInfo === null) {
@@ -192,6 +209,28 @@
                   Swal.fire({
                       title: 'Succès',
                       text: 'Votre méthode de paiement a bien été ajoutée !',
+                      icon: 'success',
+                      confirmButtonText: 'OK'
+                  }).then((result) => {
+                      if (result.isConfirmed) {
+                          window.location.href = 'settings.php';
+                      }
+                  });
+              });
+          </script>";
+        }
+      }
+    }
+
+    //edit ads configuration
+    elseif ($formId === 'configAds') {
+      if($userId && $_POST['adsTypeId'] && (int)$_POST['contentId'] > 0 && $_POST['budget']) {
+        if ($AdsProvider->addAds($userId,$_POST['adsTypeId'], $_POST['contentId'], $_POST['budget'], $_POST['ad_id'])) {
+          echo "<script>
+              document.addEventListener('DOMContentLoaded', function() {
+                  Swal.fire({
+                      title: 'Succès',
+                      text: 'Votre publicité a bien été ajoutée !',
                       icon: 'success',
                       confirmButtonText: 'OK'
                   }).then((result) => {
@@ -559,7 +598,6 @@
               <h6>MARKETPLACE</h6>
               <hr>
               <?php 
-                $marketPlaceProvider = new MarketplaceResultsProvider($con);
                 echo $marketPlaceProvider->getProductsByUser($_SESSION['user_id']);
               ?>
               <button class="btn btn-primary mt-4" data-toggle="modal" data-target="#newProductModal">Ajouter un produit</button>
@@ -569,7 +607,6 @@
               <h6>POSTS</h6>
               <hr>
               <?php 
-                $postsProvider = new PostsResultsProvider($con);
                 echo $postsProvider->getPostsByUser($_SESSION['user_id']);
               ?>
             </div>
@@ -703,30 +740,37 @@
             <div class="tab-pane" id="ads">
               <h6>ADS</h6>
               <hr>
-              <form>
+              <form method="post"> 
+                <input type="hidden" name="form_id" value="configAds">
+                <input type="hidden" name="ad_id" value="<?php echo ($userAd) ? $userAd->id : 0 ?>">
                 <div class="form-group">
                   <label for="adType">Type de publicité</label>
                   <select class="form-control" id="adType" name="adsTypeId">
                     <?php foreach ($AdsProvider->getAdsType() as $key => $value) { ?>
-                      <option value="<?php echo $value['id'] ?>"><?php echo $value['title'] ?></option>
+                      <option value="<?php echo $value['id'] ?>" <?php echo $userAd->adsTypeId == $value['id'] ? "selected" : "" ?> ><?php echo $value['title'] ?></option>
                     <?php } ?>
                   </select>
                   <small id="adTypeHelp" class="form-text text-muted">Sélectionnez le type de publicité que vous souhaitez utiliser.</small>
                 </div>
                 <div class="form-group">
-                  <label for="targeting">Contenue</label>
+                  <label for="targeting">Contenu</label>
                   <select class="form-control" id="targeting" name="contentId">
-                      <option value="">-</option>
+                    <?php if( is_null($userAd) ) { ?>
+                      <option value="" disabled selected>-- Select an option --</option>
+                    <?php } else { 
+                      foreach ($contentList as $key => $value) { ?>
+                        <option value="<?php echo $value['id'] ?>" <?php echo $userAd->contentId == $value['id'] ? "selected" : "" ?> ><?php echo $value['title'] ?></option>
+                    <?php }} ?>
                   </select>
                   <small id="targetingHelp" class="form-text text-muted">Sélectionnez votre méthode de ciblage.</small>
                 </div>
                 <div class="form-group">
                   <label for="dailyBudget">Budget quotidien</label>
                   <select class="form-control" id="dailyBudget" name="budget">
-                      <option value="10">10€</option>
-                      <option value="20">20€</option>
-                      <option value="50">50€</option>
-                      <option value="100">100€</option>
+                      <option value="10" <?php echo $userAd->budget == 10 ? "selected" : "" ?> >10€</option>
+                      <option value="20" <?php echo $userAd->budget == 20 ? "selected" : "" ?> >20€</option>
+                      <option value="50" <?php echo $userAd->budget == 50 ? "selected" : "" ?> >50€</option>
+                      <option value="100" <?php echo $userAd->budget == 100 ? "selected" : "" ?> >100€</option>
                       <option value="custom">Autre...</option>
                   </select>
                   <small id="dailyBudgetHelp" class="form-text text-muted">Sélectionnez votre budget quotidien ou choisissez "Autre" pour entrer un budget personnalisé.</small>
@@ -734,7 +778,7 @@
                 <div class="form-group small text-muted">
                   All of the fields on this page are optional and can be deleted at any time, and by filling them out, you're giving us consent to share this data wherever your user profile appears.
                 </div>
-                <button type="button" class="btn btn-primary">Valider</button>
+                <button type="submit" class="btn btn-primary">Valider</button>
                 <button type="reset" class="btn btn-light">Reset Changes</button>
               </form>
             </div>
@@ -964,6 +1008,8 @@
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
   <script>
     $(function(){
+
+      // get marketplace product and show on modal
       $(document).on('click', '.editProduct', function(e){
         var title = $(this).data('title');
         var description = $(this).data('description');
@@ -977,7 +1023,8 @@
         $('#productDate').text(date);
         $('#productImage').attr('src', image);
       });
-
+      
+      // get post data and show on modal
       $(document).on('click', '.post-item', function(e){
         var title = $(this).data('title');
         var body = $(this).data('body');
@@ -988,6 +1035,7 @@
         $('#postBody').text(body);
       });
 
+      // update username - account settings
       $(document).on('blur', '#usernameField', function(e){
         let oldUsername = "<?php echo $_SESSION['user_username'] ?>";
         if (oldUsername != $(this).val().trim()) {
@@ -995,6 +1043,7 @@
         }
       }); 
 
+      // update username - account settings
       $('#accountSetting').submit(function(e) {
         e.preventDefault(); // Empêcher la soumission réelle du formulaire
         $.post("ajax/userInfo.php", {
@@ -1012,6 +1061,7 @@
         });
       });
       
+      // remove account from the app
       $(document).on('click', '#removeAccount', function(e){
         e.preventDefault(); // Empêcher la soumission réelle du formulaire
         $.post("ajax/userInfo.php", {
@@ -1032,6 +1082,7 @@
         });
       });
 
+      // show modal to remove product form marketplace
       $(document).on('click', '.removeProductButton', function(e){
         var title = $(this).data('title');
         var id = $(this).data('id');
@@ -1040,13 +1091,17 @@
         $('#removeProductModalTitle').text(title);
       });
 
+      //Get list of produt / post with ajax
       $(document).on('change', '#adType', function(e){
         let url = ($(this).val() == 1) ? "ajax/postInfo.php" : "ajax/productInfo.php";
         $.post(url, {
           listProduct: true
         }).done(function(result){
+          $('#targeting').empty();
           let data = JSON.parse(result);
-          
+          $.each(data, function(index, value) {
+            $('#targeting').append('<option value="' + value.id + '">' + value.title + '</option>');
+          })
         });
       })
       

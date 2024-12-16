@@ -18,11 +18,85 @@ class AdsResultsProvider {
         $this->con = $con;
     }
 
+    // get all ads type
     public function getAdsType(){
         try {
             $query = $this->con->prepare("SELECT * FROM adstype");
             $query->execute();
             return $query->fetchAll();
+        } catch (PDOException $e) {
+            echo "Erreur lors de la récupération des catégories : " . $e->getMessage();
+            return [];
+        }
+    }
+
+    public function addAds($userId, $adType, $adContent, $budget, $adId){
+        try {
+            $ad = $this->getUserAd($userId);
+            if(!is_null($ad) && $ad->id == $adId) {
+                // update
+                $sql = "UPDATE ads 
+                    SET adsTypeId = :adsTypeId, contentId = :contentId, budget = :budget 
+                    WHERE id = :adId";
+                $stmt = $this->con->prepare($sql);
+
+                $stmt->bindParam(':adsTypeId', $adType);
+                $stmt->bindParam(':contentId', $adContent);
+                $stmt->bindParam(':budget', $budget);
+                $stmt->bindParam(':adId', $ad->id);
+
+                // Exécuter la requête d'update
+                $stmt->execute();
+                if ($stmt->rowCount() > 0) {
+                    return true;
+                }
+                return false;
+
+            }
+            $sql = "INSERT INTO ads (adsTypeId, contentId, budget, userId) VALUES (:adsTypeId, :contentId, :budget, :userId)";
+            $stmt = $this->con->prepare($sql);
+            $stmt->bindParam(':adsTypeId', $adType);
+            $stmt->bindParam(':contentId', $adContent);
+            $stmt->bindParam(':budget', $budget);
+            $stmt->bindParam(':userId', $userId);
+            $stmt->execute();
+            $AdId = $this->con->lastInsertId();
+            if ($AdId) {
+                return true;
+            }
+            return false;
+        } catch (PDOException $e) {
+            echo "Erreur lors de l'enregistrement : " . $e->getMessage();
+            return false;
+        }
+    }
+
+    public function getUserAd($userId) {
+        try {
+            $sql = "SELECT * FROM ads WHERE userId = :userId";
+            $stmt = $this->con->prepare($sql);
+            $stmt->bindParam(':userId', $userId);
+            $stmt->execute();
+            
+            $ad = $stmt->fetchObject();
+            
+            if ($ad) {
+                return $ad;
+            } else {
+                return null;  // L'utilisateur n'a pas de pub
+            }
+        } catch (PDOException $e) {
+            echo "Erreur lors de la récupération des données utilisateur : " . $e->getMessage();
+            return null;
+        }
+    }
+
+    public function getAdType($adType) {
+        try {
+            $query = $this->con->prepare("SELECT * FROM adstype WHERE id = :adType");
+            $query->bindParam(':adType', $adType);
+            $query->execute();
+            return $query->fetchObject();
         } catch (PDOException $e) {
             echo "Erreur lors de la récupération des catégories : " . $e->getMessage();
             return [];

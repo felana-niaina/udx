@@ -3,7 +3,7 @@
 session_start();
 
 include_once '../classes/DatabaseConnector.php';
-include_once 'classes/MarketplaceResultsProvider.php';
+include_once '../classes/MarketplaceResultsProvider.php';
 $database = new DatabaseConnector();
 $con = $database->getConnection();
 $ResultsProvider = new MarketplaceResultsProvider($con);

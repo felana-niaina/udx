@@ -177,5 +177,22 @@ class PostsResultsProvider {
             return [];
         }
     }
+
+    public function getPostList($userId) {
+        try {
+            $query = $this->con->prepare("SELECT * 
+                                          FROM posts
+                                          WHERE userId = :userId
+                                        ");
+            $query->execute([
+                'userId' => $userId
+            ]);
+            return $query->fetchAll();
+
+        } catch (PDOException $e) {
+            echo "Erreur dans la requête : " . $e->getMessage();
+            return 0;
+        }
+    }
 }
 ?>
