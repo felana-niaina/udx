@@ -14,18 +14,15 @@ $PostsResultsProvider = new PostsResultsProvider($con);
 $userId = $_SESSION['user_id']; // ID de l'utilisateur connecté
 $userInfo = $userRegistration->getUserInfo($userId);
 $coverPhoto = is_null($userInfo['cover_photo']) ? 'uploads/default_cover.jpg' : $userInfo['cover_photo'];
-$coverPhoto = 'http://'.$_SERVER['SERVER_NAME'] .'/udx/'. $coverPhoto;
+$profilePhoto = is_null($userInfo['profile_photo']) ? 'https://via.placeholder.com/150' : $userInfo['profile_photo'];
+// $coverPhoto = 'http://'.$_SERVER['SERVER_NAME'] .'/udx/'. $coverPhoto;
 
 // Vérifiez si un fichier est envoyé
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     // Vérifier quel formulaire a été soumis
     $formId = $_POST['form_id'] ?? '';
 
-    /* echo "<pre>";
-    print_r($_POST);
-    print_r($_FILES);
-    echo "</pre>"; die(); */
-
+    //update photo de couverture
     if (isset($_FILES['cover_photo']) ) {
         // Appeler la méthode pour mettre à jour la photo
         $coverPhotoFile = $_FILES['cover_photo'];
@@ -48,6 +45,32 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 </script>";
         } else {
             echo "Échec de la mise à jour de la photo de couverture.";
+        }
+    }
+
+    //update photo de profil
+    if (isset($_FILES['profile_photo']) ) {
+        // Appeler la méthode pour mettre à jour la photo
+        $profilePhotoFile = $_FILES['profile_photo'];
+        $result = $userRegistration->updateProfilePhoto($userId, $profilePhotoFile);
+
+        if ($result) {
+            echo "<script>
+                    document.addEventListener('DOMContentLoaded', function() {
+                        Swal.fire({
+                            title: 'Succès',
+                            text: 'Photo de profil mise à jour !',
+                            icon: 'success',
+                            confirmButtonText: 'OK'
+                        }).then((result) => {
+                            if (result.isConfirmed) {
+                                window.location.href = 'profil.php';
+                            }
+                        });
+                    });
+                </script>";
+        } else {
+            echo "Échec de la mise à jour de la photo de profil.";
         }
     }
 
@@ -307,9 +330,68 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             border-radius: 4px;
             cursor: pointer;
             box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+            font-size:0.85rem;
         }
 
         .save-cover-photo-btn:hover {
+            background-color: rgba(0, 200, 0, 1);
+        }
+
+        .profile-photo-container{
+            width: 250px;
+            margin-inline: auto;
+            position: relative;
+        }
+        .profile-photo {
+            width: 100%;
+            background-size: cover;
+            background-position: center;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        .edit-profile-photo {
+            position: absolute;
+            right: 0;
+            top:100px;
+            z-index:100;
+            background-color: rgba(0, 0, 0, 0.6);
+            color: white;
+            border: none;
+            padding: 10px;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+            transition: background-color 0.3s;
+        }
+
+        .edit-profile-photo i {
+            font-size: 18px;
+        }
+
+        .edit-profile-photo:hover {
+            background-color: rgba(255, 255, 255, 0.8);
+            color: black;
+        }
+
+        .save-profile-photo-btn {
+            bottom: 10px;
+            right: 70px;
+            background-color: rgba(0, 255, 0, 0.7);
+            color: white;
+            border: none;
+            padding: 8px 12px;
+            border-radius: 4px;
+            cursor: pointer;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+            margin-top:5px;
+            font-size:0.85rem;
+        }
+
+        .save-profile-photo-btn:hover {
             background-color: rgba(0, 200, 0, 1);
         }
 
@@ -364,14 +446,29 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         <!-- Formulaire d'upload de la photo -->
                         <form id="cover-photo-form" action="profil.php" method="POST" enctype="multipart/form-data" style="display: none;">
                             <!-- Image de couverture -->
-                            <input type="file" id="cover-photo-input" name="cover_photo" accept="image/*">
+                            <input type="file" id="cover-photo-input" name="cover_photo" accept="image/*" style="display: none;">
                             <!-- Bouton Enregistrer -->
                             <button type="submit" id="save-cover-photo-btn" class="save-cover-photo-btn">Enregistrer</button>
                         </form>
                     </div>
 
                     <!-- Profile picture -->
-                    <img src="https://via.placeholder.com/150" alt="User Profile Picture">
+                    <div class="profile-photo-container">
+                        <img class="profile-photo" id="profile-photo" src="<?php echo $profilePhoto; ?>">
+                        <!-- Bouton de modification avec icône -->
+                        <button class="edit-profile-photo" id="edit-profile-photo-btn" type="button">
+                            <i class="fas fa-camera"></i>
+                        </button>
+
+                        <!-- Formulaire d'upload de la photo -->
+                        <form id="profile-photo-form" action="profil.php" method="POST" enctype="multipart/form-data" style="display: none;">
+                            <!-- Image de profil -->
+                            <input type="file" id="profile-photo-input" name="profile_photo" accept="image/*" style="display: none;">
+                            <!-- Bouton Enregistrer -->
+                            <button type="submit" id="save-profile-photo-btn" class="save-profile-photo-btn">Enregistrer</button>
+                        </form>
+                    </div>
+                    <!-- <img src="https://via.placeholder.com/150"> -->
                     <h3><?php echo $userInfo['username']; ?></h3><br>
                     <p><?php echo $userInfo['profileTitle']; ?></p>
 
@@ -508,7 +605,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         document.getElementById("cover-photo-input").click();
     });
 
-    // Lorsque l'utilisateur sélectionne une nouvelle image
+    // Lorsque l'utilisateur clique sur le bouton d'édition de la photo de profil
+    document.getElementById("edit-profile-photo-btn").addEventListener("click", function () {
+        // Affiche l'input de téléchargement de photo
+        document.getElementById("profile-photo-input").click();
+    });
+
+    // Lorsque l'utilisateur sélectionne une nouvelle image de couverture
     document.getElementById("cover-photo-input").addEventListener("change", function (event) {
         const file = event.target.files[0];
         if (file) {
@@ -522,6 +625,22 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             reader.readAsDataURL(file);
         }
         document.getElementById("cover-photo-form").style.display = "block";
+    });
+
+    // Lorsque l'utilisateur sélectionne une nouvelle image de profil
+    document.getElementById("profile-photo-input").addEventListener("change", function (event) {
+        const file = event.target.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = function (e) {
+                document.getElementById("profile-photo").src = e.target.result;
+                // Afficher le bouton Enregistrer
+                document.getElementById("save-profile-photo-btn").style.display = "inline-block";
+                document.getElementById("profile-photo-form").style.display = "block";
+            };
+            reader.readAsDataURL(file);
+        }
+        document.getElementById("profile-photo-form").style.display = "block";
     });
 </script>
 

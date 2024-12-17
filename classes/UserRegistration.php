@@ -95,11 +95,43 @@ class UserRegistration {
         }
     }
 
+    // Méthode pour mettre à jour la photo de couverture de l'utilisateur
+    public function updateProfilePhoto($userId, $profilePhotoFile) {
+        try {
+            // Vérifier si le fichier est valide
+            if ($profilePhotoFile['error'] !== UPLOAD_ERR_OK) {
+                throw new Exception("Erreur lors du téléchargement du fichier.");
+            }
+            $newImageName = time() . '_' . uniqid() . '.' . pathinfo($profilePhotoFile['name'], PATHINFO_EXTENSION);
+
+            // Déplacer le fichier téléchargé dans le répertoire voulu
+            $uploadDir = 'uploads/';
+            $targetFile = $uploadDir . $newImageName;
+            
+            if (!move_uploaded_file($profilePhotoFile['tmp_name'], $targetFile)) {
+                throw new Exception("Impossible de déplacer le fichier téléchargé.");
+            }
+
+            // Mettre à jour la photo de couverture dans la base de données
+            $sql = "UPDATE users SET profile_photo = :profile_photo WHERE id =:userId";
+            $stmt = $this->con->prepare($sql);
+            $stmt->bindParam(':profile_photo', $targetFile);
+            $stmt->bindParam(':userId', $userId);
+            $stmt->execute();
+
+            return true;
+
+        } catch (Exception $e) {
+            echo "Erreur : " . $e->getMessage();
+            return false;
+        }
+    }
+
 
     // Méthode pour récupérer les informations de l'utilisateur
     public function getUserInfo($userId) {
         try {
-            $sql = "SELECT fullname, username ,profileTitle, bio, url, phone, location, cover_photo FROM users WHERE id = :userId";
+            $sql = "SELECT fullname, username ,profileTitle, bio, url, phone, location, cover_photo, profile_photo FROM users WHERE id = :userId";
             $stmt = $this->con->prepare($sql);
             $stmt->bindParam(':userId', $userId);
             $stmt->execute();

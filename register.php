@@ -47,7 +47,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $mail->Host = 'smtp.gmail.com';  // Hébergement du serveur SMTP
             $mail->SMTPAuth = true;
             $mail->Username = 'nirina.felananiaina@gmail.com';  // Votre email
-            $mail->Password = '';  // Mot de passe d'application
+            $mail->Password = 'nodemailer';  // Mot de passe d'application
             $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
             $mail->Port = 587;
 
