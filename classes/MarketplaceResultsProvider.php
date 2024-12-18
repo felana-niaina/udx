@@ -132,6 +132,7 @@ class MarketplaceResultsProvider {
                 $id = $row["id"];
                 $title = $row["title"];
                 $description = $row["description"];
+                $keywords = $row["keywords"];
                 $price = $row["price"] . " €";
                 $image = is_null($row['picture']) || $row['picture'] == '' ? "https://via.placeholder.com/150" : $siteUrl. $row['picture'];
                 $date = $row["createdDate"];
@@ -148,7 +149,7 @@ class MarketplaceResultsProvider {
                     <p class='product-price'>$price</p>
                     <p class='product-description'>$description</p>
                     <div class='product-actions' id='actionProduct-$id'>
-                        <a href='#' class='editProduct' data-toggle='modal' data-target='#productModal' data-title='$title' data-description='$description.' data-price='$price' data-image='$image' data-date='$date' data-id='$id'>Modifier</a> | <a href='#' class='removeProductButton' data-toggle='modal' data-target='#removeProductModal' data-title='$title' data-id='$id'>Supprimer</a>
+                        <a href='#' class='editProduct' data-toggle='modal' data-target='#productModal' data-title='$title' data-description='$description.' data-price='$price' data-keywords='$keywords' data-image='$image' data-date='$date' data-id='$id'>Modifier</a> | <a href='#' class='removeProductButton' data-toggle='modal' data-target='#removeProductModal' data-title='$title' data-id='$id'>Supprimer</a>
                     </div>
                 </div>
               </div>";
@@ -201,6 +202,72 @@ class MarketplaceResultsProvider {
         }
     }
 
+    public function updateProduct($productId, $userId, $name, $description, $price, $tags, $picture) {
+        try {
+            $targetFile = '';
+    
+            // Gérer l'upload de la nouvelle image, si une nouvelle est fournie
+            if (!is_null($picture)) {
+                if ($picture['error'] !== UPLOAD_ERR_OK) {
+                    throw new Exception("Erreur lors du téléchargement du fichier.");
+                }
+                $newImageName = time() . '_' . uniqid() . '.' . pathinfo($picture['name'], PATHINFO_EXTENSION);
+        
+                // Déplacer le fichier téléchargé dans le répertoire voulu
+                $uploadDir = 'uploads/';
+                $targetFile = $uploadDir . $newImageName;
+    
+                if (!move_uploaded_file($picture['tmp_name'], $targetFile)) {
+                    throw new Exception("Impossible de déplacer le fichier téléchargé.");
+                }
+    
+                // Supprimer l'ancienne image si elle existe
+                $sql = "SELECT picture FROM marketplace WHERE id = :productId";
+                $stmt = $this->con->prepare($sql);
+                $stmt->bindParam(':productId', $productId);
+                $stmt->execute();
+                $oldPicture = $stmt->fetchColumn();
+    
+                if ($oldPicture && file_exists($oldPicture)) {
+                    unlink($oldPicture);
+                }
+            }
+    
+            // Construire la requête SQL
+            $sql = "
+                UPDATE marketplace 
+                SET 
+                    title = :title, 
+                    description = :description, 
+                    price = :price, 
+                    keywords = :keywords,
+                    userId = :userId" .
+                    (!is_null($picture) ? ", picture = :picture" : "") . 
+                " WHERE id = :productId";
+    
+            $stmt = $this->con->prepare($sql);
+            $stmt->bindParam(':title', $name);
+            $stmt->bindParam(':description', $description);
+            $stmt->bindParam(':price', $price);
+            $stmt->bindParam(':keywords', $tags);
+            $stmt->bindParam(':userId', $userId);
+            $stmt->bindParam(':productId', $productId);
+    
+            // Ajouter l'image à la requête seulement si elle a été modifiée
+            if (!is_null($picture)) {
+                $stmt->bindParam(':picture', $targetFile);
+            }
+    
+            $stmt->execute();
+    
+            return true;
+    
+        } catch (Exception $e) {
+            echo "Erreur lors de la mise à jour : " . $e->getMessage();
+            return false;
+        }
+    }
+    
     public function removeProduct($userId, $productId) {
         try {
             $sql = "DELETE from marketplace 

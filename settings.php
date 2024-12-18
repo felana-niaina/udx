@@ -46,7 +46,6 @@
   }
 
   $userProducts = $marketPlaceProvider->getProductsByUser($_SESSION['user_id']);
-
   // Si l'utilisateur existe, on affiche les informations, sinon un message d'erreur
   if ($userInfo === null) {
       echo "Utilisateur introuvable.";
@@ -122,6 +121,30 @@
                   Swal.fire({
                       title: 'Succès',
                       text: 'Votre produit a bien été publié !',
+                      icon: 'success',
+                      confirmButtonText: 'OK'
+                  }).then((result) => {
+                      if (result.isConfirmed) {
+                          window.location.href = 'settings.php';
+                      }
+                  });
+              });
+          </script>";
+        }
+      }
+    }
+
+    // modification d'un produit dans marketplace
+    elseif ($formId === 'updateProduct') {
+      if($userId && $_POST['productId'] && $_POST['productNameUpdated'] && $_POST['productDescriptionUpdated'] && $_POST['productPriceUpdated'] && $_POST['productTagsUpdated']) {
+        $productPicture = isset($_FILES['productPictureUpdated']) ? $_FILES['productPictureUpdated'] : $userProducts['picture'];
+        $MarketplaceResultsProvider = new MarketplaceResultsProvider($con);
+        if ($MarketplaceResultsProvider->updateProduct($_POST['productId'],$userId,$_POST['productNameUpdated'], $_POST['productDescriptionUpdated'], $_POST['productPriceUpdated'], $_POST['productTagsUpdated'], $productPicture)) {
+          echo "<script>
+              document.addEventListener('DOMContentLoaded', function() {
+                  Swal.fire({
+                      title: 'Succès',
+                      text: 'Votre produit a bien été modifié !',
                       icon: 'success',
                       confirmButtonText: 'OK'
                   }).then((result) => {
@@ -797,24 +820,65 @@
                       </button>
                   </div>
                   <div class="modal-body">
-                      <div id="productContent">
-                          <img id="productImage" src="" alt="Image de l'article" class="product-image">
+                    <form id="postProductForm" method="post" enctype="multipart/form-data">
+                      <input type="hidden" name="form_id" value="updateProduct">
+                      <textarea hidden id="productId" name="productId" ></textarea>
+                      <!-- ancien modification du marketplace -->
+                      <!-- <div id="productContent">
                           <h5 id="productTitle"></h5>
                           <p id="productPrice"></p>
                           <p id="productDescription"></p>
                           <p id="productDate"></p>
-                      </div>
+                      </div> -->
+                      
+                      <!-- nouveau modal de modification -->
+                      
+                      <div id="productContent">
+                        <!-- Titre -->
+                        <div class="form-group">
+                            <label for="title">Titre</label>
+                            <textarea id="productTitle" class="form-control" placeholder="Titre de l'annonce" name="productNameUpdated" required></textarea>
+                        </div>
 
-                      <!-- Formulaire pour répondre à l'article -->
-                      <div class="response-box">
-                          <h6>Votre message:</h6>
-                          <textarea id="responseText" class="form-control" rows="4" placeholder="Tapez votre message ici..."></textarea>
+                        <!-- Description -->
+                        <div class="form-group">
+                            <label for="description">Description</label>
+                            <textarea id="productDescription" class="form-control" rows="3" placeholder="Description de l'article" name="productDescriptionUpdated" required></textarea>
+                        </div>
+
+                        <!-- Prix -->
+                        <div class="form-group">
+                            <label for="price">Prix</label>
+                            <textarea id="productPrice" class="form-control" placeholder="Prix de l'article" name="productPriceUpdated" required></textarea>
+                        </div>
+
+                        <!-- Mots-clés -->
+                        <div class="form-group">
+                            <label for="keywords">Mots-clés</label>
+                            <textarea id="productTags" class="form-control" placeholder="Mots-clés pour l'article" name="productTagsUpdated" required></textarea>
+                        </div>
+
+                        <!-- pièce jointe -->
+                        <div class="form-group">
+                          <input id="productImage" type="file" class="form-control-file mt-2" name="productPictureUpdated"  accept="image/*" required>
+                          <img id="imagePreview" src="" class="product-image">
+                        </div>
+
+                        <!-- Formulaire pour répondre à l'article -->
+                        <div class="response-box">
+                            <h6>Votre message:</h6>
+                            <textarea id="responseText" class="form-control" rows="4" placeholder="Tapez votre message ici..."></textarea>
+                        </div>
                       </div>
+                          
+                      
+                      <div class="modal-footer">
+                          <button type="button" class="btn btn-secondary" data-dismiss="modal">Fermer</button>
+                          <button type="submit" class="btn btn-primary" id="replyButton">Envoyer</button>
+                      </div>
+                    </form>
                   </div>
-                  <div class="modal-footer">
-                      <button type="button" class="btn btn-secondary" data-dismiss="modal">Fermer</button>
-                      <button type="button" class="btn btn-primary" id="replyButton">Envoyer</button>
-                  </div>
+                  
               </div>
           </div>
       </div>
@@ -1014,14 +1078,35 @@
         var title = $(this).data('title');
         var description = $(this).data('description');
         var price = $(this).data('price');
+        var id = $(this).data('id');
+        var keywords = $(this).data('keywords');
         var image = $(this).data('image');
         var date = $(this).data('date');
 
         $('#productTitle').text(title);
+        $('#productTags').text(keywords);
         $('#productPrice').text(price);
+        $('#productId').text(id);
         $('#productDescription').text(description);
         $('#productDate').text(date);
-        $('#productImage').attr('src', image);
+        $('#productImage').attr('value', image);
+
+        // Ajouter un événement au changement de l'input
+        $('#productImage').on('change', function(event) {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    $('#imagePreview').attr('src', e.target.result); // Afficher l'image
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+
+        // Préremplir un aperçu d'image si disponible
+        if (image) {
+            $('#imagePreview').attr('src', image); // Afficher l'image existante
+        }
       });
       
       // get post data and show on modal
