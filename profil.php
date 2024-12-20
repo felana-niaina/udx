@@ -15,7 +15,8 @@ $userId = $_SESSION['user_id']; // ID de l'utilisateur connecté
 $userInfo = $userRegistration->getUserInfo($userId);
 $coverPhoto = is_null($userInfo['cover_photo']) ? 'uploads/default_cover.jpg' : $userInfo['cover_photo'];
 $profilePhoto = is_null($userInfo['profile_photo']) ? 'https://via.placeholder.com/150' : $userInfo['profile_photo'];
-// $coverPhoto = 'http://'.$_SERVER['SERVER_NAME'] .'/udx/'. $coverPhoto;
+$coverPhoto = 'http://'.$_SERVER['SERVER_NAME'] .'/udx/'. $coverPhoto;
+$profilePhoto = 'http://'.$_SERVER['SERVER_NAME'] .'/udx/'. $profilePhoto;
 
 // Vérifiez si un fichier est envoyé
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {

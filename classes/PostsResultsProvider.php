@@ -50,14 +50,15 @@ class PostsResultsProvider {
 
             $fromLimit = ($page - 1) * $pageSize;
 
-            $query = $this->con->prepare("SELECT * 
-                                         FROM posts
-                                         WHERE title LIKE :term 
-                                         OR description LIKE :term 
-                                         OR keywords LIKE :term
-                                         ORDER BY clicks DESC
-                                         LIMIT :fromLimit, :pageSize");
-
+            $query = $this->con->prepare("SELECT posts.*, users.profile_photo 
+                                        FROM posts
+                                        LEFT JOIN users ON posts.userId = users.id
+                                        WHERE posts.title LIKE :term 
+                                        OR posts.description LIKE :term 
+                                        OR posts.keywords LIKE :term
+                                        ORDER BY posts.clicks DESC
+                                        LIMIT :fromLimit, :pageSize");
+                                        
             $searchTerm = "%" . $term . "%";
             $query->bindParam(":term", $searchTerm);
             $query->bindParam(":fromLimit", $fromLimit, PDO::PARAM_INT);
@@ -68,20 +69,48 @@ class PostsResultsProvider {
 
             while ($row = $query->fetch(PDO::FETCH_ASSOC)) {
                 $id = $row["id"];
+                $userId = $row["userId"];
                 $title = $row["title"];
                 $description = $row["description"];
+                $profilePicture = $row["profile_photo"] ?: "https://via.placeholder.com/150";
 
                 // Truncation des champs title et description si nécessaire
                 $title = $this->trimField($title, 120);
                 $description = $this->trimField($description, 230);
 
                 // Ajouter le résultat au HTML
-                $resultsHtml .= "<div class='resultContainer'>
-                                    <h3 class='title'>
-                                            $title
-                                        </a>
-                                    </h3>
-                                    <span class='description'>$description</span>
+                $resultsHtml .= "<div class='d-flex mb-3' data-post-id='$id'>
+                                    <a href='http://localhost/udx/profil.php/$userId'><img src='$profilePicture' class='profile-photo' /></a>
+                                    <div class='text'>
+                                        <div class='d-flex'>
+                                            <h3 class='title pe-3'>
+                                                    $title
+                                            </h3>
+                                             <!-- Icone Like -->
+                                            <button class='btn'>
+                                                <i class='bi bi-hand-thumbs-up'></i>
+                                            </button>
+
+                                            <!-- Icone Commentaire -->
+                                            <button class='btn'  onclick='toggleCommentArea(this)'>
+                                                <i class='bi bi-chat-dots'></i>
+                                            </button>
+
+                                        </div>
+                                        <div>
+                                            <span class='description'>$description</span>
+                                        </div>
+                                        
+                                        <!-- Zone pour le commentaire -->
+                                        <div class='comment-area' id='omment-area'>
+                                            <textarea class='form-control' rows='2' placeholder='Écrire un commentaire...'></textarea>
+                                            <div class='mt-2'>
+                                                <button class='btn btn-secondary' onclick='cancelComment(this)'>Annuler</button>
+                                                <button class='btn btn-primary' onclick='sendComment(this)'>Envoyer</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
                                   </div>";
             }
 
@@ -192,6 +221,25 @@ class PostsResultsProvider {
         } catch (PDOException $e) {
             echo "Erreur dans la requête : " . $e->getMessage();
             return 0;
+        }
+    }
+
+    public function saveComment($postId, $userId, $commentText) {
+        try {
+            $query = $this->con->prepare("INSERT INTO comments (postId, userId, commentText, createdAt) 
+                                          VALUES (:postId, :userId, :commentText, NOW())");
+    
+            $query->bindParam(":postId", $postId, PDO::PARAM_INT);
+            $query->bindParam(":userId", $userId, PDO::PARAM_INT);
+            $query->bindParam(":commentText", $commentText);
+    
+            $query->execute();
+    
+            echo json_encode(["success" => true, "message" => "Commentaire enregistré avec succès."]);
+        } catch (PDOException $e) {
+            echo json_encode(["success" => false, "message" => "Erreur : " . $e->getMessage()]);
+        } catch (Exception $e) {
+            echo json_encode(["success" => false, "message" => $e->getMessage()]);
         }
     }
 }

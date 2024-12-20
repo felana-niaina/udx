@@ -136,8 +136,11 @@
 
     // modification d'un produit dans marketplace
     elseif ($formId === 'updateProduct') {
+      $selectedProduct = $marketPlaceProvider->getProductById($_POST['productId']);
+      $currentPicture = $selectedProduct->picture;
       if($userId && $_POST['productId'] && $_POST['productNameUpdated'] && $_POST['productDescriptionUpdated'] && $_POST['productPriceUpdated'] && $_POST['productTagsUpdated']) {
-        $productPicture = isset($_FILES['productPictureUpdated']) ? $_FILES['productPictureUpdated'] : $userProducts['picture'];
+        $productPicture = isset($_FILES['productPictureUpdated']) ? $_FILES['productPictureUpdated'] : $selectedProduct->picture;
+        
         $MarketplaceResultsProvider = new MarketplaceResultsProvider($con);
         if ($MarketplaceResultsProvider->updateProduct($_POST['productId'],$userId,$_POST['productNameUpdated'], $_POST['productDescriptionUpdated'], $_POST['productPriceUpdated'], $_POST['productTagsUpdated'], $productPicture)) {
           echo "<script>
@@ -278,6 +281,8 @@
     <title>Paramètres</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@4.4.1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+
     <style type="text/css">
         /* Corps de la page */
         body {
@@ -458,6 +463,37 @@
 
         .message-details {
             display: none;
+        }
+
+        .edit-product-image-container{
+            margin-inline: auto;
+            position: relative;
+        }
+
+        .edit-marketplace-photo {
+            position: absolute;
+            bottom: 60px;
+            right: 10px;
+            background-color: rgba(0, 0, 0, 0.6);
+            color: white;
+            border: none;
+            padding: 10px;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+            transition: background-color 0.3s;
+        }
+
+        .edit-marketplace-photo i {
+            font-size: 12px;
+        }
+
+        .edit-marketplace-photo:hover {
+            background-color: rgba(255, 255, 255, 0.8);
+            color: black;
         }
         /* End Style for message */
 
@@ -860,15 +896,21 @@
 
                         <!-- pièce jointe -->
                         <div class="form-group">
-                          <input id="productImage" type="file" class="form-control-file mt-2" name="productPictureUpdated"  accept="image/*" required>
-                          <img id="imagePreview" src="" class="product-image">
+                          <input id="product-image-input" type="file" class="form-control-file mt-2" name="productPictureUpdated"  accept="image/*" hidden>
+                          <div class="edit-product-image-container">
+                            <img id="imagePreview" src="" class="product-image">
+                            <button class="edit-marketplace-photo" id="edit-marketplace-photo-btn" type="button">
+                                <i class="fas fa-camera"></i>
+                            </button>
+                          </div>
+                  
                         </div>
 
                         <!-- Formulaire pour répondre à l'article -->
-                        <div class="response-box">
+                        <!-- <div class="response-box">
                             <h6>Votre message:</h6>
                             <textarea id="responseText" class="form-control" rows="4" placeholder="Tapez votre message ici..."></textarea>
-                        </div>
+                        </div> -->
                       </div>
                           
                       
@@ -1089,24 +1131,12 @@
         $('#productId').text(id);
         $('#productDescription').text(description);
         $('#productDate').text(date);
-        $('#productImage').attr('value', image);
-
-        // Ajouter un événement au changement de l'input
-        $('#productImage').on('change', function(event) {
-            const file = event.target.files[0];
-            if (file) {
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    $('#imagePreview').attr('src', e.target.result); // Afficher l'image
-                };
-                reader.readAsDataURL(file);
-            }
-        });
 
         // Préremplir un aperçu d'image si disponible
         if (image) {
             $('#imagePreview').attr('src', image); // Afficher l'image existante
         }
+
       });
       
       // get post data and show on modal
@@ -1191,6 +1221,29 @@
       })
       
     })
+
+    // Lorsque l'utilisateur clique sur le bouton d'édition de la photo du marketplace à modifer
+    document.getElementById("edit-marketplace-photo-btn").addEventListener("click", function () {
+
+      // Affiche l'input de téléchargement de photo
+      document.getElementById("product-image-input").click();
+    });
+
+    // Lorsque l'utilisateur sélectionne une nouvelle image de profil
+    document.getElementById("product-image-input").addEventListener("change", function (event) {
+        const file = event.target.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = function (e) {
+                document.getElementById("imagePreview").src = e.target.result;
+        
+                document.getElementById("product-image-input").value = e.target.result;
+            };
+            reader.readAsDataURL(file);
+        }
+        
+    });
+
   </script>
 </body>
 </html>

@@ -1,27 +1,60 @@
 <?php
-include_once 'classes/DatabaseConnector.php';
-include("classes/SiteResultsProvider.php");
-include("classes/MarketplaceResultsProvider.php"); 
-include("classes/PostsResultsProvider.php"); 
-include("classes/ImageResultsProvider.php");
+    include_once 'classes/DatabaseConnector.php';
+    include("classes/SiteResultsProvider.php");
+    include("classes/MarketplaceResultsProvider.php"); 
+    include("classes/PostsResultsProvider.php"); 
+    include("classes/ImageResultsProvider.php");
 
-// Créer une instance de la classe DatabaseConnector
-$database = new DatabaseConnector();
-$con = $database->getConnection();
-$isUserConnected = false;
-session_start();
-if(!empty($_SESSION)) {
-    $isUserConnected = true;
-};
+    // Créer une instance de la classe DatabaseConnector
+    $database = new DatabaseConnector();
+    $con = $database->getConnection();
 
-if(isset($_GET["term"])){
-    $term = $_GET["term"];
-}else{
-    exit("please enter a search term > 0");
-}
+    $postsResults = new PostsResultsProvider($con);
+    
+    $postId = $userId = $commentText = null;
+    if ($_SERVER["REQUEST_METHOD"] === "POST") {
+        $postId = $_POST["postId"];
+        $userId = $_POST["userId"];
+        $commentText = $_POST["comment"];
 
-$type = isset($_GET["type"]) ? $_GET["type"] : "sites";
-$page = isset($_GET["page"]) ? $_GET["page"] : 1;
+        $result = $postsResults->saveComment($postId, $userId, $commentText);
+
+        if ($result) {
+            echo "<script>
+                    document.addEventListener('DOMContentLoaded', function() {
+                        Swal.fire({
+                            title: 'Succès',
+                            text: 'Commentaire ajouté !',
+                            icon: 'success',
+                            confirmButtonText: 'OK'
+                        }).then((result) => {
+                            if (result.isConfirmed) {
+                                window.location.href = 'search.php';
+                            }
+                        });
+                    });
+                </script>";
+        } else {
+            echo "Échec de l'envoie du commentaire.";
+        }
+    }
+
+    
+
+    $isUserConnected = false;
+    session_start();
+    if(!empty($_SESSION)) {
+        $isUserConnected = true;
+    };
+
+    if(isset($_GET["term"])){
+        $term = $_GET["term"];
+    }else{
+        exit("please enter a search term > 0");
+    }
+
+    $type = isset($_GET["type"]) ? $_GET["type"] : "sites";
+    $page = isset($_GET["page"]) ? $_GET["page"] : 1;
 
 ?>
 <!doctype html>
@@ -34,8 +67,28 @@ $page = isset($_GET["page"]) ? $_GET["page"] : 1;
     <title>Underdex</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@4.4.1/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet"> 
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/fancybox/3.3.5/jquery.fancybox.min.css" />
     <link rel="stylesheet" type="text/css" href="assets/css/style.css?A">
+    <style type="text/css">
+        .profile-photo {
+            width: 50px;
+            height:50px;
+            background-size: cover;
+            background-position: center;
+            border-radius: 100%;
+            overflow: hidden;
+        }
+
+        .text {
+            margin-left: 20px;
+        }
+
+        .comment-area {
+            margin-top: 10px;
+            display: none; /* Masque le champ initialement */
+        }
+    </style>
     <script src="https://code.jquery.com/jquery-3.3.1.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
 
 </head>
@@ -185,5 +238,55 @@ $page = isset($_GET["page"]) ? $_GET["page"] : 1;
     <script src="https://cdnjs.cloudflare.com/ajax/libs/fancybox/3.3.5/jquery.fancybox.min.js"></script>
     <script src="https://unpkg.com/masonry-layout@4/dist/masonry.pkgd.min.js"></script>
     <script type="text/javascript" src="assets/js/script.js?3"></script>
+    <script>
+        function toggleCommentArea(button) {
+            // Recherche de la div comment-area associée
+            const commentArea = document.getElementById('omment-area');
+            
+            // Alterne la visibilité
+            if (commentArea.style.display === 'none' || commentArea.style.display === '') {
+                commentArea.style.display = 'block'; // Affiche le champ de texte
+            } else {
+                commentArea.style.display = 'none'; // Masque à nouveau
+            }
+        }
+
+        // Annuler et cacher le champ de commentaire
+        function cancelComment(button) {
+            const commentArea = button.closest('.comment-area');
+            commentArea.style.display = 'none'; // Cache la div entière
+        }
+
+        function sendComment(button) {
+            const commentArea = button.closest(".comment-area");
+            const postId = button.closest(".d-flex").dataset.postId; // ID du post
+            const userId = 10; // ID de l'utilisateur connecté (à récupérer dynamiquement)
+            const commentText = commentArea.querySelector("textarea").value;
+
+            if (!commentText.trim()) {
+                alert("Le commentaire est vide !");
+                return;
+            }
+
+            // Envoyer les données via AJAX
+            fetch("search.php", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/x-www-form-urlencoded",
+                },
+                body: `postId=${postId}&userId=${userId}&comment=${encodeURIComponent(commentText)}`,
+            })
+            .then((response) => response.json())
+            .then((data) => {
+                if (data.success) {
+                    alert("Commentaire envoyé avec succès !");
+                    commentArea.style.display = "none"; // Masquer le champ après l'envoi
+                } else {
+                    alert("Erreur : " + data.message);
+                }
+            })
+            .catch((error) => console.error("Erreur : ", error));
+        }
+    </script>
 </body>
 </html>
