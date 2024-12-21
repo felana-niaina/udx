@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Hôte : 127.0.0.1
--- Généré le : sam. 21 déc. 2024 à 18:27
+-- Généré le : sam. 21 déc. 2024 à 21:48
 -- Version du serveur : 10.4.32-MariaDB
 -- Version de PHP : 8.2.12
 
@@ -41,7 +41,7 @@ CREATE TABLE `ads` (
 --
 
 INSERT INTO `ads` (`id`, `adsTypeId`, `contentId`, `budget`, `userId`, `createdDate`) VALUES
-(3, 2, 12, 50, 9, '2024-12-21');
+(4, 2, 9, 50, 9, '2024-12-21');
 
 -- --------------------------------------------------------
 
@@ -123,6 +123,7 @@ CREATE TABLE `marketplace` (
   `ads` tinyint(1) DEFAULT NULL,
   `picture` text NOT NULL,
   `userId` int(11) NOT NULL,
+  `isFeatured` int(1) NOT NULL DEFAULT 0,
   `createdDate` date NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
@@ -130,16 +131,43 @@ CREATE TABLE `marketplace` (
 -- Déchargement des données de la table `marketplace`
 --
 
-INSERT INTO `marketplace` (`id`, `title`, `description`, `price`, `keywords`, `clicks`, `ads`, `picture`, `userId`, `createdDate`) VALUES
-(1, 'iPhone 13', 'Bonjour je vends mon iphone 13 pas cher', 0, 'iphone', '', NULL, '', 0, '2024-12-14'),
-(6, 'Ordi portable', 'Asus zenbook i7.', 1000, 'asus, ordinateur', '', NULL, 'uploads/1734800329_6766f3c9ef8ef.png', 9, '2024-12-15'),
-(7, 'Ecran TV', 'Ecran plat 32\"', 200, 'samsung, écran', '', NULL, '', 8, '2024-12-15'),
-(9, 'Iphone 6S', 'Iphone 6S Gold', 150, 'iphone, iphone 16', '', NULL, '', 8, '2024-12-15'),
-(10, 'cuisinière à gaz', 'cuisinière 4 feux avec four à gaz', 200, 'four, cuisinière', '', NULL, 'uploads/1734276596_675ef5f420d81.jpg', 8, '2024-12-15'),
-(11, 'termosy', 'jskgljg', 10, 'test', '', NULL, 'uploads/1734276929_675ef7415e294.webp', 8, '2024-12-15'),
-(12, 'Armoire 3 portes', 'Armoire 3 porte en mélamine', 200, 'armoire, mélamine', '', NULL, 'uploads/1734361124_6760402476864.webp', 9, '2024-12-16'),
-(13, 'New product', 'Product description', 10, 'product', '', NULL, 'uploads/1734452314_6761a45aa113f.jpg', 10, '2024-12-17'),
-(14, 'Other product', 'Other product des', 23, 'asus, ordinateur', '', NULL, 'uploads/1734452435_6761a4d3e8c8c.jpg', 10, '2024-12-17');
+INSERT INTO `marketplace` (`id`, `title`, `description`, `price`, `keywords`, `clicks`, `ads`, `picture`, `userId`, `isFeatured`, `createdDate`) VALUES
+(1, 'iPhone 13', 'Bonjour je vends mon iphone 13 pas cher', 0, 'iphone', '', NULL, '', 0, 0, '2024-12-14'),
+(6, 'Ordi portable', 'Asus zenbook i7.', 1000, 'asus, ordinateur', '', NULL, 'uploads/1734800329_6766f3c9ef8ef.png', 9, 0, '2024-12-15'),
+(7, 'Ecran TV', 'Ecran plat 32\"', 200, 'samsung, écran', '', NULL, '', 8, 0, '2024-12-15'),
+(9, 'Iphone 6S', 'Iphone 6S Gold', 150, 'iphone, iphone 16', '', NULL, '', 9, 1, '2024-12-15'),
+(10, 'cuisinière à gaz', 'cuisinière 4 feux avec four à gaz', 200, 'four, cuisinière', '', NULL, 'uploads/1734276596_675ef5f420d81.jpg', 8, 0, '2024-12-15'),
+(11, 'termosy', 'jskgljg', 10, 'test', '', NULL, 'uploads/1734276929_675ef7415e294.webp', 8, 0, '2024-12-15'),
+(12, 'Armoire 3 portes', 'Armoire 3 porte en mélamine', 200, 'armoire, mélamine', '', NULL, 'uploads/1734361124_6760402476864.webp', 9, 0, '2024-12-16'),
+(13, 'New product', 'Product description', 10, 'product', '', NULL, 'uploads/1734452314_6761a45aa113f.jpg', 10, 0, '2024-12-17'),
+(14, 'Other product', 'Other product des', 23, 'asus, ordinateur', '', NULL, 'uploads/1734452435_6761a4d3e8c8c.jpg', 10, 0, '2024-12-17');
+
+-- --------------------------------------------------------
+
+--
+-- Structure de la table `message`
+--
+
+CREATE TABLE `message` (
+  `id` int(11) NOT NULL,
+  `subject` varchar(255) NOT NULL,
+  `content` text NOT NULL,
+  `fromUserId` int(11) NOT NULL,
+  `toUserId` int(11) NOT NULL,
+  `isRead` int(1) NOT NULL DEFAULT 0,
+  `createdDate` datetime NOT NULL DEFAULT current_timestamp(),
+  `updatedDate` datetime DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci;
+
+--
+-- Déchargement des données de la table `message`
+--
+
+INSERT INTO `message` (`id`, `subject`, `content`, `fromUserId`, `toUserId`, `isRead`, `createdDate`, `updatedDate`) VALUES
+(1, 'Test new message', 'This is a test', 9, 10, 0, '2024-12-21 22:33:40', NULL),
+(2, 'Test new message', 'Answer of the first message', 10, 9, 0, '2024-12-21 23:23:36', NULL),
+(3, 'A new subject', 'He how  are you ?', 11, 10, 0, '2024-12-21 23:26:51', NULL),
+(4, 'A new subject', 'I\'m fine thanks', 10, 7, 0, '2024-12-21 23:38:42', NULL);
 
 -- --------------------------------------------------------
 
@@ -155,6 +183,7 @@ CREATE TABLE `posts` (
   `clicks` int(30) NOT NULL,
   `userId` int(40) NOT NULL,
   `categoryId` int(2) NOT NULL,
+  `isFeatured` int(1) NOT NULL DEFAULT 0,
   `createdDate` date NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
@@ -162,11 +191,11 @@ CREATE TABLE `posts` (
 -- Déchargement des données de la table `posts`
 --
 
-INSERT INTO `posts` (`id`, `title`, `description`, `keywords`, `clicks`, `userId`, `categoryId`, `createdDate`) VALUES
-(1, 'Bonjour voici un post', 'Bonjour voici un post, ceci est un essai, merci', 'post', 1, 10, 0, '2024-12-14'),
-(2, 'Check new post', 'Testing of new post form', '', 0, 8, 2, '2024-12-15'),
-(3, 'My first post', 'This is my first post for test', '', 0, 9, 1, '2024-12-16'),
-(4, 'New post for Ilies', 'desc ilies post', '', 0, 10, 2, '2024-12-17');
+INSERT INTO `posts` (`id`, `title`, `description`, `keywords`, `clicks`, `userId`, `categoryId`, `isFeatured`, `createdDate`) VALUES
+(1, 'Bonjour voici un post', 'Bonjour voici un post, ceci est un essai, merci', 'post', 1, 10, 0, 0, '2024-12-14'),
+(2, 'Check new post', 'Testing of new post form', '', 0, 8, 2, 0, '2024-12-15'),
+(3, 'My first post', 'This is my first post for test', '', 0, 9, 1, 0, '2024-12-16'),
+(4, 'New post for Ilies', 'desc ilies post', '', 0, 10, 2, 0, '2024-12-17');
 
 -- --------------------------------------------------------
 
@@ -261,6 +290,12 @@ ALTER TABLE `marketplace`
   ADD PRIMARY KEY (`id`);
 
 --
+-- Index pour la table `message`
+--
+ALTER TABLE `message`
+  ADD PRIMARY KEY (`id`);
+
+--
 -- Index pour la table `posts`
 --
 ALTER TABLE `posts`
@@ -281,7 +316,7 @@ ALTER TABLE `users`
 -- AUTO_INCREMENT pour la table `ads`
 --
 ALTER TABLE `ads`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
 
 --
 -- AUTO_INCREMENT pour la table `adstype`
@@ -306,6 +341,12 @@ ALTER TABLE `category`
 --
 ALTER TABLE `marketplace`
   MODIFY `id` int(40) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=15;
+
+--
+-- AUTO_INCREMENT pour la table `message`
+--
+ALTER TABLE `message`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
 
 --
 -- AUTO_INCREMENT pour la table `posts`

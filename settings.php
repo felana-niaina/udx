@@ -8,6 +8,7 @@
   include_once 'classes/PostsResultsProvider.php';
   include_once 'classes/BillingResultsProvider.php'; 
   include_once 'classes/AdsResultsProvider.php';
+  include_once 'classes/MessageResultsProvider.php';
 
   // Créer une instance de la classe DatabaseConnector
   $database = new DatabaseConnector();
@@ -25,6 +26,7 @@
   $AdsProvider = new AdsResultsProvider($con);
   $marketPlaceProvider = new MarketplaceResultsProvider($con);
   $postsProvider = new PostsResultsProvider($con);
+  $messageProvider = new MessageResultsProvider($con);
   
 
   // Récupérer l'ID utilisateur à partir de la session
