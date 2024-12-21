@@ -321,5 +321,24 @@ class MarketplaceResultsProvider {
             return 0;
         }
     }
+
+    public function updateProductFeatured($userId, $productId, $isFeatured){
+        try {
+            $sql = "UPDATE marketplace 
+                    SET isFeatured = :isFeatured
+                    WHERE id = :productId AND userId = :userId";
+            $stmt = $this->con->prepare($sql);
+            $stmt->bindParam(':isFeatured', $isFeatured);
+            $stmt->bindParam(':productId', $productId);
+            $stmt->bindParam(':userId', $userId);
+
+            // Exécuter la requête d'update
+            $stmt->execute();
+            return true;
+        } catch (PDOException $e) {
+            echo "Erreur lors de la mise à jour du produit : " . $e->getMessage();
+            return false;
+        }
+    }
 }
 ?>

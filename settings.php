@@ -75,6 +75,7 @@
             case 'configAds':
                 if(intval($_POST['ad_id']) > 0)
                   $AdsProvider->resetAdParam($userId, $_POST['ad_id']);
+                  // $marketPlaceProvider->updateProductFeatured($userId, $_POST['ad_id']);
                 break;
             default:
                 echo "Formulaire inconnu pour Reset.";
@@ -254,8 +255,20 @@
 
     //edit ads configuration
     elseif ($formId === 'configAds') {
-      if($userId && $_POST['adsTypeId'] && (int)$_POST['contentId'] > 0 && $_POST['budget']) {
+      // Get list of allowed ad type
+      $listAdType = array_map(function ($item) {
+        return $item['contentTable'];
+      }, $AdsProvider->getAdsType());
+      if($userId && $_POST['adsTypeId'] && (int)$_POST['contentId'] > 0 && $_POST['budget'] && in_array($_POST['contentAdType'], $listAdType)) {
         if ($AdsProvider->addAds($userId,$_POST['adsTypeId'], $_POST['contentId'], $_POST['budget'], $_POST['ad_id'])) {
+          // Check which type of ad is added
+          if($_POST['contentAdType'] === 'posts')  {
+            // Set post as featured
+            $postsProvider->updatePostFeatured($userId, $_POST['contentId'], 1);
+          } elseif ($_POST['contentAdType'] === 'marketplace') {
+            // Set post as featured
+            $marketPlaceProvider->updateProductFeatured($userId, $_POST['contentId'], 1);
+          }
           echo "<script>
               document.addEventListener('DOMContentLoaded', function() {
                   Swal.fire({
@@ -806,12 +819,13 @@
               <form method="post"> 
                 <input type="hidden" name="form_id" value="configAds">
                 <input type="hidden" name="ad_id" value="<?php echo ($userAd) ? $userAd->id : 0 ?>">
+                <input type="hidden" name="contentAdType" id="contentAdType" value="<?php echo ($userAd) ? $adType->contentTable : '' ?>">
                 <div class="form-group">
                   <label for="adType">Type de publicité</label>
                   <select class="form-control" id="adType" name="adsTypeId">
                     <option value="" disabled selected>-- Select an option --</option>
                     <?php foreach ($AdsProvider->getAdsType() as $key => $value) { ?>
-                      <option value="<?php echo $value['id'] ?>" <?php echo $userAd && $userAd->adsTypeId == $value['id'] ? "selected" : "" ?> ><?php echo $value['title'] ?></option>
+                      <option value="<?php echo $value['id'] ?>" <?php echo $userAd && $userAd->adsTypeId == $value['id'] ? "selected" : "" ?> data-table="<?php echo $value['contentTable'] ?>"><?php echo $value['title'] ?></option>
                     <?php } ?>
                   </select>
                   <small id="adTypeHelp" class="form-text text-muted">Sélectionnez le type de publicité que vous souhaitez utiliser.</small>
@@ -861,7 +875,7 @@
                       </button>
                   </div>
                   <div class="modal-body">
-                    <form id="postProductForm" method="post" enctype="multipart/form-data">
+                    <form id="updateProductForm" method="post" enctype="multipart/form-data">
                       <input type="hidden" name="form_id" value="updateProduct">
                       <textarea hidden id="productId" name="productId" ></textarea>
                       <!-- ancien modification du marketplace -->
@@ -1213,7 +1227,9 @@
 
       //Get list of produt / post with ajax
       $(document).on('change', '#adType', function(e){
-        let url = ($(this).val() == 1) ? "ajax/postInfo.php" : "ajax/productInfo.php";
+        let contentType = $(this).find(':selected').data('table');
+        $("#contentAdType").val(contentType);
+        let url = (contentType == "posts") ? "ajax/postInfo.php" : "ajax/productInfo.php";
         $.post(url, {
           listProduct: true
         }).done(function(result){

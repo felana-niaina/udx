@@ -47,11 +47,7 @@ class AdsResultsProvider {
 
                 // Exécuter la requête d'update
                 $stmt->execute();
-                if ($stmt->rowCount() > 0) {
-                    return true;
-                }
-                return false;
-
+                return true;
             }
             $sql = "INSERT INTO ads (adsTypeId, contentId, budget, userId) VALUES (:adsTypeId, :contentId, :budget, :userId)";
             $stmt = $this->con->prepare($sql);

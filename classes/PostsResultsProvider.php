@@ -242,5 +242,26 @@ class PostsResultsProvider {
             echo json_encode(["success" => false, "message" => $e->getMessage()]);
         }
     }
+
+    public function updatePostFeatured($userId, $postId, $isFeatured){
+        try {
+            $sql = "UPDATE posts 
+                    SET isFeatured = :isFeatured 
+                    WHERE id = :postId AND userId = :userId";
+            $stmt = $this->con->prepare($sql);
+
+            $stmt->bindParam(':isFeatured', $isFeatured);
+            $stmt->bindParam(':postId', $postId);
+            $stmt->bindParam(':userId', $userId);
+
+            // Exécuter la requête d'update
+            $stmt->execute();
+            return true;
+
+        } catch (PDOException $e) {
+            echo "Erreur lors de la mise à jour du produit : " . $e->getMessage();
+            return false;
+        }
+    }
 }
 ?>
