@@ -103,5 +103,20 @@ class AdsResultsProvider {
         }
     }
 
+    function resetAdParam($userId, $AdId) {
+        try {
+            $sql = "DELETE from ads 
+                    WHERE id = :AdId AND userId = :userId ";
+            $stmt = $this->con->prepare($sql);
+            $stmt->bindParam(':AdId', $AdId);
+            $stmt->bindParam(':userId', $userId);
+            $stmt->execute();
+            header("Location: settings.php");
+            exit();
+        } catch (PDOException $e) {
+            echo "Erreur lors de la réinitialisation du profil : " . $e->getMessage();
+        }
+    }
+
 }
 ?>

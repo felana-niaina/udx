@@ -72,6 +72,10 @@
             case 'update_profile':
                 $userRegistration->resetProfileInfo($userId); // Appeler la fonction spécifique au formulaire de profil
                 break;
+            case 'configAds':
+                if(intval($_POST['ad_id']) > 0)
+                  $AdsProvider->resetAdParam($userId, $_POST['ad_id']);
+                break;
             default:
                 echo "Formulaire inconnu pour Reset.";
                 break;
@@ -805,8 +809,9 @@
                 <div class="form-group">
                   <label for="adType">Type de publicité</label>
                   <select class="form-control" id="adType" name="adsTypeId">
+                    <option value="" disabled selected>-- Select an option --</option>
                     <?php foreach ($AdsProvider->getAdsType() as $key => $value) { ?>
-                      <option value="<?php echo $value['id'] ?>" <?php echo $userAd->adsTypeId == $value['id'] ? "selected" : "" ?> ><?php echo $value['title'] ?></option>
+                      <option value="<?php echo $value['id'] ?>" <?php echo $userAd && $userAd->adsTypeId == $value['id'] ? "selected" : "" ?> ><?php echo $value['title'] ?></option>
                     <?php } ?>
                   </select>
                   <small id="adTypeHelp" class="form-text text-muted">Sélectionnez le type de publicité que vous souhaitez utiliser.</small>
@@ -818,7 +823,7 @@
                       <option value="" disabled selected>-- Select an option --</option>
                     <?php } else { 
                       foreach ($contentList as $key => $value) { ?>
-                        <option value="<?php echo $value['id'] ?>" <?php echo $userAd->contentId == $value['id'] ? "selected" : "" ?> ><?php echo $value['title'] ?></option>
+                        <option value="<?php echo $value['id'] ?>" <?php echo $userAd && $userAd->contentId == $value['id'] ? "selected" : "" ?> ><?php echo $value['title'] ?></option>
                     <?php }} ?>
                   </select>
                   <small id="targetingHelp" class="form-text text-muted">Sélectionnez votre méthode de ciblage.</small>
@@ -826,10 +831,10 @@
                 <div class="form-group">
                   <label for="dailyBudget">Budget quotidien</label>
                   <select class="form-control" id="dailyBudget" name="budget">
-                      <option value="10" <?php echo $userAd->budget == 10 ? "selected" : "" ?> >10€</option>
-                      <option value="20" <?php echo $userAd->budget == 20 ? "selected" : "" ?> >20€</option>
-                      <option value="50" <?php echo $userAd->budget == 50 ? "selected" : "" ?> >50€</option>
-                      <option value="100" <?php echo $userAd->budget == 100 ? "selected" : "" ?> >100€</option>
+                      <option value="10" <?php echo $userAd && $userAd->budget == 10 ? "selected" : "" ?> >10€</option>
+                      <option value="20" <?php echo $userAd && $userAd->budget == 20 ? "selected" : "" ?> >20€</option>
+                      <option value="50" <?php echo $userAd && $userAd->budget == 50 ? "selected" : "" ?> >50€</option>
+                      <option value="100" <?php echo $userAd && $userAd->budget == 100 ? "selected" : "" ?> >100€</option>
                       <option value="custom">Autre...</option>
                   </select>
                   <small id="dailyBudgetHelp" class="form-text text-muted">Sélectionnez votre budget quotidien ou choisissez "Autre" pour entrer un budget personnalisé.</small>
@@ -838,7 +843,7 @@
                   All of the fields on this page are optional and can be deleted at any time, and by filling them out, you're giving us consent to share this data wherever your user profile appears.
                 </div>
                 <button type="submit" class="btn btn-primary">Valider</button>
-                <button type="reset" class="btn btn-light">Reset Changes</button>
+                <button type="submit" class="btn btn-light" name="reset_changes">Reset Changes</button>
               </form>
             </div>
           </div>

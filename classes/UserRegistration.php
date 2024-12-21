@@ -227,11 +227,11 @@ class UserRegistration {
 
     function resetProfileInfo($userId) {
         try {
-            $sql = "UPDATE users SET profileTitle = '', bio = '', url = '', phone = '', location = '' WHERE id = :userId";
+            $sql = "UPDATE users SET fullname = '', profileTitle = '', bio = '', url = '', phone = '', location = '' WHERE id = :userId";
             $stmt = $this->con->prepare($sql);
             $stmt->bindParam(':userId', $userId);
             $stmt->execute();
-            header("Location: settings.php?reset=profile_success");
+            header("Location: settings.php");
             exit();
         } catch (PDOException $e) {
             echo "Erreur lors de la réinitialisation du profil : " . $e->getMessage();
