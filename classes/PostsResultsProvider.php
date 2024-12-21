@@ -56,7 +56,7 @@ class PostsResultsProvider {
                                         WHERE posts.title LIKE :term 
                                         OR posts.description LIKE :term 
                                         OR posts.keywords LIKE :term
-                                        ORDER BY posts.clicks DESC
+                                        ORDER BY isFeatured, posts.clicks DESC
                                         LIMIT :fromLimit, :pageSize");
                                         
             $searchTerm = "%" . $term . "%";

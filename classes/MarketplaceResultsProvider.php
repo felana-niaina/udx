@@ -55,7 +55,7 @@ class MarketplaceResultsProvider {
                                          WHERE title LIKE :term 
                                          OR description LIKE :term 
                                          OR keywords LIKE :term
-                                         ORDER BY clicks DESC
+                                         ORDER BY isFeatured, clicks DESC
                                          LIMIT :fromLimit, :pageSize");
 
             $searchTerm = "%" . $term . "%";

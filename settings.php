@@ -261,6 +261,12 @@
       }, $AdsProvider->getAdsType());
       if($userId && $_POST['adsTypeId'] && (int)$_POST['contentId'] > 0 && $_POST['budget'] && in_array($_POST['contentAdType'], $listAdType)) {
         if ($AdsProvider->addAds($userId,$_POST['adsTypeId'], $_POST['contentId'], $_POST['budget'], $_POST['ad_id'])) {
+          if($userAd && ($adType->contentTable === 'posts')) {
+            $postsProvider->updatePostFeatured($userId, $userAd->contentId, 0);
+          } elseif ($userAd && ($adType->contentTable === 'marketplace')) {
+            $marketPlaceProvider->updateProductFeatured($userId, $userAd->contentId, 0);
+          }
+
           // Check which type of ad is added
           if($_POST['contentAdType'] === 'posts')  {
             // Set post as featured
