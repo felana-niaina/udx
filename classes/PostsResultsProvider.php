@@ -77,6 +77,7 @@ class PostsResultsProvider {
                 // Truncation des champs title et description si nécessaire
                 $title = $this->trimField($title, 120);
                 $description = $this->trimField($description, 230);
+                $isFeatured = $row["isFeatured"];
 
                 // Ajouter le résultat au HTML
                 $resultsHtml .= "<div class='d-flex mb-3' data-post-id='$id'>
@@ -84,7 +85,11 @@ class PostsResultsProvider {
                                     <div class='text'>
                                         <div class='d-flex'>
                                             <h3 class='title pe-3'>
-                                                    $title
+                                                    $title ";
+                if($isFeatured) {
+                    $resultsHtml .= "<span class='badge badge-success' id='success-badge'>Pub</span>";
+                }                                   
+                $resultsHtml .= "
                                             </h3>
                                              <!-- Icone Like -->
                                             <button class='btn'>

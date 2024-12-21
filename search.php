@@ -88,6 +88,9 @@
             margin-top: 10px;
             display: none; /* Masque le champ initialement */
         }
+        #success-badge{
+            font-size: 0.7rem;
+        }
     </style>
     <script src="https://code.jquery.com/jquery-3.3.1.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
 
