@@ -27,7 +27,6 @@
   $marketPlaceProvider = new MarketplaceResultsProvider($con);
   $postsProvider = new PostsResultsProvider($con);
   $messageProvider = new MessageResultsProvider($con);
-  
 
   // Récupérer l'ID utilisateur à partir de la session
   $userId = $_SESSION['user_id'];
@@ -698,20 +697,9 @@
             <div class="tab-pane" id="messages">
               <h6>YOUR INBOX</h6>
               <hr>
-              <div class="list-group">
-                <!-- Example of received message -->
-                <div class="list-group-item message-item" data-toggle="modal" data-target="#messageModal" data-subject="Meeting Request" data-body="Hi, I wanted to schedule a meeting with you next week. Let me know your availability." data-sender="John Doe" data-date="2024-12-10">
-                  <h5 class="mb-1">Meeting Request</h5>
-                  <p class="mb-1">John Doe - 2024-12-10</p>
-                  <small>Hi, I wanted to schedule a meeting with you next week...</small>
-                </div>
-                <!-- Add more messages here as needed -->
-                <div class="list-group-item message-item" data-toggle="modal" data-target="#messageModal" data-subject="Project Update" data-body="The project status has been updated. Please check the dashboard." data-sender="Jane Smith" data-date="2024-12-09">
-                  <h5 class="mb-1">Project Update</h5>
-                  <p class="mb-1">Jane Smith - 2024-12-09</p>
-                  <small>The project status has been updated...</small>
-                </div>
-              </div>
+              <?php 
+                echo $messageProvider->getMessagesByUser($_SESSION['user_id']);
+              ?>
             </div>
             
             <div class="tab-pane" id="security">
