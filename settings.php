@@ -1280,41 +1280,22 @@
           let userId = <?php echo $_SESSION['user_id'] ?>;
           $("#parent_id").val(parentId);
           $('#messageContent').append("<h5 id='messageSubject'>Subject : "+subject+"</h5>");
-          let senderUser = null;
+          let currentUser = null;
           $.each(data, function(index, value) {
-            /* console.log(senderUser)
-            if (userId === value.fromUserId) {
-              if (senderUser != value.fromUserId) {
-                // User has changed, update currentUser
-                senderUser = value.fromUserId;
-                // Append a new div
-                let html = "<div class='alert alert-light text-left message-detail'>" + value.content + "</div>";
-                $('#messageContent').append(html);
-              } else {
-                  // If user is not changed, just update the content (optional)
-                  $('#messageContent .message-detail:last').append("<p>" + value.content + "</p>");
-              }
-            } else if (userId === value.toUserId) {
-              if (currentUser != value.toUserId) {
-                // User has changed, update currentUser
-                currentUser = value.toUserId;
-
-                // Append a new div
-                let html = "<div class='alert alert-secondary text-right message-detail'>" + value.content + "</div>";
-                $('#messageContent').append(html);
-              } else {
-                // If user is not changed, just update the content (optional)
-                $('#messageContent .message-detail:last').append("<p>" + value.content + "</p>");
-              }
-            } */
             if(userId === value.fromUserId) {
-              currentUser = value.fromUserId;
-              let html = "<div class='alert alert-light text-left message-detail'>"+ value.content +"</div>";
-              $('#messageContent').append(html);
+              if(index > 0 && data[index-1].fromUserId == value.fromUserId) {
+                $('#messageContent .message-detail:last').append("<br>" + value.content);
+              } else {
+                let html = "<div class='alert alert-light text-left message-detail'>"+ value.content +"</div>";
+                $('#messageContent').append(html);
+              }
             } else if (userId === value.toUserId) {
-              currentUser = value.toUserId;
-              let html = "<div class='alert alert-secondary text-right message-detail'>"+ value.content +"</div>";
-              $('#messageContent').append(html);
+              if(index > 0 && data[index-1].toUserId == value.toUserId) {
+                $('#messageContent .message-detail:last').append("<br>" + value.content);
+              } else {
+                let html = "<div class='alert alert-secondary text-right message-detail'>"+ value.content +"</div>";
+                $('#messageContent').append(html);
+              }
             }
           });
           $("#messageModal").modal('show');
