@@ -18,17 +18,30 @@ class MessageResultsProvider {
         $this->con = $con;
     }
 
-    public function sendMessage($userId, $receiverId, $message, $subject) {
+    public function sendMessage($userId, $receiverId, $message, $subject, $parentId = 0) {
         try {
-            $sql = "INSERT INTO message (subject, content, fromUserId, toUserId) VALUES (:subject, :fromUserId, :toUserId)";
+            $sql = "INSERT INTO message (subject, content, fromUserId, toUserId, parentId) VALUES (:subject, :content, :fromUserId, :toUserId, :parentId)";
             $stmt = $this->con->prepare($sql);
-            $stmt->bindParam(':subject', $adType);
-            $stmt->bindParam(':content', $adContent);
-            $stmt->bindParam(':fromUserId', $budget);
-            $stmt->bindParam(':toUserId', $userId);
+            $stmt->bindParam(':subject', $subject);
+            $stmt->bindParam(':content', $message);
+            $stmt->bindParam(':fromUserId', $userId);
+            $stmt->bindParam(':toUserId', $receiverId);
+            $stmt->bindParam(':parentId', $parentId);
             $stmt->execute();
             $messageId = $this->con->lastInsertId();
             if ($messageId) {
+                if($parentId == 0) {
+                    // Update parentId by the last insert Id
+                    $sql = "UPDATE message 
+                    SET parentId = :parentId, contentId = :contentId, budget = :budget 
+                    WHERE id = :messageId";
+                    $stmt = $this->con->prepare($sql);
+                    $stmt->bindParam(':parentId', $messageId);
+                    $stmt->bindParam(':messageId', $messageId);
+
+                    // Exécuter la requête d'update
+                    $stmt->execute();
+                }
                 return true;
             }
             return false;
@@ -55,6 +68,7 @@ class MessageResultsProvider {
         }
     }
 
+    // Récupération détails des messages de l'utilisateur
     public function getMessagesByUser($userId) {
         try {
             if (!$this->con) {
@@ -99,6 +113,30 @@ class MessageResultsProvider {
             }
             $resultsHtml .= '</div>';
             return $resultsHtml;
+        } catch (PDOException $e) {
+            echo "Erreur lors de la récupération des messages : " . $e->getMessage();
+            return [];
+        }
+    }
+
+    // Récupération détails des messages du même sujet
+    public function getMessagesByParent($userId, $parentId){
+        try {
+            if (!$this->con) {
+                throw new Exception("La connexion à la base de données a échoué.");
+            }
+            $sql = "SELECT m1.*, fus.profile_photo, fus.username, tus.profile_photo, tus.username 
+                FROM message m1
+                INNER JOIN users fus ON m1.fromUserId = fus.id
+                INNER JOIN users tus ON m1.toUserId = tus.id
+                WHERE m1.parentId = :parentId AND ( m1.fromUserId = :userId OR m1.toUserId = :userId )
+                ORDER BY createdDate ASC;
+                ";
+            $stmt = $this->con->prepare($sql);
+            $stmt->bindParam(':parentId', $parentId);
+            $stmt->bindParam(':userId', $userId);
+            $stmt->execute();
+            return $stmt->fetchAll();
         } catch (PDOException $e) {
             echo "Erreur lors de la récupération des messages : " . $e->getMessage();
             return [];

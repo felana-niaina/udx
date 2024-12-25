@@ -1235,6 +1235,20 @@
             $('#targeting').append('<option value="' + value.id + '">' + value.title + '</option>');
           })
         });
+      });
+
+      $(document).on('click', '.message-item', function(e){
+        let parentId = $(this).data('parent');
+        $.post("ajax/postMessage.php", {
+          parentId: parentId
+        }).done(function(result){
+          $('#messageContent').empty();
+          let data = JSON.parse(result);
+          $.each(data, function(index, value) {
+            // $('#targeting').append('<option value="' + value.id + '">' + value.title + '</option>');
+          });
+          $("#messageModal").modal('show');
+        });
       })
       
     })
