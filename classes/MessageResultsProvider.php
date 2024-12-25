@@ -20,6 +20,15 @@ class MessageResultsProvider {
 
     public function sendMessage($userId, $receiverId, $message, $subject, $parentId = 0) {
         try {
+            if (is_null($receiverId) && $parentId > 0) {
+                // get receiver Id and the subject
+                $exchange = $this->getMessageDetailsByParendId($parentId);
+                if($exchange) {
+                    $subject = $exchange->subject;
+                    $receiverId = $exchange->fromUserId == $userId ? $exchange->toUserId : $exchange->fromUserId;
+                }
+            }
+
             $sql = "INSERT INTO message (subject, content, fromUserId, toUserId, parentId) VALUES (:subject, :content, :fromUserId, :toUserId, :parentId)";
             $stmt = $this->con->prepare($sql);
             $stmt->bindParam(':subject', $subject);
@@ -104,7 +113,7 @@ class MessageResultsProvider {
                 }
                 $content = $row['content'];
                 $parentId = $row['parentId'];
-                $resultsHtml .= "<div class='list-group-item message-item' data-parent='$parentId'>
+                $resultsHtml .= "<div class='list-group-item message-item' data-parent='$parentId' data-subject='$subject'>
                     <h5 class='mb-1'>$subject</h5>
                     <p class='mb-1'>$userName - $date</p>
                     <small>$content...</small>
@@ -140,6 +149,26 @@ class MessageResultsProvider {
         } catch (PDOException $e) {
             echo "Erreur lors de la récupération des messages : " . $e->getMessage();
             return [];
+        }
+    }
+
+    public function getMessageDetailsByParendId($parentId) {
+        try {
+            $sql = "SELECT * FROM message WHERE parentId = :parentId LIMIT 0,1";
+            $stmt = $this->con->prepare($sql);
+            $stmt->bindParam(':parentId', $parentId);
+            $stmt->execute();
+            
+            $message = $stmt->fetchObject();
+            
+            if ($message) {
+                return $message;
+            } else {
+                return null;  // L'utilisateur n'a pas de pub
+            }
+        } catch (PDOException $e) {
+            echo "Erreur lors de la récupération des données utilisateur : " . $e->getMessage();
+            return null;
         }
     }
 }

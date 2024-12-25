@@ -294,6 +294,28 @@
       }
     }
 
+    // reply message
+    elseif ($formId === 'messageReply') {
+      if($_POST['parent_id'] > 0 && trim($_POST['content'] !== "")) {
+        if ($messageProvider->sendMessage($userId, NULL, $_POST['content'], NULL,$_POST['parent_id'])) {
+          echo "<script>
+              document.addEventListener('DOMContentLoaded', function() {
+                  Swal.fire({
+                      title: 'Succès',
+                      text: 'Message envoyé !',
+                      icon: 'success',
+                      confirmButtonText: 'OK'
+                  }).then((result) => {
+                      if (result.isConfirmed) {
+                          window.location.href = 'settings.php';
+                      }
+                  });
+              });
+          </script>";
+        }
+      }
+    }
+
   }
 
 ?>
@@ -518,6 +540,13 @@
         .edit-marketplace-photo:hover {
             background-color: rgba(255, 255, 255, 0.8);
             color: black;
+        }
+
+        .message-item > h5, #messageSubject {
+          font-size : 1.25rem !important;
+        }
+        .message-item > p, .message-detail {
+          font-size : 1rem !important;
         }
         /* End Style for message */
 
@@ -931,7 +960,7 @@
                       
                       <div class="modal-footer">
                           <button type="button" class="btn btn-secondary" data-dismiss="modal">Fermer</button>
-                          <button type="submit" class="btn btn-primary" id="replyButton">Envoyer</button>
+                          <button type="submit" class="btn btn-primary">Envoyer</button>
                       </div>
                     </form>
                   </div>
@@ -1041,7 +1070,7 @@
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                <button type="button" class="btn btn-primary" id="replyButton">Reply</button>
+                <button type="button" class="btn btn-primary">Reply</button>
             </div>
           </div>
         </div>
@@ -1100,21 +1129,24 @@
             </div>
             <div class="modal-body">
               <div id="messageContent">
-                <h5 id="messageSubject"></h5>
-                <p id="messageSender"></p>
-                <p id="messageDate"></p>
-                <p id="messageBody"></p>
+                
               </div>
 
               <!-- Form for responding to the message -->
               <div class="response-box">
                 <h6>Your Reply:</h6>
-                <textarea id="responseText" class="form-control" rows="4" placeholder="Type your reply here..."></textarea>
+                <form method="post" id="sendMessageForm">
+                  <input type="hidden" name="form_id" id="messageFormId" value="messageReply">
+                  <input type="hidden" name="parent_id" id="parent_id" value="">
+                  <div class="form-group">
+                    <textarea id="responseText" name="content" class="form-control" rows="4" placeholder="Type your reply here..." required></textarea>
+                  </div>
+                  <div class="form-group text-right">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                    <button type="submit" class="btn btn-primary" id="replyButton">Reply</button>
+                  </div>
+                </form>
               </div>
-            </div>
-            <div class="modal-footer">
-              <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-              <button type="button" class="btn btn-primary" id="replyButton">Reply</button>
             </div>
           </div>
         </div>
@@ -1239,18 +1271,64 @@
 
       $(document).on('click', '.message-item', function(e){
         let parentId = $(this).data('parent');
+        let subject = $(this).data('subject');
         $.post("ajax/postMessage.php", {
           parentId: parentId
         }).done(function(result){
           $('#messageContent').empty();
           let data = JSON.parse(result);
+          let userId = <?php echo $_SESSION['user_id'] ?>;
+          $("#parent_id").val(parentId);
+          $('#messageContent').append("<h5 id='messageSubject'>Subject : "+subject+"</h5>");
+          let senderUser = null;
           $.each(data, function(index, value) {
-            // $('#targeting').append('<option value="' + value.id + '">' + value.title + '</option>');
+            /* console.log(senderUser)
+            if (userId === value.fromUserId) {
+              if (senderUser != value.fromUserId) {
+                // User has changed, update currentUser
+                senderUser = value.fromUserId;
+                // Append a new div
+                let html = "<div class='alert alert-light text-left message-detail'>" + value.content + "</div>";
+                $('#messageContent').append(html);
+              } else {
+                  // If user is not changed, just update the content (optional)
+                  $('#messageContent .message-detail:last').append("<p>" + value.content + "</p>");
+              }
+            } else if (userId === value.toUserId) {
+              if (currentUser != value.toUserId) {
+                // User has changed, update currentUser
+                currentUser = value.toUserId;
+
+                // Append a new div
+                let html = "<div class='alert alert-secondary text-right message-detail'>" + value.content + "</div>";
+                $('#messageContent').append(html);
+              } else {
+                // If user is not changed, just update the content (optional)
+                $('#messageContent .message-detail:last').append("<p>" + value.content + "</p>");
+              }
+            } */
+            if(userId === value.fromUserId) {
+              currentUser = value.fromUserId;
+              let html = "<div class='alert alert-light text-left message-detail'>"+ value.content +"</div>";
+              $('#messageContent').append(html);
+            } else if (userId === value.toUserId) {
+              currentUser = value.toUserId;
+              let html = "<div class='alert alert-secondary text-right message-detail'>"+ value.content +"</div>";
+              $('#messageContent').append(html);
+            }
           });
           $("#messageModal").modal('show');
         });
-      })
-      
+      });
+
+      /* $('#sendMessageForm').submit(function(e) {
+        e.preventDefault();
+        $.post("ajax/postMessage.php", {
+          data: $('#sendMessageForm').serialize()
+        }).done(function(result){
+
+        });
+      }); */
     })
 
     // Lorsque l'utilisateur clique sur le bouton d'édition de la photo du marketplace à modifer
