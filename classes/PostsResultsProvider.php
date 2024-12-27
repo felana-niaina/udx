@@ -107,7 +107,7 @@ class PostsResultsProvider {
                                         </div>
                                         
                                         <!-- Zone pour le commentaire -->
-                                        <div class='comment-area' id='omment-area'>
+                                        <div class='comment-area' id='comment-area'>
                                             <textarea class='form-control' rows='2' placeholder='Écrire un commentaire...'></textarea>
                                             <div class='mt-2'>
                                                 <button class='btn btn-secondary' onclick='cancelComment(this)'>Annuler</button>

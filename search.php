@@ -1,6 +1,7 @@
 <?php
     include_once 'classes/DatabaseConnector.php';
     include("classes/SiteResultsProvider.php");
+    include("classes/MessageResultsProvider.php");
     include("classes/MarketplaceResultsProvider.php"); 
     include("classes/PostsResultsProvider.php"); 
     include("classes/ImageResultsProvider.php");
@@ -10,43 +11,78 @@
     $con = $database->getConnection();
 
     $postsResults = new PostsResultsProvider($con);
+    $messageResult = new MessageResultsProvider($con);
     
-    $postId = $userId = $commentText = null;
-    if ($_SERVER["REQUEST_METHOD"] === "POST") {
-        $postId = $_POST["postId"];
-        $userId = $_POST["userId"];
-        $commentText = $_POST["comment"];
-
-        $result = $postsResults->saveComment($postId, $userId, $commentText);
-
-        if ($result) {
-            echo "<script>
-                    document.addEventListener('DOMContentLoaded', function() {
-                        Swal.fire({
-                            title: 'Succès',
-                            text: 'Commentaire ajouté !',
-                            icon: 'success',
-                            confirmButtonText: 'OK'
-                        }).then((result) => {
-                            if (result.isConfirmed) {
-                                window.location.href = 'search.php';
-                            }
-                        });
-                    });
-                </script>";
-        } else {
-            echo "Échec de l'envoie du commentaire.";
-        }
-    }
-
-    
-
     $isUserConnected = false;
     session_start();
     if(!empty($_SESSION)) {
         $isUserConnected = true;
     };
 
+    $postId = $userId = $commentText = null;
+    if ($_SERVER["REQUEST_METHOD"] === "POST") {
+        $addMessagePost = $_POST["marketplace_id"];
+
+        if(!$addMessagePost){
+            $postId = $_POST["postId"];
+            $userId = $_POST["userId"];
+            $commentText = $_POST["comment"];
+
+            $result = $postsResults->saveComment($postId, $userId, $commentText);
+
+            if ($result) {
+                echo "<script>
+                        document.addEventListener('DOMContentLoaded', function() {
+                            Swal.fire({
+                                title: 'Succès',
+                                text: 'Commentaire ajouté !',
+                                icon: 'success',
+                                confirmButtonText: 'OK'
+                            }).then((result) => {
+                                if (result.isConfirmed) {
+                                    window.location.href = 'search.php';
+                                }
+                            });
+                        });
+                    </script>";
+            } else {
+                echo "Échec de l'envoie du commentaire.";
+            }
+        }
+        elseif($addMessagePost === "sendMessage")
+        {
+            $userId = $_SESSION['user_id'];
+            $receiverId = $_POST["userId"];
+            $message = $_POST["message"];
+            $subject = $_POST["subject"];
+            $parentId = 0;
+            echo "<script>console.log($userId,$receiverId)</script>";
+
+            $result = $messageResult->sendMessage($userId,$receiverId, $message, $subject,$parentId);
+
+            if ($result) {
+                echo "<script>
+                        document.addEventListener('DOMContentLoaded', function() {
+                            Swal.fire({
+                                title: 'Succès',
+                                text: 'Message envoyé !',
+                                icon: 'success',
+                                confirmButtonText: 'OK'
+                            }).then((result) => {
+                                if (result.isConfirmed) {
+                                    window.location.href = 'search.php';
+                                }
+                            });
+                        });
+                    </script>";
+            } else {
+                echo "Échec de l'envoie du message.";
+            }
+        }
+        
+    }
+
+    
     if(isset($_GET["term"])){
         $term = $_GET["term"];
     }else{
@@ -65,7 +101,7 @@
           content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>Underdex</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@4.4.1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet"> 
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/fancybox/3.3.5/jquery.fancybox.min.css" />
@@ -236,15 +272,50 @@
             </div>
         </div>
 
+        <!-- Modal pour envoyer message -->
+        <div class="modal fade" id="contactModal" tabindex="-1" aria-labelledby="contactModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="contactModalLabel">Contacter le Product Owner</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <?php if ($isUserConnected): ?>
+                        <!-- Formulaire pour répondre à l'article -->
+                        <form id="contactForm" method="post" enctype="multipart/form-data">
+                            <input type="hidden" name="marketplace_id" value="sendMessage">
+                            <input type="hidden" name="userId" id="userId" value="" >
+                            <div class="mb-3">
+                                <label for="subject" class="form-label">Objet du message</label>
+                                <input type="text" class="form-control" id="subject" name="subject" require/>
+                            </div>
+                            <div class="mb-3">
+                                <label for="message" class="form-label">Votre message</label>
+                                <textarea class="form-control" id="message" name="message" rows="4" placeholder="Écrivez votre message ici..."></textarea>
+                            </div>
+                            <div>
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fermer</button>
+                                <button type="submit" class="btn btn-primary" id="sendMessage">Envoyer</button>
+                            </div>
+                        </form>
+                        <?php else: ?>
+                            <p>Veuillez vous connecter pour envoyer un message.</p>
+                        <?php endif; ?>
+                    </div>
+                </div>
+            </div>
+        </div>
+
     </div>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.4.1/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/fancybox/3.3.5/jquery.fancybox.min.js"></script>
     <script src="https://unpkg.com/masonry-layout@4/dist/masonry.pkgd.min.js"></script>
     <script type="text/javascript" src="assets/js/script.js?3"></script>
     <script>
         function toggleCommentArea(button) {
             // Recherche de la div comment-area associée
-            const commentArea = document.getElementById('omment-area');
+            const commentArea = document.getElementById('comment-area');
             
             // Alterne la visibilité
             if (commentArea.style.display === 'none' || commentArea.style.display === '') {
@@ -260,6 +331,7 @@
             commentArea.style.display = 'none'; // Cache la div entière
         }
 
+        //Ajouter commentaire
         function sendComment(button) {
             const commentArea = button.closest(".comment-area");
             const postId = button.closest(".d-flex").dataset.postId; // ID du post
@@ -271,7 +343,7 @@
                 return;
             }
 
-            // Envoyer les données via AJAX
+            // Envoie des données via AJAX
             fetch("search.php", {
                 method: "POST",
                 headers: {
@@ -290,6 +362,32 @@
             })
             .catch((error) => console.error("Erreur : ", error));
         }
+
+        
+        document.addEventListener('DOMContentLoaded', function () {
+            document.querySelectorAll('.contact-product-owner').forEach((button) => {
+                button.addEventListener('click', function () {
+                    let element = document.querySelector('.contact-product-owner');
+                    const receiverId = element.getAttribute('data-user-id'); // ID du propriétaire du produit
+                    console.log("receiver", receiverId);
+                    
+                    // Met à jour la valeur de l'input caché pour le champ userId
+                    const hiddenInput = document.getElementById("userId");
+                    if (hiddenInput) {
+                        hiddenInput.setAttribute('value', receiverId); // Met à jour la valeur de l'input
+                        console.log("receiver:::::", receiverId);
+
+                    } else {
+                        console.error("L'input caché pour userId n'a pas été trouvé.");
+                    }
+                });
+            });
+        });
+
+        
+
+
+        
     </script>
 </body>
 </html>

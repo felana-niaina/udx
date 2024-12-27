@@ -42,7 +42,7 @@ class MessageResultsProvider {
                 if($parentId == 0) {
                     // Update parentId by the last insert Id
                     $sql = "UPDATE message 
-                    SET parentId = :parentId, contentId = :contentId, budget = :budget 
+                    SET parentId = :parentId
                     WHERE id = :messageId";
                     $stmt = $this->con->prepare($sql);
                     $stmt->bindParam(':parentId', $messageId);
