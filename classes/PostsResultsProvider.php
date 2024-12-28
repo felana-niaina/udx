@@ -50,7 +50,7 @@ class PostsResultsProvider {
 
             $fromLimit = ($page - 1) * $pageSize;
 
-            $query = $this->con->prepare("SELECT posts.*, users.profile_photo 
+            $query = $this->con->prepare("SELECT posts.*, users.profile_photo, users.username
                                         FROM posts
                                         LEFT JOIN users ON posts.userId = users.id
                                         WHERE posts.title LIKE :term 
@@ -72,6 +72,7 @@ class PostsResultsProvider {
                 $userId = $row["userId"];
                 $title = $row["title"];
                 $description = $row["description"];
+                $username = $row["username"];
                 $profilePicture = $row["profile_photo"] ?: "https://via.placeholder.com/150";
 
                 // Truncation des champs title et description si nécessaire
@@ -83,6 +84,7 @@ class PostsResultsProvider {
                 $resultsHtml .= "<div class='d-flex mb-3'>
                                     <a href='http://localhost/udx/profil.php/$userId'><img src='$profilePicture' class='profile-photo' /></a>
                                     <div class='text'>
+                                        <span>$username</span>
                                         <div class='d-flex'>
                                             <h3 class='title pe-3'>
                                                     $title ";

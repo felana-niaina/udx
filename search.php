@@ -277,6 +277,25 @@
                 </div>
             </div>
         </div>
+        
+        <!-- Modal pour afficher la photo du produit -->
+        <div class="modal fade" id="seePictureModal" tabindex="-1" aria-labelledby="photoModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="photoModalLabel">Photo du Produit</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body text-center">
+                    <img id="productImage" src="" alt="Product Image" class="img-fluid">
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fermer</button>
+                </div>
+                </div>
+            </div>
+        </div>
+
 
     </div>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
@@ -368,6 +387,26 @@
                 });
             });
         });
+
+        document.addEventListener('DOMContentLoaded', function () {
+            document.querySelectorAll('.see-market-image').forEach((button) => {
+                button.addEventListener('click', function () {
+                    let element = document.querySelector('.see-market-image');
+                    const picture = element.getAttribute('data-picture'); // ID du propriétaire du produit  
+
+                    // Met à jour la valeur de l'input caché pour le champ userId
+                    const img = document.getElementById("productImage");
+                    if (img) {
+                        img.setAttribute('src', picture); // Met à jour la valeur de l'image
+                    } else {
+                        console.error("image non trouvé.");
+                    }
+                });
+            });
+        });
+
+        
+
 
     </script>
 </body>
