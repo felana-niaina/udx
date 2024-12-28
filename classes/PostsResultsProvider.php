@@ -165,12 +165,12 @@ class PostsResultsProvider {
 
                 // Ajouter le résultat au HTML
 				$resultsHtml .= "
-                <div class='list-group-item post-item' data-toggle='modal' data-target='#postModal' data-title='$title' data-body='$description' data-keyword='$keywords' data-date='$date' data-id='$id'>
+                <div class='list-group-item post-item' >
                     <h5 class='post-title'>$title</h5>
                     <p class='post-date'>$date</p>
                     <p class='post-body'>$description</p>
                     <div class='post-actions'>
-                        <a href='#'>Edit</a> | <a href='#'>Delete</a>
+                        <a href='#' data-toggle='modal' data-target='#postModal' data-title='$title' data-body='$description' data-keyword='$keywords' data-date='$date' data-id='$id'>Edit</a> | <a href='#' class='removePostButton' data-toggle='modal' data-target='#removePostModal' data-title='$title' data-id='$id'>Delete</a>
                     </div>
                 </div>";
             }

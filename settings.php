@@ -1152,6 +1152,36 @@
         </div>
       </div>
 
+      <!-- Modal pour supprimer un post -->
+      <div class="modal fade" id="removePostModal" tabindex="-1" role="dialog" aria-labelledby="removePostModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title" id="removePostModalTitle"></h5>
+              <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+              </button>
+            </div>
+            <div class="modal-body">
+              <form id="removePostForm" method="post">
+                <input type="hidden" name="form_id" value="removePost">
+                <input type="hidden" name="post_id" id="postIdValue" value="">
+                <!-- Titre -->
+                <div class="form-group text-center">
+                    <label for="title">Voulez-vous vraiment supprimer ce post ?</label>
+                </div>
+
+                <!-- Mots-clés -->
+                <div class="form-group text-center">
+                <button type="button" data-dismiss="modal" class="btn btn-primary">Annuler</button>
+                <button type="submit" class="btn btn-danger">Confirmer</button>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
+
     </div>
   </div>
   <script src="https://code.jquery.com/jquery-1.10.2.min.js"></script>
@@ -1300,6 +1330,15 @@
           });
           $("#messageModal").modal('show');
         });
+      });
+
+      // show modal to remove product form marketplace
+      $(document).on('click', '.removePostButton', function(e){
+        var title = $(this).data('title');
+        var id = $(this).data('id');
+
+        $('#postIdValue').val(id);
+        $('#removePostModalTitle').text(title);
       });
 
       /* $('#sendMessageForm').submit(function(e) {
