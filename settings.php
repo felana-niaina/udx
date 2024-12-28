@@ -921,14 +921,6 @@
                     <form id="updateProductForm" method="post" enctype="multipart/form-data">
                       <input type="hidden" name="form_id" value="updateProduct">
                       <textarea hidden id="productId" name="productId" ></textarea>
-                      <!-- ancien modification du marketplace -->
-                      <!-- <div id="productContent">
-                          <h5 id="productTitle"></h5>
-                          <p id="productPrice"></p>
-                          <p id="productDescription"></p>
-                          <p id="productDate"></p>
-                      </div> -->
-                      
                       <!-- nouveau modal de modification -->
                       
                       <div id="productContent">
@@ -1074,21 +1066,33 @@
                 </button>
             </div>
             <div class="modal-body">
+              <form id="updatePostForm" method="post">
+                <input type="hidden" name="form_id" value="updatePost">
+                <input type="hidden" name="post_id" id="post_id" value="">
+                
                 <div id="postContent">
-                    <h5 id="postTitle" class="post-title"></h5>
-                    <p id="postDate" class="post-date"></p>
-                    <p id="postBody" class="post-body"></p>
+                  <div class="form-group">
+                    <input type="text" class="form-control" placeholder="Titre du post" id="postTitle" name="postTitle" required>
+                  </div>
+                  <div class="form-group">
+                    <textarea class="form-control" rows="4" placeholder="Description du post" id="postDescription" name="postDescription" required></textarea>
+                  </div>
+                  <div class="form-group">
+                    <select id="postCategory" class="form-control" name="postCategory" required>
+                      <?php foreach ($postsProvider->getPostCategories() as $key => $value) { ?>
+                          <option value="<?php echo $value['id'] ?>"><?php echo $value['title'] ?></option>
+                      <?php } ?>
+                    </select>
+                  </div>
+                  <div class="form-group">
+                    <input type="text" class="form-control" placeholder="Keywords" id="post-keys" name="postKeyword" required>
+                  </div>
                 </div>
-
-                <!-- Form for responding to the post -->
-                <div class="response-box">
-                    <h6>Your Reply:</h6>
-                    <textarea id="responseText" class="form-control" rows="4" placeholder="Type your reply here..."></textarea>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-primary">Reply</button>
                 </div>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                <button type="button" class="btn btn-primary">Reply</button>
+              </form>
             </div>
           </div>
         </div>
@@ -1233,17 +1237,6 @@
         }
 
       });
-      
-      // get post data and show on modal
-      $(document).on('click', '.post-item', function(e){
-        var title = $(this).data('title');
-        var body = $(this).data('body');
-        var date = $(this).data('date');
-
-        $('#postTitle').text(title);
-        $('#postDate').text('Date: ' + date);
-        $('#postBody').text(body);
-      });
 
       // update username - account settings
       $(document).on('blur', '#usernameField', function(e){
@@ -1350,13 +1343,28 @@
         });
       });
 
-      // show modal to remove product form marketplace
+      // show modal to remove post form marketplace
       $(document).on('click', '.removePostButton', function(e){
         var title = $(this).data('title');
         var id = $(this).data('id');
 
         $('#postIdValue').val(id);
         $('#removePostModalTitle').text(title);
+      });
+
+      // show modal to edit post form marketplace
+      $(document).on('click', '.updatePostButton', function(e){
+        var title = $(this).data('title');
+        var description = $(this).data('body');
+        var keyword = $(this).data('keyword');
+        var id = $(this).data('id');
+        var category = $(this).data('category');
+        var date = $(this).data('date');
+        console.log(keywords)
+        $('#postTitle').val(title);
+        $('#post-keys').val(keywords);
+        $('#post_id').val(id);
+        $('#postDescription').text(description);
       });
 
       /* $('#sendMessageForm').submit(function(e) {

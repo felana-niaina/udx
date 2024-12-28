@@ -158,6 +158,7 @@ class PostsResultsProvider {
                 $description = $row["description"];
                 $keywords = $row["keywords"];
                 $date = $row["createdDate"];
+                $category = $row['categoryId'];
 
                 // Truncation des champs title et description si nécessaire
                 $title = $this->trimField($title, 120);
@@ -170,7 +171,7 @@ class PostsResultsProvider {
                     <p class='post-date'>$date</p>
                     <p class='post-body'>$description</p>
                     <div class='post-actions'>
-                        <a href='#' data-toggle='modal' data-target='#postModal' data-title='$title' data-body='$description' data-keyword='$keywords' data-date='$date' data-id='$id'>Edit</a> | <a href='#' class='removePostButton' data-toggle='modal' data-target='#removePostModal' data-title='$title' data-id='$id'>Delete</a>
+                        <a href='#' class='updatePostButton' data-toggle='modal' data-target='#postModal' data-title='$title' data-body='$description' data-keyword='$keywords' data-date='$date' data-id='$id' data-category='$category'>Edit</a> | <a href='#' class='removePostButton' data-toggle='modal' data-target='#removePostModal' data-title='$title' data-id='$id'>Delete</a>
                     </div>
                 </div>";
             }
