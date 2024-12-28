@@ -47,6 +47,8 @@ class PostsResultsProvider {
             if (!$this->con) {
                 throw new Exception("La connexion à la base de données a échoué.");
             }
+            // Vérifier si l'utilisateur est connecté via la session
+            $isUserConnected = !empty($_SESSION);
 
             $fromLimit = ($page - 1) * $pageSize;
 
@@ -111,13 +113,16 @@ class PostsResultsProvider {
                                         
                                         <!-- Zone pour le commentaire -->
                                         <div class='comment-area' id='comment-area-$id'>
-                                            $commentList
-                                            <textarea class='form-control' rows='2' placeholder='Écrire un commentaire...'></textarea>
-                                            <div class='mt-2'>
-                                                <button class='btn btn-secondary' onclick='cancelComment(this)'>Annuler</button>
-                                                <button class='btn btn-primary' onclick='sendComment(this, $id)'>Envoyer</button>
-                                            </div>
-                                        </div>
+                                            $commentList ";
+                if($isUserConnected) {
+                    $resultsHtml .= "<textarea class='form-control' rows='2' placeholder='Écrire un commentaire...'></textarea>
+                    <div class='mt-2'>
+                        <button class='btn btn-secondary' onclick='cancelComment(this)'>Annuler</button>
+                        <button class='btn btn-primary' onclick='sendComment(this, $id)'>Envoyer</button>
+                    </div>";
+                }
+                                            
+                $resultsHtml .=         "</div>
                                     </div>
                                     
                                   </div>";
