@@ -97,13 +97,20 @@ class MarketplaceResultsProvider {
                     if($isFeatured) {
                         $resultsHtml .= "<div><span class='badge badge-success'>Pub</span></div>";
                     }
-                $resultsHtml .=             "<button class='btn see-market-image' onClick='getProductPictures($id)'>
+
+                    if($isUserConnected) {
+                        $resultsHtml .=             "<button class='btn see-market-image' onClick='getProductPictures($id)'>
                                 <i class='bi bi-images'></i>
                             </button>
                             <button class='btn contact-product-owner' data-bs-toggle='modal' data-bs-target='#contactModal' data-user-id='$userId' data-id=`$id`>
                                 <i class='bi bi-chat-dots'></i>
-                            </button>
-                        </div>
+                            </button>";
+                    } else {
+                        $resultsHtml .= "<span class='price connexionInfo'>(Connectez-vous pour voir l' offre)</span>";
+                    }
+
+                
+                    $resultsHtml .=     "</div>
                         <div>
                             <span class='description'>$description</span><br/>
                             <span class='price'>$price €</span>

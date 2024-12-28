@@ -116,6 +116,10 @@
         .comment-list{
             margin-bottom: 10px;
         }
+        .connexionInfo{
+            padding-top: 5px;
+            padding-left: 5px;
+        }
     </style>
     <script src="https://code.jquery.com/jquery-3.3.1.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
 
@@ -349,7 +353,7 @@
         function sendComment(button, id) {
             const commentArea = button.closest(".comment-area");
             const postId = id; // ID du post
-            const userId = <?php echo $_SESSION['user_id'] ?>; // ID de l'utilisateur connecté (à récupérer dynamiquement)
+            const userId = <?php echo $_SESSION['user_id'] ?? 0 ?>; // ID de l'utilisateur connecté (à récupérer dynamiquement)
             const commentText = commentArea.querySelector("textarea").value;
 
             if (!commentText.trim()) {
