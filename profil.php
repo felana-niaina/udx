@@ -9,9 +9,17 @@ include_once 'classes/PostsResultsProvider.php';
 $database = new DatabaseConnector();
 $con = $database->getConnection();
 
+$userIdParam = isset($_GET['userId']) ? $_GET['userId'] : null;
+$connectedUserId = isset($_SESSION['user_id']) ? $_SESSION['user_id'] : null;
+
+if ($userIdParam) {
+    $userId = $userIdParam;  // Si un userId est passé dans l'URL, on l'utilise
+} else {
+    $userId = $connectedUserId; // Sinon, on utilise l'ID de l'utilisateur connecté
+}
 $userRegistration = new UserRegistration($con);
 $PostsResultsProvider = new PostsResultsProvider($con);
-$userId = $_SESSION['user_id']; // ID de l'utilisateur connecté
+// $userId = $_SESSION['user_id']; // ID de l'utilisateur connecté
 $userInfo = $userRegistration->getUserInfo($userId);
 $coverPhoto = is_null($userInfo['cover_photo']) ? 'uploads/default_cover.jpg' : $userInfo['cover_photo'];
 $profilePhoto = is_null($userInfo['profile_photo']) ? 'https://via.placeholder.com/150' : $userInfo['profile_photo'];
@@ -121,6 +129,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
     }
 }
+
 
 ?>
 <!DOCTYPE html>
@@ -439,10 +448,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 <div class="card-header profile-header">
                     <!-- Cover photo -->
                     <div class="cover-photo" id="cover-photo" style='background-image: url(<?php echo $coverPhoto ?>);'>
-                        <!-- Bouton de modification avec icône -->
-                        <button class="edit-cover-photo" id="edit-cover-photo-btn" type="button">
-                            <i class="fas fa-camera"></i>
-                        </button>
+                        <?php if (!$userIdParam): ?>
+                            <!-- Bouton de modification avec icône -->
+                            <button class="edit-cover-photo" id="edit-cover-photo-btn" type="button">
+                                <i class="fas fa-camera"></i>
+                            </button>
+                        <?php endif; ?>
 
                         <!-- Formulaire d'upload de la photo -->
                         <form id="cover-photo-form" action="profil.php" method="POST" enctype="multipart/form-data" style="display: none;">
@@ -456,10 +467,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     <!-- Profile picture -->
                     <div class="profile-photo-container">
                         <img class="profile-photo" id="profile-photo" src="<?php echo $profilePhoto; ?>">
-                        <!-- Bouton de modification avec icône -->
-                        <button class="edit-profile-photo" id="edit-profile-photo-btn" type="button">
-                            <i class="fas fa-camera"></i>
-                        </button>
+                        <?php if (!$userIdParam): ?>
+                            <!-- Bouton de modification avec icône -->
+                            <button class="edit-profile-photo" id="edit-profile-photo-btn" type="button">
+                                <i class="fas fa-camera"></i>
+                            </button>
+                        <?php endif; ?>
 
                         <!-- Formulaire d'upload de la photo -->
                         <form id="profile-photo-form" action="profil.php" method="POST" enctype="multipart/form-data" style="display: none;">
@@ -477,10 +490,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     <div class="buttons-container">
                         <button data-toggle="modal" data-target="#messageModal"><i class="fas fa-envelope"></i> Send Message</button>
                         <button class="follow-btn"><i class="fas fa-user-plus"></i> Follow</button>
-
-                        <!-- New Buttons for Post and Sell -->
-                        <button id="post-btn" class="btn btn-warning" onclick="showPostForm()"><i class="fas fa-comment"></i> Publier</button>
-                        <button id="sell-btn" class="btn btn-success" onclick="showSaleForm()"><i class="fas fa-tags"></i> Vendre</button>
+                        <?php if (!$userIdParam): ?>
+                            <!-- New Buttons for Post and Sell -->
+                            <button id="post-btn" class="btn btn-warning" onclick="showPostForm()"><i class="fas fa-comment"></i> Publier</button>
+                            <button id="sell-btn" class="btn btn-success" onclick="showSaleForm()"><i class="fas fa-tags"></i> Vendre</button>
+                        <?php endif; ?>
                     </div>
                 </div>
 
@@ -549,7 +563,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     <!-- Followers Section -->
                     <div class="followers">
                         <p><span>Followers:</span> 1,024</p>
-                        <p><span>Points:</span> 8,024</p>
+                        <?php if (!$userIdParam): ?>
+                            <p><span>Points:</span> 8,024</p>
+                        <?php endif; ?>
                     </div>
                 </div>
             </div>

@@ -87,7 +87,7 @@ class MarketplaceResultsProvider {
 
                 // Ajouter le résultat au HTML
 				$resultsHtml .= " <div class='d-flex mb-12 marketResult'>
-                    <a href='http://localhost/udx/profil.php/$userId'><img src='$profilePicture' class='profile-photo'></a>
+                    <a href='http://localhost/udx/profil.php?userId=$userId'><img src='$profilePicture' class='profile-photo'></a>
                     <div class='text'>
                         <div>
                             <h6 class='price'>$username</h6>
