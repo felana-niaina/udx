@@ -289,9 +289,13 @@
     <script type="text/javascript" src="assets/js/script.js?3"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script>
-        function toggleCommentArea(button) {
+        function toggleCommentArea(button, id) {
+            const elements = document.querySelectorAll('.comment-area');
+            elements.forEach(element => {
+                element.style.display = 'none';
+            });
             // Recherche de la div comment-area associée
-            const commentArea = document.getElementById('comment-area');
+            const commentArea = document.getElementById('comment-area-'+id);
             
             // Alterne la visibilité
             if (commentArea.style.display === 'none' || commentArea.style.display === '') {
@@ -308,9 +312,9 @@
         }
 
         //Ajouter commentaire
-        function sendComment(button) {
+        function sendComment(button, id) {
             const commentArea = button.closest(".comment-area");
-            const postId = button.closest(".d-flex").dataset.postId; // ID du post
+            const postId = id; // ID du post
             const userId = <?php echo $_SESSION['user_id'] ?>; // ID de l'utilisateur connecté (à récupérer dynamiquement)
             const commentText = commentArea.querySelector("textarea").value;
 
@@ -322,7 +326,7 @@
             $.post("ajax/postInfo.php", {
                 postId: postId,
                 userId: userId,
-                comment : encodeURIComponent(commentText),
+                comment : commentText,
                 postComment: true
             }).done(function(result){
                 let data = JSON.parse(result);
@@ -348,6 +352,7 @@
                         } 
                     });
                 }
+                document.getElementById('comment-area-'+id).style.display = 'none';
             })
         }
 

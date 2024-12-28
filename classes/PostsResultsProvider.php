@@ -80,7 +80,7 @@ class PostsResultsProvider {
                 $isFeatured = $row["isFeatured"];
 
                 // Ajouter le résultat au HTML
-                $resultsHtml .= "<div class='d-flex mb-3' data-post-id='$id'>
+                $resultsHtml .= "<div class='d-flex mb-3'>
                                     <a href='http://localhost/udx/profil.php/$userId'><img src='$profilePicture' class='profile-photo' /></a>
                                     <div class='text'>
                                         <div class='d-flex'>
@@ -97,7 +97,7 @@ class PostsResultsProvider {
                                             </button>
 
                                             <!-- Icone Commentaire -->
-                                            <button class='btn'  onclick='toggleCommentArea(this)'>
+                                            <button class='btn'  onclick='toggleCommentArea(this, $id)'>
                                                 <i class='bi bi-chat-dots'></i>
                                             </button>
 
@@ -107,11 +107,11 @@ class PostsResultsProvider {
                                         </div>
                                         
                                         <!-- Zone pour le commentaire -->
-                                        <div class='comment-area' id='comment-area'>
+                                        <div class='comment-area' id='comment-area-$id'>
                                             <textarea class='form-control' rows='2' placeholder='Écrire un commentaire...'></textarea>
                                             <div class='mt-2'>
                                                 <button class='btn btn-secondary' onclick='cancelComment(this)'>Annuler</button>
-                                                <button class='btn btn-primary' onclick='sendComment(this)'>Envoyer</button>
+                                                <button class='btn btn-primary' onclick='sendComment(this, $id)'>Envoyer</button>
                                             </div>
                                         </div>
                                     </div>
