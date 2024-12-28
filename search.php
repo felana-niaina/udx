@@ -93,9 +93,25 @@
             margin-top: 10px;
             display: none; /* Masque le champ initialement */
         }
-        #success-badge{
+       .badge-success{
             font-size: 0.7rem;
             background-color: green;
+            margin-left: 10px;
+        }
+        .marketResult{
+            padding-bottom: 15px;
+        }
+        .title{
+            font-size: 1.4rem;
+        }
+        .description{
+            font-size: 0.9rem;
+        }
+        .price{
+            font-size: 0.8rem;
+        }
+        .btn{
+            margin-top: -5px;
         }
     </style>
     <script src="https://code.jquery.com/jquery-3.3.1.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>

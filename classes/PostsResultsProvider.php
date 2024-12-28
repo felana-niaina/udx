@@ -84,13 +84,13 @@ class PostsResultsProvider {
                                     <a href='http://localhost/udx/profil.php/$userId'><img src='$profilePicture' class='profile-photo' /></a>
                                     <div class='text'>
                                         <div class='d-flex'>
-                                            <h3 class='title pe-3'>
+                                            <h4 class='title'>
                                                     $title ";
                 if($isFeatured) {
                     $resultsHtml .= "<span class='badge badge-success' id='success-badge'>Pub</span>";
                 }                                   
                 $resultsHtml .= "
-                                            </h3>
+                                            </h4>
                                              <!-- Icone Like -->
                                             <button class='btn'>
                                                 <i class='bi bi-hand-thumbs-up'></i>
