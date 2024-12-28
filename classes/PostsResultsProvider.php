@@ -47,6 +47,8 @@ class PostsResultsProvider {
             if (!$this->con) {
                 throw new Exception("La connexion à la base de données a échoué.");
             }
+            // Vérifier si l'utilisateur est connecté via la session
+            $isUserConnected = !empty($_SESSION);
 
             $fromLimit = ($page - 1) * $pageSize;
 
@@ -111,13 +113,16 @@ class PostsResultsProvider {
                                         
                                         <!-- Zone pour le commentaire -->
                                         <div class='comment-area' id='comment-area-$id'>
-                                            $commentList
-                                            <textarea class='form-control' rows='2' placeholder='Écrire un commentaire...'></textarea>
-                                            <div class='mt-2'>
-                                                <button class='btn btn-secondary' onclick='cancelComment(this)'>Annuler</button>
-                                                <button class='btn btn-primary' onclick='sendComment(this, $id)'>Envoyer</button>
-                                            </div>
-                                        </div>
+                                            $commentList ";
+                if($isUserConnected) {
+                    $resultsHtml .= "<textarea class='form-control' rows='2' placeholder='Écrire un commentaire...'></textarea>
+                    <div class='mt-2'>
+                        <button class='btn btn-secondary' onclick='cancelComment(this)'>Annuler</button>
+                        <button class='btn btn-primary' onclick='sendComment(this, $id)'>Envoyer</button>
+                    </div>";
+                }
+                                            
+                $resultsHtml .=         "</div>
                                     </div>
                                     
                                   </div>";
@@ -160,12 +165,12 @@ class PostsResultsProvider {
 
                 // Ajouter le résultat au HTML
 				$resultsHtml .= "
-                <div class='list-group-item post-item' data-toggle='modal' data-target='#postModal' data-title='$title' data-body='$description' data-keyword='$keywords' data-date='$date' data-id='$id'>
+                <div class='list-group-item post-item' >
                     <h5 class='post-title'>$title</h5>
                     <p class='post-date'>$date</p>
                     <p class='post-body'>$description</p>
                     <div class='post-actions'>
-                        <a href='#'>Edit</a> | <a href='#'>Delete</a>
+                        <a href='#' data-toggle='modal' data-target='#postModal' data-title='$title' data-body='$description' data-keyword='$keywords' data-date='$date' data-id='$id'>Edit</a> | <a href='#' class='removePostButton' data-toggle='modal' data-target='#removePostModal' data-title='$title' data-id='$id'>Delete</a>
                     </div>
                 </div>";
             }
@@ -307,6 +312,26 @@ class PostsResultsProvider {
         } catch (PDOException $e) {
             echo "Erreur dans la requête : " . $e->getMessage();
             return 0;
+        }
+    }
+
+    public function removePost($userId, $postId) {
+        try {
+            $sql = "DELETE from posts 
+                    WHERE id = :postId AND userId = :userId ";
+            $stmt = $this->con->prepare($sql);
+            $stmt->bindParam(':postId', $postId);
+            $stmt->bindParam(':userId', $userId);
+
+            // Exécuter la requête de suppression
+            $stmt->execute();
+            // Vérifier si des lignes ont été mises à jour
+            if ($stmt->rowCount() > 0) {
+                return true;
+            }
+            return false;
+        } catch (PDOException $e) {
+            echo "Erreur lors de la suppression du post : " . $e->getMessage();
         }
     }
 }
