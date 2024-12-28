@@ -21,17 +21,15 @@
 
     $postId = $userId = $commentText = null;
     if ($_SERVER["REQUEST_METHOD"] === "POST") {
-        $addMessagePost = isset($_POST["marketplace_id"]) ? $_POST["marketplace_id"] : false;
-        if($addMessagePost === "sendMessage")
+        $formPost = isset($_POST["marketplace_id"]) ? $_POST["marketplace_id"] : false;
+        if($formPost === "sendMessage")
         {
-            $userId = $_SESSION['user_id'];
-            $receiverId = $_POST["senderId"];
+            $toUserId = $_POST['userId'];
+            $fromUserId = $_POST["senderId"];
             $message = $_POST["message"];
             $subject = $_POST["subject"];
-            $parentId = 0;
-            echo "<script>console.log($userId,$receiverId)</script>";
 
-            $result = $messageResult->sendMessage($userId,$receiverId, $message, $subject,$parentId);
+            $result = $messageResult->sendMessage($fromUserId,$toUserId, $message, $subject);
 
             if ($result) {
                 echo "<script>
@@ -42,9 +40,7 @@
                                 icon: 'success',
                                 confirmButtonText: 'OK'
                             }).then((result) => {
-                                if (result.isConfirmed) {
-                                    window.location.href = 'search.php';
-                                }
+                                
                             });
                         });
                     </script>";
@@ -361,15 +357,11 @@
             document.querySelectorAll('.contact-product-owner').forEach((button) => {
                 button.addEventListener('click', function () {
                     let element = document.querySelector('.contact-product-owner');
-                    const receiverId = element.getAttribute('data-user-id'); // ID du propriétaire du produit
-                    console.log("receiver", receiverId);
-                    
+                    const receiverId = element.getAttribute('data-user-id'); // ID du propriétaire du produit                 
                     // Met à jour la valeur de l'input caché pour le champ userId
                     const hiddenInput = document.getElementById("userId");
                     if (hiddenInput) {
                         hiddenInput.setAttribute('value', receiverId); // Met à jour la valeur de l'input
-                        console.log("receiver:::::", receiverId);
-
                     } else {
                         console.error("L'input caché pour userId n'a pas été trouvé.");
                     }
