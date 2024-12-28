@@ -99,7 +99,7 @@ class MarketplaceResultsProvider {
                     }
 
                     if($isUserConnected) {
-                        $resultsHtml .=             "<button class='btn see-market-image' onClick='getProductPictures($id)'>
+                        $resultsHtml .=             "<button class='btn see-market-image' data-bs-toggle='modal' data-bs-target='#seePictureModal' data-picture='http://localhost/udx/$picture' data-id=`$id`>
                                 <i class='bi bi-images'></i>
                             </button>
                             <button class='btn contact-product-owner' data-bs-toggle='modal' data-bs-target='#contactModal' data-user-id='$userId' data-id=`$id`>

@@ -75,7 +75,6 @@ function getProductPictures(productId) {
     .done(function(result) {
         if(result !== ""){
             let product = JSON.parse(result);
-            console.log(product)
             $("#productDetailTitle").text(product.title);
             $("#productDetailPrice").text(product.price + " €");
             $("#productDetailDescription").html(product.description);
