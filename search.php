@@ -21,38 +21,11 @@
 
     $postId = $userId = $commentText = null;
     if ($_SERVER["REQUEST_METHOD"] === "POST") {
-        $addMessagePost = $_POST["marketplace_id"];
-
-        if(!$addMessagePost){
-            $postId = $_POST["postId"];
-            $userId = $_POST["userId"];
-            $commentText = $_POST["comment"];
-
-            $result = $postsResults->saveComment($postId, $userId, $commentText);
-
-            if ($result) {
-                echo "<script>
-                        document.addEventListener('DOMContentLoaded', function() {
-                            Swal.fire({
-                                title: 'Succès',
-                                text: 'Commentaire ajouté !',
-                                icon: 'success',
-                                confirmButtonText: 'OK'
-                            }).then((result) => {
-                                if (result.isConfirmed) {
-                                    window.location.href = 'search.php';
-                                }
-                            });
-                        });
-                    </script>";
-            } else {
-                echo "Échec de l'envoie du commentaire.";
-            }
-        }
-        elseif($addMessagePost === "sendMessage")
+        $addMessagePost = isset($_POST["marketplace_id"]) ? $_POST["marketplace_id"] : false;
+        if($addMessagePost === "sendMessage")
         {
             $userId = $_SESSION['user_id'];
-            $receiverId = $_POST["userId"];
+            $receiverId = $_POST["senderId"];
             $message = $_POST["message"];
             $subject = $_POST["subject"];
             $parentId = 0;
@@ -126,6 +99,7 @@
         }
         #success-badge{
             font-size: 0.7rem;
+            background-color: green;
         }
     </style>
     <script src="https://code.jquery.com/jquery-3.3.1.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
@@ -286,6 +260,7 @@
                         <form id="contactForm" method="post" enctype="multipart/form-data">
                             <input type="hidden" name="marketplace_id" value="sendMessage">
                             <input type="hidden" name="userId" id="userId" value="" >
+                            <input type="hidden" name="senderId" id="senderId" value="<?php echo $_SESSION['user_id'] ?>">
                             <div class="mb-3">
                                 <label for="subject" class="form-label">Objet du message</label>
                                 <input type="text" class="form-control" id="subject" name="subject" require/>
@@ -312,6 +287,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/fancybox/3.3.5/jquery.fancybox.min.js"></script>
     <script src="https://unpkg.com/masonry-layout@4/dist/masonry.pkgd.min.js"></script>
     <script type="text/javascript" src="assets/js/script.js?3"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script>
         function toggleCommentArea(button) {
             // Recherche de la div comment-area associée
@@ -335,7 +311,7 @@
         function sendComment(button) {
             const commentArea = button.closest(".comment-area");
             const postId = button.closest(".d-flex").dataset.postId; // ID du post
-            const userId = 10; // ID de l'utilisateur connecté (à récupérer dynamiquement)
+            const userId = <?php echo $_SESSION['user_id'] ?>; // ID de l'utilisateur connecté (à récupérer dynamiquement)
             const commentText = commentArea.querySelector("textarea").value;
 
             if (!commentText.trim()) {
@@ -343,24 +319,36 @@
                 return;
             }
 
-            // Envoie des données via AJAX
-            fetch("search.php", {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/x-www-form-urlencoded",
-                },
-                body: `postId=${postId}&userId=${userId}&comment=${encodeURIComponent(commentText)}`,
-            })
-            .then((response) => response.json())
-            .then((data) => {
-                if (data.success) {
-                    alert("Commentaire envoyé avec succès !");
-                    commentArea.style.display = "none"; // Masquer le champ après l'envoi
+            $.post("ajax/postInfo.php", {
+                postId: postId,
+                userId: userId,
+                comment : encodeURIComponent(commentText),
+                postComment: true
+            }).done(function(result){
+                let data = JSON.parse(result);
+                if(data.success) {
+                    Swal.fire({
+                        title: 'Succès',
+                        text: data.message,
+                        icon: 'success',
+                        confirmButtonText: 'OK'
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            window.location.href = document.location.href;
+                        }
+                    });
                 } else {
-                    alert("Erreur : " + data.message);
+                    Swal.fire({
+                        text: data.message,
+                        icon: 'warning',
+                        confirmButtonText: 'OK'
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            window.location.href = document.location.href;
+                        } 
+                    });
                 }
             })
-            .catch((error) => console.error("Erreur : ", error));
         }
 
         
@@ -384,10 +372,6 @@
             });
         });
 
-        
-
-
-        
     </script>
 </body>
 </html>
