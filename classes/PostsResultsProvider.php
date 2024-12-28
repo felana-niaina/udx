@@ -73,6 +73,7 @@ class PostsResultsProvider {
                 $title = $row["title"];
                 $description = $row["description"];
                 $profilePicture = $row["profile_photo"] ?: "https://via.placeholder.com/150";
+                $commentList = $this->getPostComments($id);
 
                 // Truncation des champs title et description si nécessaire
                 $title = $this->trimField($title, 120);
@@ -108,6 +109,7 @@ class PostsResultsProvider {
                                         
                                         <!-- Zone pour le commentaire -->
                                         <div class='comment-area' id='comment-area-$id'>
+                                            $commentList
                                             <textarea class='form-control' rows='2' placeholder='Écrire un commentaire...'></textarea>
                                             <div class='mt-2'>
                                                 <button class='btn btn-secondary' onclick='cancelComment(this)'>Annuler</button>
@@ -266,6 +268,43 @@ class PostsResultsProvider {
         } catch (PDOException $e) {
             echo "Erreur lors de la mise à jour du produit : " . $e->getMessage();
             return false;
+        }
+    }
+
+    private function getPostComments($postId) {
+        try {
+            $query = $this->con->prepare("SELECT comments.*, users.profile_photo, users.username
+                                          FROM comments 
+                                          INNER JOIN users ON comments.userId = users.id
+                                          WHERE postId = :postId
+                                        ");
+            $query->bindParam(":postId", $postId, PDO::PARAM_INT);
+            $query->execute();
+            $resultsHtml = "<div class='commentList'>";
+
+            while ($row = $query->fetch(PDO::FETCH_ASSOC)) {
+                $id = $row["userId"];
+                $comment = $row["commentText"];
+                $profilePicture = $row["profile_photo"] ?: "https://via.placeholder.com/150";
+                $username = $row['username'];
+
+                $resultsHtml .= "<div class='d-flex mb-12 comment-list'>
+                    <a href='http://localhost/udx/profil.php/$id'><img src='$profilePicture' class='profile-photo'></a>
+                    <div class='text'>
+                        <div>
+                            <span class='price'>$username a écrit : </span><br/>
+                            <span class='description'>$comment</span>
+                        </div>
+                    </div>
+                </div>";
+            }
+
+            $resultsHtml .= "</div>";
+            return $resultsHtml;
+
+        } catch (PDOException $e) {
+            echo "Erreur dans la requête : " . $e->getMessage();
+            return 0;
         }
     }
 }
