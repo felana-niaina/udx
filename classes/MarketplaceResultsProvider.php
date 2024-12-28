@@ -79,6 +79,7 @@ class MarketplaceResultsProvider {
                 $description = $row["description"];
                 $price = $row["price"];
                 $isFeatured = $row["isFeatured"];
+                $profilePicture = $row["profile_photo"] ?: "https://via.placeholder.com/150";
 
                 // Truncation des champs title et description si nécessaire
                 $title = $this->trimField($title, 120);
