@@ -316,6 +316,24 @@
       }
     }
 
+    // remove post
+    elseif ($formId === 'removePost' ) {
+      if($userId && $_POST['post_id'] > 0) {
+        if($postsProvider->removePost($userId, $_POST['post_id'])) {
+          echo "<script>
+              document.addEventListener('DOMContentLoaded', function() {
+                  Swal.fire({
+                      title: 'Succès',
+                      text: 'Post supprimé avec succès',
+                      icon: 'success',
+                      confirmButtonText: 'OK'
+                  })
+              });
+          </script>";
+        }
+      }
+    }
+
   }
 
 ?>

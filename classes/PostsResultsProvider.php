@@ -314,5 +314,25 @@ class PostsResultsProvider {
             return 0;
         }
     }
+
+    public function removePost($userId, $postId) {
+        try {
+            $sql = "DELETE from posts 
+                    WHERE id = :postId AND userId = :userId ";
+            $stmt = $this->con->prepare($sql);
+            $stmt->bindParam(':postId', $postId);
+            $stmt->bindParam(':userId', $userId);
+
+            // Exécuter la requête de suppression
+            $stmt->execute();
+            // Vérifier si des lignes ont été mises à jour
+            if ($stmt->rowCount() > 0) {
+                return true;
+            }
+            return false;
+        } catch (PDOException $e) {
+            echo "Erreur lors de la suppression du post : " . $e->getMessage();
+        }
+    }
 }
 ?>
