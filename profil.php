@@ -1,9 +1,20 @@
 <?php
- session_start();
+session_start();
+
+if(!$_SESSION['user_id']) {
+    header('Location: index.php');
+    exit;
+}
+
 include_once 'classes/DatabaseConnector.php';
 include_once 'classes/UserRegistration.php';
 include_once 'classes/MarketplaceResultsProvider.php';
 include_once 'classes/PostsResultsProvider.php';
+include_once 'classes/MessageResultsProvider.php';
+
+ini_set('display_errors', 1);
+ini_set('display_startup_errors', 1);
+error_reporting(E_ALL);
 
 // Créer une instance de la classe DatabaseConnector
 $database = new DatabaseConnector();
@@ -19,6 +30,7 @@ if ($userIdParam) {
 }
 $userRegistration = new UserRegistration($con);
 $PostsResultsProvider = new PostsResultsProvider($con);
+$messageResult = new MessageResultsProvider($con);
 // $userId = $_SESSION['user_id']; // ID de l'utilisateur connecté
 $userInfo = $userRegistration->getUserInfo($userId);
 $coverPhoto = is_null($userInfo['cover_photo']) ? 'uploads/default_cover.jpg' : $userInfo['cover_photo'];
@@ -126,6 +138,32 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                   });
               </script>";
             }
+        }
+    }
+
+    elseif ($formId === "sendMessage" && $_POST["senderId"] > 0) {
+        $toUserId = $_POST['userId'];
+        $fromUserId = $_POST["senderId"];
+        $message = $_POST["message"];
+        $subject = $_POST["subject"];
+
+        $result = $messageResult->sendMessage($fromUserId,$toUserId, $message, $subject);
+
+        if ($result) {
+            echo "<script>
+                    document.addEventListener('DOMContentLoaded', function() {
+                        Swal.fire({
+                            title: 'Succès',
+                            text: 'Message envoyé !',
+                            icon: 'success',
+                            confirmButtonText: 'OK'
+                        }).then((result) => {
+                            
+                        });
+                    });
+                </script>";
+        } else {
+            echo "Échec de l'envoie du message.";
         }
     }
 }
@@ -448,7 +486,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 <div class="card-header profile-header">
                     <!-- Cover photo -->
                     <div class="cover-photo" id="cover-photo" style='background-image: url(<?php echo $coverPhoto ?>);'>
-                        <?php if (!$userIdParam): ?>
+                        <?php if (!$userIdParam || ($userIdParam && $connectedUserId == $userIdParam) ): ?>
                             <!-- Bouton de modification avec icône -->
                             <button class="edit-cover-photo" id="edit-cover-photo-btn" type="button">
                                 <i class="fas fa-camera"></i>
@@ -467,7 +505,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     <!-- Profile picture -->
                     <div class="profile-photo-container">
                         <img class="profile-photo" id="profile-photo" src="<?php echo $profilePhoto; ?>">
-                        <?php if (!$userIdParam): ?>
+                        <?php if (!$userIdParam || ($userIdParam && $connectedUserId == $userIdParam) ): ?>
                             <!-- Bouton de modification avec icône -->
                             <button class="edit-profile-photo" id="edit-profile-photo-btn" type="button">
                                 <i class="fas fa-camera"></i>
@@ -488,9 +526,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
                     <!-- Buttons Container (Send Message & Follow) -->
                     <div class="buttons-container">
-                        <button data-toggle="modal" data-target="#messageModal"><i class="fas fa-envelope"></i> Send Message</button>
-                        <button class="follow-btn"><i class="fas fa-user-plus"></i> Follow</button>
-                        <?php if (!$userIdParam): ?>
+                        <?php if ($userIdParam && $connectedUserId != $userIdParam) { ?>
+                            <button data-toggle="modal" data-target="#messageModal"><i class="fas fa-envelope"></i> Send Message</button>
+                            <button class="follow-btn"><i class="fas fa-user-plus"></i> Follow</button>
+                        <?php } ?>
+                        
+                        <?php if (!$userIdParam || ($userIdParam && $connectedUserId == $userIdParam) ): ?>
                             <!-- New Buttons for Post and Sell -->
                             <button id="post-btn" class="btn btn-warning" onclick="showPostForm()"><i class="fas fa-comment"></i> Publier</button>
                             <button id="sell-btn" class="btn btn-success" onclick="showSaleForm()"><i class="fas fa-tags"></i> Vendre</button>
@@ -585,16 +626,23 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         </button>
       </div>
       <div class="modal-body">
-        <form>
-          <div class="form-group">
-            <label for="message-text" class="col-form-label">Your Message:</label>
-            <textarea class="form-control" id="message-text" rows="4" placeholder="Type your message here..."></textarea>
-          </div>
+        <form method="post">
+            <input type="hidden" name="form_id" value="sendMessage">
+            <input type="hidden" name="userId" id="userId" value="<?php echo $userIdParam ?>" >
+            <input type="hidden" name="senderId" id="senderId" value="<?php echo $connectedUserId ?>">
+            <div class="form-group">
+                <label for="subject" class="form-label">Objet du message</label>
+                <input type="text" class="form-control" id="subject" name="subject" require/>
+            </div>
+            <div class="form-group">
+                <label for="message-text" class="col-form-label">Your Message:</label>
+                <textarea class="form-control" id="message-text" rows="4" name="message" placeholder="Type your message here..." required></textarea>
+            </div>
+            <div class="form-group text-right">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                <button type="submit" class="btn btn-primary">Send Message</button>
+            </div>
         </form>
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-        <button type="button" class="btn btn-primary">Send Message</button>
       </div>
     </div>
   </div>
