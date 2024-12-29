@@ -335,5 +335,30 @@ class PostsResultsProvider {
             echo "Erreur lors de la suppression du post : " . $e->getMessage();
         }
     }
+
+    public function updatePost($userId, $postId, $title, $description, $keywords, $categoryId){
+        try {
+            $sql = "UPDATE posts 
+                    SET title = :title, description = :description, keywords = :keywords, categoryId = :categoryId
+                    WHERE id = :postId AND userId = :userId";
+            $stmt = $this->con->prepare($sql);
+
+            $stmt->bindParam(':title', $title);
+            $stmt->bindParam(':description', $description);
+            $stmt->bindParam(':keywords', $keywords);
+            $stmt->bindParam(':categoryId', $categoryId);
+            $stmt->bindParam(':postId', $postId);
+            $stmt->bindParam(':userId', $userId);
+
+            // Exécuter la requête d'update
+            $stmt->execute();
+            return true;
+
+        } catch (PDOException $e) {
+            echo "Erreur lors de la mise à jour du post : " . $e->getMessage();
+            return false;
+        }
+    }
+
 }
 ?>

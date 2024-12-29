@@ -334,6 +334,25 @@
       }
     }
 
+    elseif ($formId === 'updatePost' && isset($_POST['post_id']) && $userId) {
+      if ($postsProvider->updatePost($userId,$_POST['post_id'],$_POST['postTitle'], $_POST['postDescription'], $_POST['postKeyword'], $_POST['postCategory'])) {
+        echo "<script>
+            document.addEventListener('DOMContentLoaded', function() {
+                Swal.fire({
+                    title: 'Succès',
+                    text: 'Votre post a bien été modifié !',
+                    icon: 'success',
+                    confirmButtonText: 'OK'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        window.location.href = 'settings.php';
+                    }
+                });
+            });
+        </script>";
+      }
+    }
+
   }
 
 ?>
@@ -1090,7 +1109,7 @@
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                    <button type="button" class="btn btn-primary">Reply</button>
+                    <button type="submit" class="btn btn-primary">Reply</button>
                 </div>
               </form>
             </div>
@@ -1360,11 +1379,11 @@
         var id = $(this).data('id');
         var category = $(this).data('category');
         var date = $(this).data('date');
-        console.log(keywords)
         $('#postTitle').val(title);
-        $('#post-keys').val(keywords);
+        $('#post-keys').val(keyword);
         $('#post_id').val(id);
         $('#postDescription').text(description);
+        $('#postCategory').val(category);
       });
 
       /* $('#sendMessageForm').submit(function(e) {
