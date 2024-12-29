@@ -266,6 +266,48 @@ class UserRegistration {
             return false;
         }
     }
+
+    public function isFollowedUser($followerId, $followedId) {
+        try {
+            $sql = "SELECT * FROM followers WHERE followerId = :followerId AND followedId = :followedId";
+            $stmt = $this->con->prepare($sql);
+            $stmt->bindParam(':followerId', $followerId);
+            $stmt->bindParam(':followedId', $followedId);
+            $stmt->execute();
+            
+            $user = $stmt->fetch(PDO::FETCH_ASSOC);
+            
+            if ($user) {
+                return $user;
+            } else {
+                return null;  // L'utilisateur n'a pas été trouvé
+            }
+        } catch (PDOException $e) {
+            echo "Erreur lors de la récupération des données : " . $e->getMessage();
+            return null;
+        }
+    }
+
+    public function isLiked($likerId, $likedId) {
+        try {
+            $sql = "SELECT * FROM likers WHERE likerId = :likerId AND likedId = :likedId";
+            $stmt = $this->con->prepare($sql);
+            $stmt->bindParam(':likerId', $likerId);
+            $stmt->bindParam(':likedId', $likedId);
+            $stmt->execute();
+            
+            $user = $stmt->fetch(PDO::FETCH_ASSOC);
+            
+            if ($user) {
+                return $user;
+            } else {
+                return null;  // L'utilisateur n'a pas été trouvé
+            }
+        } catch (PDOException $e) {
+            echo "Erreur lors de la récupération des données : " . $e->getMessage();
+            return null;
+        }
+    }
     
 }
 ?>
