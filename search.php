@@ -415,7 +415,7 @@
             document.querySelectorAll('.see-market-image').forEach((button) => {
                 button.addEventListener('click', function () {
                     let element = document.querySelector('.see-market-image');
-                    const picture = element.getAttribute('data-picture'); // ID du propriétaire du produit  
+                    const picture = this.getAttribute('data-picture'); // ID du propriétaire du produit  
 
                     // Met à jour la valeur de l'input caché pour le champ userId
                     const img = document.getElementById("productImage");
