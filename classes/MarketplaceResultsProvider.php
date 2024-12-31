@@ -150,7 +150,6 @@ class MarketplaceResultsProvider {
             $query->execute([
                 'userId' => $userId
             ]);
-            $siteUrl = 'http://'.$_SERVER['SERVER_NAME'] .'/udx/';
 
             $resultsHtml = "<div class='row'>";
             while ($row = $query->fetch(PDO::FETCH_ASSOC)) {
@@ -159,7 +158,7 @@ class MarketplaceResultsProvider {
                 $description = $row["description"];
                 $keywords = $row["keywords"];
                 $price = $row["price"] . " €";
-                $image = is_null($row['picture']) || $row['picture'] == '' ? "https://via.placeholder.com/150" : $siteUrl. $row['picture'];
+                $image = is_null($row['picture']) || $row['picture'] == '' ? "https://via.placeholder.com/150" : $this->siteUrl. '/' .$row['picture'];
                 $date = $row["createdDate"];
 
                 // Truncation des champs title et description si nécessaire
