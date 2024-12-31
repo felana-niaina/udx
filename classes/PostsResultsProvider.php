@@ -371,5 +371,7 @@ class PostsResultsProvider {
         }
     }
 
+
+    
 }
 ?>

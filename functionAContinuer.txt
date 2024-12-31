@@ -1,0 +1,414 @@
+// Fonction pour récupérer le nombre de followers d'un utilisateur
+    public function getFollowersCount($followedId) {
+        try {
+            $sql = "SELECT COUNT(*) FROM followers WHERE followedId = :followedId";
+            $stmt = $this->con->prepare($sql);
+            $stmt->bindParam(':followedId', $followedId);
+            $stmt->execute();
+            
+            return $stmt->fetchColumn(); // Retourne le nombre de followers
+        } catch (PDOException $e) {
+            return 0; // Si une erreur survient, retourne 0
+        }
+    }
+
+    // Fonction pour récupérer les points d'un utilisateur
+    public function getUserPoints($userId) {
+        try {
+            // 1. Récupérer le nombre de posts (chaque post vaut 1 point)
+            $sqlPosts = "SELECT COUNT(*) FROM posts WHERE userId = :userId";
+            $stmtPosts = $this->con->prepare($sqlPosts);
+            $stmtPosts->bindParam(':userId', $userId);
+            $stmtPosts->execute();
+            $postCount = $stmtPosts->fetchColumn(); // Nombre de posts de l'utilisateur
+            
+            // 2. Récupérer le nombre de followers (chaque follower vaut 2 points)
+            $followersCount = $this->getFollowersCount($userId);
+            
+            // Calculer les points totaux
+            $totalPoints = ($postCount * 1) + ($followersCount * 2);
+            
+            return $totalPoints; // Retourner le nombre total de points
+        } catch (PDOException $e) {
+            return 0; // Si une erreur survient, retourne 0
+        }
+    }// Fonction pour récupérer le nombre de followers d'un utilisateur
+    public function getFollowersCount($followedId) {
+        try {
+            $sql = "SELECT COUNT(*) FROM followers WHERE followedId = :followedId";
+            $stmt = $this->con->prepare($sql);
+            $stmt->bindParam(':followedId', $followedId);
+            $stmt->execute();
+            
+            return $stmt->fetchColumn(); // Retourne le nombre de followers
+        } catch (PDOException $e) {
+            return 0; // Si une erreur survient, retourne 0
+        }
+    }
+
+    // Fonction pour récupérer les points d'un utilisateur
+    public function getUserPoints($userId) {
+        try {
+            // 1. Récupérer le nombre de posts (chaque post vaut 1 point)
+            $sqlPosts = "SELECT COUNT(*) FROM posts WHERE userId = :userId";
+            $stmtPosts = $this->con->prepare($sqlPosts);
+            $stmtPosts->bindParam(':userId', $userId);
+            $stmtPosts->execute();
+            $postCount = $stmtPosts->fetchColumn(); // Nombre de posts de l'utilisateur
+            
+            // 2. Récupérer le nombre de followers (chaque follower vaut 2 points)
+            $followersCount = $this->getFollowersCount($userId);
+            
+            // Calculer les points totaux
+            $totalPoints = ($postCount * 1) + ($followersCount * 2);
+            
+            return $totalPoints; // Retourner le nombre total de points
+        } catch (PDOException $e) {
+            return 0; // Si une erreur survient, retourne 0
+        }
+    }// Fonction pour récupérer le nombre de followers d'un utilisateur
+    public function getFollowersCount($followedId) {
+        try {
+            $sql = "SELECT COUNT(*) FROM followers WHERE followedId = :followedId";
+            $stmt = $this->con->prepare($sql);
+            $stmt->bindParam(':followedId', $followedId);
+            $stmt->execute();
+            
+            return $stmt->fetchColumn(); // Retourne le nombre de followers
+        } catch (PDOException $e) {
+            return 0; // Si une erreur survient, retourne 0
+        }
+    }
+
+    // Fonction pour récupérer les points d'un utilisateur
+    public function getUserPoints($userId) {
+        try {
+            // 1. Récupérer le nombre de posts (chaque post vaut 1 point)
+            $sqlPosts = "SELECT COUNT(*) FROM posts WHERE userId = :userId";
+            $stmtPosts = $this->con->prepare($sqlPosts);
+            $stmtPosts->bindParam(':userId', $userId);
+            $stmtPosts->execute();
+            $postCount = $stmtPosts->fetchColumn(); // Nombre de posts de l'utilisateur
+            
+            // 2. Récupérer le nombre de followers (chaque follower vaut 2 points)
+            $followersCount = $this->getFollowersCount($userId);
+            
+            // Calculer les points totaux
+            $totalPoints = ($postCount * 1) + ($followersCount * 2);
+            
+            return $totalPoints; // Retourner le nombre total de points
+        } catch (PDOException $e) {
+            return 0; // Si une erreur survient, retourne 0
+        }
+    }// Fonction pour récupérer le nombre de followers d'un utilisateur
+    public function getFollowersCount($followedId) {
+        try {
+            $sql = "SELECT COUNT(*) FROM followers WHERE followedId = :followedId";
+            $stmt = $this->con->prepare($sql);
+            $stmt->bindParam(':followedId', $followedId);
+            $stmt->execute();
+            
+            return $stmt->fetchColumn(); // Retourne le nombre de followers
+        } catch (PDOException $e) {
+            return 0; // Si une erreur survient, retourne 0
+        }
+    }
+
+    // Fonction pour récupérer les points d'un utilisateur
+    public function getUserPoints($userId) {
+        try {
+            // 1. Récupérer le nombre de posts (chaque post vaut 1 point)
+            $sqlPosts = "SELECT COUNT(*) FROM posts WHERE userId = :userId";
+            $stmtPosts = $this->con->prepare($sqlPosts);
+            $stmtPosts->bindParam(':userId', $userId);
+            $stmtPosts->execute();
+            $postCount = $stmtPosts->fetchColumn(); // Nombre de posts de l'utilisateur
+            
+            // 2. Récupérer le nombre de followers (chaque follower vaut 2 points)
+            $followersCount = $this->getFollowersCount($userId);
+            
+            // Calculer les points totaux
+            $totalPoints = ($postCount * 1) + ($followersCount * 2);
+            
+            return $totalPoints; // Retourner le nombre total de points
+        } catch (PDOException $e) {
+            return 0; // Si une erreur survient, retourne 0
+        }
+    }// Fonction pour récupérer le nombre de followers d'un utilisateur
+    public function getFollowersCount($followedId) {
+        try {
+            $sql = "SELECT COUNT(*) FROM followers WHERE followedId = :followedId";
+            $stmt = $this->con->prepare($sql);
+            $stmt->bindParam(':followedId', $followedId);
+            $stmt->execute();
+            
+            return $stmt->fetchColumn(); // Retourne le nombre de followers
+        } catch (PDOException $e) {
+            return 0; // Si une erreur survient, retourne 0
+        }
+    }
+
+    // Fonction pour récupérer les points d'un utilisateur
+    public function getUserPoints($userId) {
+        try {
+            // 1. Récupérer le nombre de posts (chaque post vaut 1 point)
+            $sqlPosts = "SELECT COUNT(*) FROM posts WHERE userId = :userId";
+            $stmtPosts = $this->con->prepare($sqlPosts);
+            $stmtPosts->bindParam(':userId', $userId);
+            $stmtPosts->execute();
+            $postCount = $stmtPosts->fetchColumn(); // Nombre de posts de l'utilisateur
+            
+            // 2. Récupérer le nombre de followers (chaque follower vaut 2 points)
+            $followersCount = $this->getFollowersCount($userId);
+            
+            // Calculer les points totaux
+            $totalPoints = ($postCount * 1) + ($followersCount * 2);
+            
+            return $totalPoints; // Retourner le nombre total de points
+        } catch (PDOException $e) {
+            return 0; // Si une erreur survient, retourne 0
+        }
+    }// Fonction pour récupérer le nombre de followers d'un utilisateur
+    public function getFollowersCount($followedId) {
+        try {
+            $sql = "SELECT COUNT(*) FROM followers WHERE followedId = :followedId";
+            $stmt = $this->con->prepare($sql);
+            $stmt->bindParam(':followedId', $followedId);
+            $stmt->execute();
+            
+            return $stmt->fetchColumn(); // Retourne le nombre de followers
+        } catch (PDOException $e) {
+            return 0; // Si une erreur survient, retourne 0
+        }
+    }
+
+    // Fonction pour récupérer les points d'un utilisateur
+    public function getUserPoints($userId) {
+        try {
+            // 1. Récupérer le nombre de posts (chaque post vaut 1 point)
+            $sqlPosts = "SELECT COUNT(*) FROM posts WHERE userId = :userId";
+            $stmtPosts = $this->con->prepare($sqlPosts);
+            $stmtPosts->bindParam(':userId', $userId);
+            $stmtPosts->execute();
+            $postCount = $stmtPosts->fetchColumn(); // Nombre de posts de l'utilisateur
+            
+            // 2. Récupérer le nombre de followers (chaque follower vaut 2 points)
+            $followersCount = $this->getFollowersCount($userId);
+            
+            // Calculer les points totaux
+            $totalPoints = ($postCount * 1) + ($followersCount * 2);
+            
+            return $totalPoints; // Retourner le nombre total de points
+        } catch (PDOException $e) {
+            return 0; // Si une erreur survient, retourne 0
+        }
+    }// Fonction pour récupérer le nombre de followers d'un utilisateur
+    public function getFollowersCount($followedId) {
+        try {
+            $sql = "SELECT COUNT(*) FROM followers WHERE followedId = :followedId";
+            $stmt = $this->con->prepare($sql);
+            $stmt->bindParam(':followedId', $followedId);
+            $stmt->execute();
+            
+            return $stmt->fetchColumn(); // Retourne le nombre de followers
+        } catch (PDOException $e) {
+            return 0; // Si une erreur survient, retourne 0
+        }
+    }
+
+    // Fonction pour récupérer les points d'un utilisateur
+    public function getUserPoints($userId) {
+        try {
+            // 1. Récupérer le nombre de posts (chaque post vaut 1 point)
+            $sqlPosts = "SELECT COUNT(*) FROM posts WHERE userId = :userId";
+            $stmtPosts = $this->con->prepare($sqlPosts);
+            $stmtPosts->bindParam(':userId', $userId);
+            $stmtPosts->execute();
+            $postCount = $stmtPosts->fetchColumn(); // Nombre de posts de l'utilisateur
+            
+            // 2. Récupérer le nombre de followers (chaque follower vaut 2 points)
+            $followersCount = $this->getFollowersCount($userId);
+            
+            // Calculer les points totaux
+            $totalPoints = ($postCount * 1) + ($followersCount * 2);
+            
+            return $totalPoints; // Retourner le nombre total de points
+        } catch (PDOException $e) {
+            return 0; // Si une erreur survient, retourne 0
+        }
+    }// Fonction pour récupérer le nombre de followers d'un utilisateur
+    public function getFollowersCount($followedId) {
+        try {
+            $sql = "SELECT COUNT(*) FROM followers WHERE followedId = :followedId";
+            $stmt = $this->con->prepare($sql);
+            $stmt->bindParam(':followedId', $followedId);
+            $stmt->execute();
+            
+            return $stmt->fetchColumn(); // Retourne le nombre de followers
+        } catch (PDOException $e) {
+            return 0; // Si une erreur survient, retourne 0
+        }
+    }
+
+    // Fonction pour récupérer les points d'un utilisateur
+    public function getUserPoints($userId) {
+        try {
+            // 1. Récupérer le nombre de posts (chaque post vaut 1 point)
+            $sqlPosts = "SELECT COUNT(*) FROM posts WHERE userId = :userId";
+            $stmtPosts = $this->con->prepare($sqlPosts);
+            $stmtPosts->bindParam(':userId', $userId);
+            $stmtPosts->execute();
+            $postCount = $stmtPosts->fetchColumn(); // Nombre de posts de l'utilisateur
+            
+            // 2. Récupérer le nombre de followers (chaque follower vaut 2 points)
+            $followersCount = $this->getFollowersCount($userId);
+            
+            // Calculer les points totaux
+            $totalPoints = ($postCount * 1) + ($followersCount * 2);
+            
+            return $totalPoints; // Retourner le nombre total de points
+        } catch (PDOException $e) {
+            return 0; // Si une erreur survient, retourne 0
+        }
+    }// Fonction pour récupérer le nombre de followers d'un utilisateur
+    public function getFollowersCount($followedId) {
+        try {
+            $sql = "SELECT COUNT(*) FROM followers WHERE followedId = :followedId";
+            $stmt = $this->con->prepare($sql);
+            $stmt->bindParam(':followedId', $followedId);
+            $stmt->execute();
+            
+            return $stmt->fetchColumn(); // Retourne le nombre de followers
+        } catch (PDOException $e) {
+            return 0; // Si une erreur survient, retourne 0
+        }
+    }
+
+    // Fonction pour récupérer les points d'un utilisateur
+    public function getUserPoints($userId) {
+        try {
+            // 1. Récupérer le nombre de posts (chaque post vaut 1 point)
+            $sqlPosts = "SELECT COUNT(*) FROM posts WHERE userId = :userId";
+            $stmtPosts = $this->con->prepare($sqlPosts);
+            $stmtPosts->bindParam(':userId', $userId);
+            $stmtPosts->execute();
+            $postCount = $stmtPosts->fetchColumn(); // Nombre de posts de l'utilisateur
+            
+            // 2. Récupérer le nombre de followers (chaque follower vaut 2 points)
+            $followersCount = $this->getFollowersCount($userId);
+            
+            // Calculer les points totaux
+            $totalPoints = ($postCount * 1) + ($followersCount * 2);
+            
+            return $totalPoints; // Retourner le nombre total de points
+        } catch (PDOException $e) {
+            return 0; // Si une erreur survient, retourne 0
+        }
+    }// Fonction pour récupérer le nombre de followers d'un utilisateur
+    public function getFollowersCount($followedId) {
+        try {
+            $sql = "SELECT COUNT(*) FROM followers WHERE followedId = :followedId";
+            $stmt = $this->con->prepare($sql);
+            $stmt->bindParam(':followedId', $followedId);
+            $stmt->execute();
+            
+            return $stmt->fetchColumn(); // Retourne le nombre de followers
+        } catch (PDOException $e) {
+            return 0; // Si une erreur survient, retourne 0
+        }
+    }
+
+    // Fonction pour récupérer les points d'un utilisateur
+    public function getUserPoints($userId) {
+        try {
+            // 1. Récupérer le nombre de posts (chaque post vaut 1 point)
+            $sqlPosts = "SELECT COUNT(*) FROM posts WHERE userId = :userId";
+            $stmtPosts = $this->con->prepare($sqlPosts);
+            $stmtPosts->bindParam(':userId', $userId);
+            $stmtPosts->execute();
+            $postCount = $stmtPosts->fetchColumn(); // Nombre de posts de l'utilisateur
+            
+            // 2. Récupérer le nombre de followers (chaque follower vaut 2 points)
+            $followersCount = $this->getFollowersCount($userId);
+            
+            // Calculer les points totaux
+            $totalPoints = ($postCount * 1) + ($followersCount * 2);
+            
+            return $totalPoints; // Retourner le nombre total de points
+        } catch (PDOException $e) {
+            return 0; // Si une erreur survient, retourne 0
+        }
+    }// Fonction pour récupérer le nombre de followers d'un utilisateur
+    public function getFollowersCount($followedId) {
+        try {
+            $sql = "SELECT COUNT(*) FROM followers WHERE followedId = :followedId";
+            $stmt = $this->con->prepare($sql);
+            $stmt->bindParam(':followedId', $followedId);
+            $stmt->execute();
+            
+            return $stmt->fetchColumn(); // Retourne le nombre de followers
+        } catch (PDOException $e) {
+            return 0; // Si une erreur survient, retourne 0
+        }
+    }
+
+    // Fonction pour récupérer les points d'un utilisateur
+    public function getUserPoints($userId) {
+        try {
+            // 1. Récupérer le nombre de posts (chaque post vaut 1 point)
+            $sqlPosts = "SELECT COUNT(*) FROM posts WHERE userId = :userId";
+            $stmtPosts = $this->con->prepare($sqlPosts);
+            $stmtPosts->bindParam(':userId', $userId);
+            $stmtPosts->execute();
+            $postCount = $stmtPosts->fetchColumn(); // Nombre de posts de l'utilisateur
+            
+            // 2. Récupérer le nombre de followers (chaque follower vaut 2 points)
+            $followersCount = $this->getFollowersCount($userId);
+            
+            // Calculer les points totaux
+            $totalPoints = ($postCount * 1) + ($followersCount * 2);
+            
+            return $totalPoints; // Retourner le nombre total de points
+        } catch (PDOException $e) {
+            return 0; // Si une erreur survient, retourne 0
+        }
+    }
+
+    function updateFollowers($followedId, $followerId) {
+        try {
+            // Vérifier si l'utilisateur suit déjà cet utilisateur
+            $sql = "SELECT COUNT(*) FROM followers WHERE followerId = :followerId AND followedId = :followedId";
+            $stmt = $this->con->prepare($sql);
+            $stmt->bindParam(':followerId', $followerId);
+            $stmt->bindParam(':followedId', $followedId);
+            $stmt->execute();
+
+            $count = $stmt->fetchColumn();
+
+            // Si l'utilisateur suit déjà le suivi
+            if ($count > 0) {
+                return ['success' => false, 'message' => 'Vous suivez déjà cet utilisateur.'];
+            }
+
+
+            $sql = "INSERT INTO followers (followerId, followedId) VALUES (:followerId, :followedId)";
+            $stmt = $this->con->prepare($sql);
+            $stmt->bindParam(':followedId', $followedId);
+            $stmt->bindParam(':followerId', $followerId);
+            $stmt->execute();
+
+            // Récupérer le nombre de followers et de points après le suivi
+            $followersCount = $this->getFollowersCount($followedId);
+            $userPoints = $this->getUserPoints($followerId);
+
+    
+            return ['success' => true, 
+            'message' => 'Félicitations ! Vous suivez désormais cet utilisateur.',
+            'followersCount' => $followersCount, // Nombre de followers
+            'userPoints' => $userPoints // Nombre de points de l'utilisateur
+        ];
+    
+        } catch (PDOException $e) {
+            return ['success' => false, 'message' => 'Erreur de base de données : ' . $e->getMessage()];
+        }
+    }

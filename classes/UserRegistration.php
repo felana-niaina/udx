@@ -308,6 +308,41 @@ class UserRegistration {
             return null;
         }
     }
+
+
+    function updateFollowers($followedId, $followerId) {
+        try {
+            // Vérifier si l'utilisateur suit déjà cet utilisateur
+            $sql = "SELECT COUNT(*) FROM followers WHERE followerId = :followerId AND followedId = :followedId";
+            $stmt = $this->con->prepare($sql);
+            $stmt->bindParam(':followerId', $followerId);
+            $stmt->bindParam(':followedId', $followedId);
+            $stmt->execute();
+
+            $count = $stmt->fetchColumn();
+
+            // Si l'utilisateur suit déjà le suivi
+            if ($count > 0) {
+                return ['success' => false, 'message' => 'Vous suivez déjà cet utilisateur.'];
+            }
+
+
+            $sql = "INSERT INTO followers (followerId, followedId) VALUES (:followerId, :followedId)";
+            $stmt = $this->con->prepare($sql);
+            $stmt->bindParam(':followedId', $followedId);
+            $stmt->bindParam(':followerId', $followerId);
+            $stmt->execute();
+    
+            return ['success' => true, 
+            'message' => 'Félicitations ! Vous suivez désormais cet utilisateur.',
+        ];
+    
+        } catch (PDOException $e) {
+            return ['success' => false, 'message' => 'Erreur de base de données : ' . $e->getMessage()];
+        }
+    }
+
+
     
 }
 ?>

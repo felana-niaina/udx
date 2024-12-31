@@ -38,6 +38,16 @@ $profilePhoto = is_null($userInfo['profile_photo']) ? 'https://via.placeholder.c
 $coverPhoto = 'http://'.$_SERVER['SERVER_NAME'] .'/udx/'. $coverPhoto;
 $profilePhoto = 'http://'.$_SERVER['SERVER_NAME'] .'/udx/'. $profilePhoto;
 
+// check if followed
+// Récupérer l'ID du follower et de l'utilisateur suivi
+$followedId = $userIdParam;  // ID de l'utilisateur suivi
+$followerId = $connectedUserId;  // ID de l'utilisateur connecté (le follower)
+
+$followedUser = $userRegistration->isFollowedUser($followerId, $followedId);
+
+// Déterminer si l'utilisateur est suivi ou non
+$isFollowed = ($followedUser !== null); 
+
 // Vérifiez si un fichier est envoyé
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     // Vérifier quel formulaire a été soumis
@@ -166,6 +176,39 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             echo "Échec de l'envoie du message.";
         }
     }
+}
+
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    if(isset($_POST['followedId']) && isset($_POST['followerId']) ){
+        // Récupérer les données POST
+        $followedId = $_POST['followedId'];
+        $followerId = $_POST['followerId'];
+
+        try {
+            $result = $userRegistration->updateFollowers($followedId, $followerId);
+            if ($result) {
+                echo "<script>
+                        document.addEventListener('DOMContentLoaded', function() {
+                            Swal.fire({
+                                icon: 'success',
+                                title: 'Utilisateur suivi',
+                                text: `Félicitations ! Vous commencez à la suivre`,
+                                confirmButtonText: 'Fermer'
+                            }).then(function() {
+                                // Redirection vers le profil de l'utilisateur suivi
+                                window.location.href = 'profil.php?userId=' + {$followedId};
+                            });
+                        });
+                    </script>";
+            } else {
+                echo "Érreur survenu.";
+            }
+
+        } catch (PDOException $e) {
+            echo json_encode(['success' => false, 'message' => 'Erreur de connexion à la base de données : ' . $e->getMessage()]);
+        }
+    }
+    
 }
 
 
@@ -443,6 +486,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             background-color: rgba(0, 200, 0, 1);
         }
 
+        /* Style pour les boutons non cliquables */
+        .follow-btn:disabled {
+            background-color: #ADD8E6; /* Couleur de fond grise pour un bouton désactivé */
+            color: white;
+            border: 1px solid #ccc;
+        }
+
+
         /* Responsive */
         @media (max-width: 768px) {
             .container {
@@ -528,7 +579,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     <div class="buttons-container">
                         <?php if ($userIdParam && $connectedUserId != $userIdParam) { ?>
                             <button data-toggle="modal" data-target="#messageModal"><i class="fas fa-envelope"></i> Send Message</button>
-                            <button class="follow-btn"><i class="fas fa-user-plus"></i> Follow</button>
+                            <button 
+                                class="follow-btn" 
+                                onclick="handleFollowClick(this)" 
+                                data-followed-id="<?php echo $userIdParam; ?>" 
+                                data-follower-id="<?php echo $connectedUserId; ?>"
+                                <?php echo $isFollowed ? 'disabled' : ''; ?>>
+                                <i class="fas fa-user-plus"></i>
+                                <?php echo $isFollowed ? 'Already Following' : 'Follow'; ?>
+                            </button>                        
                         <?php } ?>
                         
                         <?php if (!$userIdParam || ($userIdParam && $connectedUserId == $userIdParam) ): ?>
@@ -707,6 +766,44 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
         document.getElementById("profile-photo-form").style.display = "block";
     });
+
+    function handleFollowClick(button) {
+        // Récupérer les IDs des utilisateurs depuis les attributs data
+        const followedId = button.dataset.followedId;
+        const followerId = button.dataset.followerId;
+
+        // Assurer que les données sont présentes
+        if (!followedId || !followerId) {
+            alert("Erreur : Impossible de suivre cet utilisateur.");
+            return;
+        }
+
+        // Créez un formulaire dynamique et soumettez les données via POST
+        const form = document.createElement('form');
+        form.method = 'POST';
+        form.action = `profil.php?userId= + ${followedId}`; // L'action vers laquelle les données seront envoyées
+
+        // Ajoutez les champs à la requête
+        const inputFollowedId = document.createElement('input');
+        inputFollowedId.type = 'hidden';
+        inputFollowedId.name = 'followedId';
+        inputFollowedId.value = followedId;
+
+        const inputFollowerId = document.createElement('input');
+        inputFollowerId.type = 'hidden';
+        inputFollowerId.name = 'followerId';
+        inputFollowerId.value = followerId;
+
+        form.appendChild(inputFollowedId);
+        form.appendChild(inputFollowerId);
+
+        // Ajoutez le formulaire au body et soumettez-le
+        document.body.appendChild(form);
+        form.submit();
+
+}
+
+    
 </script>
 
 </body>
