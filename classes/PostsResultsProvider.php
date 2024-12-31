@@ -83,9 +83,18 @@ class PostsResultsProvider {
                 $description = $this->trimField($description, 230);
                 $isFeatured = $row["isFeatured"];
 
+                // Vérifiez si l'utilisateur est connecté
+                $profileLink = $isUserConnected
+                ? "http://localhost/udx/profil.php?userId=$userId"
+                : "javascript:void(0);";
+
+                $onclickEvent = $isUserConnected
+                    ? ""
+                    : "onclick=\"showLoginPopup()\"";
+
                 // Ajouter le résultat au HTML
                 $resultsHtml .= "<div class='d-flex mb-3'>
-                                    <a href='http://localhost/udx/profil.php?userId=$userId'><img src='$profilePicture' class='profile-photo' /></a>
+                                    <a href='$profileLink' $onclickEvent><img src='$profilePicture' class='profile-photo' /></a>
                                     <div class='text'>
                                         <span>$username</span>
                                         <div class='d-flex'>
@@ -120,6 +129,8 @@ class PostsResultsProvider {
                         <button class='btn btn-secondary' onclick='cancelComment(this)'>Annuler</button>
                         <button class='btn btn-primary' onclick='sendComment(this, $id)'>Envoyer</button>
                     </div>";
+                }else{
+                    $resultsHtml .= "<span class='description'><strong>Connectez-vous pour pouvoir commenter ce post.</strong></span>";
                 }
                                             
                 $resultsHtml .=         "</div>

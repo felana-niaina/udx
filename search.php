@@ -429,6 +429,9 @@
         });
 
         
+        function showLoginPopup() {
+            alert("Vous devez vous connecter pour visiter ce profil.");
+        }
 
 
     </script>

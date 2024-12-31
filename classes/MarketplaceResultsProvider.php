@@ -229,13 +229,13 @@ class MarketplaceResultsProvider {
         try {
             $targetFile = '';
     
-            // Gérer l'upload de la nouvelle image, si une nouvelle est fournie
-            if (!is_null($picture)) {
+            // Gérer l'upload de la nouvelle image si elle est sous forme de tableau ($_FILES)
+            if (is_array($picture) && isset($picture['tmp_name']) && !empty($picture['tmp_name'])) {
                 if ($picture['error'] !== UPLOAD_ERR_OK) {
                     throw new Exception("Erreur lors du téléchargement du fichier.");
                 }
                 $newImageName = time() . '_' . uniqid() . '.' . pathinfo($picture['name'], PATHINFO_EXTENSION);
-        
+    
                 // Déplacer le fichier téléchargé dans le répertoire voulu
                 $uploadDir = 'uploads/';
                 $targetFile = $uploadDir . $newImageName;
@@ -254,6 +254,9 @@ class MarketplaceResultsProvider {
                 if ($oldPicture && file_exists($oldPicture)) {
                     unlink($oldPicture);
                 }
+            } else {
+                // Utiliser l'ancienne image si aucun fichier n'a été uploadé
+                $targetFile = $picture;
             }
     
             // Construire la requête SQL
@@ -265,7 +268,7 @@ class MarketplaceResultsProvider {
                     price = :price, 
                     keywords = :keywords,
                     userId = :userId" .
-                    (!is_null($picture) ? ", picture = :picture" : "") . 
+                    (!empty($targetFile) ? ", picture = :picture" : "") . 
                 " WHERE id = :productId";
     
             $stmt = $this->con->prepare($sql);
@@ -277,7 +280,7 @@ class MarketplaceResultsProvider {
             $stmt->bindParam(':productId', $productId);
     
             // Ajouter l'image à la requête seulement si elle a été modifiée
-            if (!is_null($picture)) {
+            if (!empty($targetFile)) {
                 $stmt->bindParam(':picture', $targetFile);
             }
     
@@ -290,6 +293,7 @@ class MarketplaceResultsProvider {
             return false;
         }
     }
+    
     
     public function removeProduct($userId, $productId) {
         try {

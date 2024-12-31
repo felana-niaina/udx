@@ -145,8 +145,10 @@
       $selectedProduct = $marketPlaceProvider->getProductById($_POST['productId']);
       $currentPicture = $selectedProduct->picture;
       if($userId && $_POST['productId'] && $_POST['productNameUpdated'] && $_POST['productDescriptionUpdated'] && $_POST['productPriceUpdated'] && $_POST['productTagsUpdated']) {
-        $productPicture = isset($_FILES['productPictureUpdated']) ? $_FILES['productPictureUpdated'] : $selectedProduct->picture;
-        
+        $productPicture = isset($_FILES['productPictureUpdated']['tmp_name']) && !empty($_FILES['productPictureUpdated']['tmp_name']) 
+            ? $_FILES['productPictureUpdated'] 
+            : $currentPicture;
+
         $MarketplaceResultsProvider = new MarketplaceResultsProvider($con);
         if ($MarketplaceResultsProvider->updateProduct($_POST['productId'],$userId,$_POST['productNameUpdated'], $_POST['productDescriptionUpdated'], $_POST['productPriceUpdated'], $_POST['productTagsUpdated'], $productPicture)) {
           echo "<script>
@@ -979,11 +981,7 @@
                   
                         </div>
 
-                        <!-- Formulaire pour répondre à l'article -->
-                        <!-- <div class="response-box">
-                            <h6>Votre message:</h6>
-                            <textarea id="responseText" class="form-control" rows="4" placeholder="Tapez votre message ici..."></textarea>
-                        </div> -->
+                        
                       </div>
                           
                       
@@ -1231,6 +1229,7 @@
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.4.1/dist/js/bootstrap.bundle.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
   <script>
+
     $(function(){
 
       // get marketplace product and show on modal
@@ -1395,6 +1394,7 @@
         });
       }); */
     })
+
 
     // Lorsque l'utilisateur clique sur le bouton d'édition de la photo du marketplace à modifer
     document.getElementById("edit-marketplace-photo-btn").addEventListener("click", function () {
