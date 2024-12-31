@@ -3,6 +3,7 @@
 // Classe AnnoncesResultsProvider
 class MarketplaceResultsProvider {
     private $con;
+    private $siteUrl;
 
     // Le constructeur attend une connexion PDO avec une base de données
     public function __construct($con) {
@@ -16,6 +17,7 @@ class MarketplaceResultsProvider {
         }
 
         $this->con = $con;
+        $this->siteUrl = 'http://'.$_SERVER['SERVER_NAME'] ;
     }
 
     // Méthode pour obtenir le nombre de résultats
@@ -87,7 +89,7 @@ class MarketplaceResultsProvider {
 
                 // Ajouter le résultat au HTML
 				$resultsHtml .= " <div class='d-flex mb-12 marketResult'>
-                    <a href='http://localhost/udx/profil.php?userId=$userId'><img src='$profilePicture' class='profile-photo'></a>
+                    <a href='$this->siteUrl/udx/profil.php?userId=$userId'><img src='$profilePicture' class='profile-photo'></a>
                     <div class='text'>
                         <div>
                             <h6 class='price'>$username</h6>
@@ -99,7 +101,7 @@ class MarketplaceResultsProvider {
                     }
 
                     if($isUserConnected) {
-                        $resultsHtml .=             "<button class='btn see-market-image' data-bs-toggle='modal' data-bs-target='#seePictureModal' data-picture='http://localhost/udx/$picture' data-id=`$id`>
+                        $resultsHtml .=             "<button class='btn see-market-image' data-bs-toggle='modal' data-bs-target='#seePictureModal' data-picture='$this->siteUrl/udx/$picture' data-id=`$id`>
                                 <i class='bi bi-images'></i>
                             </button>
                             <button class='btn contact-product-owner' data-bs-toggle='modal' data-bs-target='#contactModal' data-user-id='$userId' data-id=`$id`>
@@ -148,7 +150,6 @@ class MarketplaceResultsProvider {
             $query->execute([
                 'userId' => $userId
             ]);
-            $siteUrl = 'http://'.$_SERVER['SERVER_NAME'] .'/udx/';
 
             $resultsHtml = "<div class='row'>";
             while ($row = $query->fetch(PDO::FETCH_ASSOC)) {
@@ -157,7 +158,7 @@ class MarketplaceResultsProvider {
                 $description = $row["description"];
                 $keywords = $row["keywords"];
                 $price = $row["price"] . " €";
-                $image = is_null($row['picture']) || $row['picture'] == '' ? "https://via.placeholder.com/150" : $siteUrl. $row['picture'];
+                $image = is_null($row['picture']) || $row['picture'] == '' ? "https://via.placeholder.com/150" : $this->siteUrl. '/' .$row['picture'];
                 $date = $row["createdDate"];
 
                 // Truncation des champs title et description si nécessaire

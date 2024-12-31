@@ -282,11 +282,11 @@
                             <input type="hidden" name="senderId" id="senderId" value="<?php echo $_SESSION['user_id'] ?>">
                             <div class="mb-3">
                                 <label for="subject" class="form-label">Objet du message</label>
-                                <input type="text" class="form-control" id="subject" name="subject" require/>
+                                <input type="text" class="form-control" id="subject" name="subject" required/>
                             </div>
                             <div class="mb-3">
                                 <label for="message" class="form-label">Votre message</label>
-                                <textarea class="form-control" id="message" name="message" rows="4" placeholder="Écrivez votre message ici..."></textarea>
+                                <textarea class="form-control" id="message" name="message" rows="4" placeholder="Écrivez votre message ici..." required></textarea>
                             </div>
                             <div>
                                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fermer</button>
