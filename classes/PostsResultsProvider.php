@@ -3,6 +3,7 @@
 // Classe AnnoncesResultsProvider
 class PostsResultsProvider {
     private $con;
+    private $siteUrl;
 
     // Le constructeur attend une connexion PDO avec une base de données
     public function __construct($con) {
@@ -16,6 +17,7 @@ class PostsResultsProvider {
         }
 
         $this->con = $con;
+        $this->siteUrl = 'http://'.$_SERVER['SERVER_NAME'] ;
     }
 
     // Méthode pour obtenir le nombre de résultats
@@ -85,7 +87,7 @@ class PostsResultsProvider {
 
                 // Vérifiez si l'utilisateur est connecté
                 $profileLink = $isUserConnected
-                ? "http://localhost/udx/profil.php?userId=$userId"
+                ? "$this->siteUrl/udx/profil.php?userId=$userId"
                 : "javascript:void(0);";
 
                 $onclickEvent = $isUserConnected
@@ -308,7 +310,7 @@ class PostsResultsProvider {
                 $username = $row['username'];
 
                 $resultsHtml .= "<div class='d-flex mb-12 comment-list'>
-                    <a href='http://localhost/udx/profil.php/$id'><img src='$profilePicture' class='profile-photo'></a>
+                    <a href='$this->siteUrl/udx/profil.php/$id'><img src='$profilePicture' class='profile-photo'></a>
                     <div class='text'>
                         <div>
                             <span class='price'>$username a écrit : </span><br/>
