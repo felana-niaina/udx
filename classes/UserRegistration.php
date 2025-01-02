@@ -310,7 +310,7 @@ class UserRegistration {
     }
 
 
-    public function updateFollowers($followedId, $followerId) {
+    function updateFollowers($followedId, $followerId) {
         try {
             // Vérifier si l'utilisateur suit déjà cet utilisateur
             $sql = "SELECT COUNT(*) FROM followers WHERE followerId = :followerId AND followedId = :followedId";
@@ -342,33 +342,58 @@ class UserRegistration {
         }
     }
 
-    public function getFollowerNumber($followedId) {
+    public function countFollowers($userId) {
         try {
-            $sql = "SELECT COUNT(*) FROM followers WHERE followedId = :followedId";
+            // Vérifiez que la connexion à la base de données existe
+            if (!$this->con) {
+                throw new Exception("La connexion à la base de données a échoué.");
+            }
+    
+            // Requête pour compter les followers
+            $sql = "SELECT COUNT(*) AS totalFollowers FROM followers WHERE followedId = :userId";
             $stmt = $this->con->prepare($sql);
-            $stmt->bindParam(':followedId', $followedId);
+            $stmt->bindParam(':userId', $userId, PDO::PARAM_INT);
             $stmt->execute();
-            
-            return $stmt->fetchColumn();
+    
+            // Récupérer le nombre total de followers
+            $result = $stmt->fetch(PDO::FETCH_ASSOC);
+    
+            return $result['totalFollowers'];
+    
         } catch (PDOException $e) {
-            echo "Erreur lors de la récupération des données : " . $e->getMessage();
-            return null;
+            return 0;
         }
     }
     
-    public function getFollowedNumber($followerId) {
+    public function calculatePoints($userId) {
         try {
-            $sql = "SELECT COUNT(*) FROM followers WHERE followerId = :followerId";
-            $stmt = $this->con->prepare($sql);
-            $stmt->bindParam(':followerId', $followerId);
-            $stmt->execute();
-            
-            return $stmt->fetchColumn();
+            if (!$this->con) {
+                throw new Exception("La connexion à la base de données a échoué.");
+            }
+
+            // Récupération du nombre de followers de l'utilisateur
+            $totalFollowers = $this->countFollowers($userId);
+    
+            // Récupération du nombre de posts de l'utilisateur
+            $postQuery = "SELECT COUNT(*) AS totalPosts FROM posts WHERE userId = :userId";
+            $postStmt = $this->con->prepare($postQuery);
+            $postStmt->bindParam(':userId', $userId, PDO::PARAM_INT);
+            $postStmt->execute();
+            $postResult = $postStmt->fetch(PDO::FETCH_ASSOC);
+            $totalPosts = $postResult['totalPosts'];
+    
+            // Calcul des points
+            $points = ($totalPosts * 1) + ($totalFollowers * 2);
+    
+            return $points;
+    
         } catch (PDOException $e) {
-            echo "Erreur lors de la récupération des données : " . $e->getMessage();
-            return null;
+            return 0;
+        } catch (Exception $e) {
+            return 0;
         }
     }
-
+    
+    
 }
 ?>

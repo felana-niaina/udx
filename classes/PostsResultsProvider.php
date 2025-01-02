@@ -17,7 +17,7 @@ class PostsResultsProvider {
         }
 
         $this->con = $con;
-        $this->siteUrl = 'http://'.$_SERVER['SERVER_NAME'] . '/udx' ;
+        $this->siteUrl = 'http://'.$_SERVER['SERVER_NAME'] ;
     }
 
     // Méthode pour obtenir le nombre de résultats
@@ -43,6 +43,25 @@ class PostsResultsProvider {
         }
     }
 
+    public function isLikedPost($likerId, $postId) {
+        try {
+            $sql = "SELECT * FROM likers WHERE likerId = :likerId AND postId = :postId";
+            $stmt = $this->con->prepare($sql);
+            $stmt->bindParam(':likerId', $likerId);
+            $stmt->bindParam(':postId', $postId);
+            $stmt->execute();
+            
+            // Si une ligne existe, l'utilisateur a aimé le post
+            return $stmt->fetchColumn() !== false;
+
+        } catch (PDOException $e) {
+            echo "Erreur lors de la récupération des données : " . $e->getMessage();
+            return false;
+        }
+   
+    }
+
+
     // Méthode pour obtenir les résultats sous forme de HTML
     public function getResultsHtml($page, $pageSize, $term) {
         try {
@@ -51,6 +70,9 @@ class PostsResultsProvider {
             }
             // Vérifier si l'utilisateur est connecté via la session
             $isUserConnected = !empty($_SESSION);
+
+            $userIdConnected = isset($_SESSION['user_id']) ? $_SESSION['user_id'] : null;
+
 
             $fromLimit = ($page - 1) * $pageSize;
 
@@ -85,9 +107,19 @@ class PostsResultsProvider {
                 $description = $this->trimField($description, 230);
                 $isFeatured = $row["isFeatured"];
 
+                $likedClass = '';
+                if ($isUserConnected) {
+                   
+                    $likedPost = $this->isLikedPost($userIdConnected, $id); // Vérifiez si l'utilisateur a aimé ce post
+                    if ($likedPost) {
+                        $likedClass = 'liked'; // Ajoutez une classe "liked" si l'utilisateur a aimé
+                    }
+                }
+
+
                 // Vérifiez si l'utilisateur est connecté
                 $profileLink = $isUserConnected
-                ? "$this->siteUrl/profil.php?userId=$userId"
+                ? "$this->siteUrl/udx/profil.php?userId=$userId"
                 : "javascript:void(0);";
 
                 $onclickEvent = $isUserConnected
@@ -108,7 +140,11 @@ class PostsResultsProvider {
                 $resultsHtml .= "
                                             </h4>
                                              <!-- Icone Like -->
-                                            <button class='btn' onclick='likePost(this, $id)'>
+                                            <button class='btn like-btn $likedClass' 
+                                                data-post-id='$id' 
+                                                data-user-id='$userId'
+                                                onclick='handleLikeClick(this)'
+                                            >
                                                 <i class='bi bi-hand-thumbs-up'></i>
                                             </button>
 
@@ -310,7 +346,7 @@ class PostsResultsProvider {
                 $username = $row['username'];
 
                 $resultsHtml .= "<div class='d-flex mb-12 comment-list'>
-                    <a href='$this->siteUrl/profil.php?userId=$id'><img src='$profilePicture' class='profile-photo'></a>
+                    <a href='$this->siteUrl/udx/profil.php/$id'><img src='$profilePicture' class='profile-photo'></a>
                     <div class='text'>
                         <div>
                             <span class='price'>$username a écrit : </span><br/>
@@ -373,49 +409,51 @@ class PostsResultsProvider {
         }
     }
 
-    public function likePost($likerId, $postId) {
+    public function toggleLikePost($likerId, $likedId, $postId) {
         try {
-            // Vérifier si l'utilisateur suit déjà cet utilisateur
-            $sql = "SELECT COUNT(*) FROM likers WHERE likerId = :likerId AND postId = :postId";
-            $stmt = $this->con->prepare($sql);
-            $stmt->bindParam(':likerId', $likerId);
-            $stmt->bindParam(':postId', $postId);
-            $stmt->execute();
 
-            $count = $stmt->fetchColumn();
+             // Vérification si un "like" existe déjà pour cet utilisateur et ce post
+            $sqlCheck = "SELECT id FROM likers WHERE likerId = :likerId AND likedId = :likedId AND postId = :postId";
+            $stmtCheck = $this->con->prepare($sqlCheck);
 
-            // Si l'utilisateur suit déjà le suivi
-            if ($count > 0) {
-                return ['success' => false, 'message' => 'Vous suivez liker ce poste.'];
+            $stmtCheck->bindParam(':likerId', $likerId);
+            $stmtCheck->bindParam(':likedId', $likedId);
+            $stmtCheck->bindParam(':postId', $postId);
+
+            $stmtCheck->execute();
+            $like = $stmtCheck->fetch();
+
+            if ($like) {
+                // Si like existe, like retiré
+                $sqlDelete = "DELETE FROM likers WHERE id = :id";
+                $stmtDelete = $this->con->prepare($sqlDelete);
+
+                $stmtDelete->bindParam(':id', $like['id']);
+                $stmtDelete->execute();
+
+                return ['success' => true, 'isLiked' => false];
+
+            } else {
+        
+                $sqlInsert = "INSERT INTO likers (likerId, likedId, postId, createdDate) 
+                                VALUES (:likerId, :likedId, :postId, NOW())";
+                $stmtInsert = $this->con->prepare($sqlInsert);
+
+                $stmtInsert->bindParam(':likerId', $likerId);
+                $stmtInsert->bindParam(':likedId', $likedId);
+                $stmtInsert->bindParam(':postId', $postId);
+
+                $stmtInsert->execute();
+
+                return ['success' => true, 'isLiked' => true];
+
             }
-
-
-            $sql = "INSERT INTO likers (likerId, postId) VALUES (:likerId, :postId)";
-            $stmt = $this->con->prepare($sql);
-            $stmt->bindParam(':likerId', $likerId);
-            $stmt->bindParam(':postId', $postId);
-            $stmt->execute();
-    
-            return json_encode(['success' => true, 'message' => 'Félicitations ! Vous avez liker ce poste.']);
-    
+          
         } catch (PDOException $e) {
-            return json_encode(['success' => false, 'message' => 'Erreur de base de données : ' . $e->getMessage()]);
+            return ['success' => false, 'message' => 'Erreur : ' . $e->getMessage()];
         }
     }
-
-    public function getPostsNumberByUser($userId){
-        try {
-            $sql = "SELECT COUNT(*) FROM posts WHERE userId = :userId";
-            $stmt = $this->con->prepare($sql);
-            $stmt->bindParam(':userId', $userId);
-            $stmt->execute();
-            
-            return $stmt->fetchColumn();
-        } catch (PDOException $e) {
-            echo "Erreur lors de la récupération des données : " . $e->getMessage();
-            return null;
-        }
-    }
+    
     
 }
 ?>

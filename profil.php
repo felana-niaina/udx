@@ -28,19 +28,18 @@ if ($userIdParam) {
 } else {
     $userId = $connectedUserId; // Sinon, on utilise l'ID de l'utilisateur connecté
 }
+
 $userRegistration = new UserRegistration($con);
 $PostsResultsProvider = new PostsResultsProvider($con);
 $messageResult = new MessageResultsProvider($con);
-// $userId = $_SESSION['user_id']; // ID de l'utilisateur connecté
 $userInfo = $userRegistration->getUserInfo($userId);
-$userFollowers = $userRegistration->getFollowerNumber($userId);
-$userFollowed = $userRegistration->getFollowedNumber($userId);
-$postNumber = $PostsResultsProvider->getPostsNumberByUser($userId);
-// $userLikedPost = $userRegistration->getLikedPost($userId);
 $coverPhoto = is_null($userInfo['cover_photo']) ? 'uploads/default_cover.jpg' : $userInfo['cover_photo'];
 $profilePhoto = is_null($userInfo['profile_photo']) ? 'https://via.placeholder.com/150' : $userInfo['profile_photo'];
 $coverPhoto = 'http://'.$_SERVER['SERVER_NAME'] .'/udx/'. $coverPhoto;
 $profilePhoto = 'http://'.$_SERVER['SERVER_NAME'] .'/udx/'. $profilePhoto;
+
+$followersCount = $userRegistration->countFollowers($userId);
+$points = $userRegistration->calculatePoints($userId);
 
 // check if followed
 // Récupérer l'ID du follower et de l'utilisateur suivi
@@ -666,10 +665,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
                     <!-- Followers Section -->
                     <div class="followers">
-                        <p><span>Followers:</span> <? echo $userFollowers ?></p>
-                        <p><span>Points:</span> <? echo $userFollowed * 2 + $postNumber ?></p>
+                        <p><span>Followers:</span> <?php echo number_format($followersCount); ?></p>
                         <?php if (!$userIdParam): ?>
-                            
+                            <p><span>Points:</span><?php echo number_format($points); ?></p>
                         <?php endif; ?>
                     </div>
                 </div>
@@ -783,12 +781,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             return;
         }
 
-        // Créez un formulaire dynamique et soumettez les données via POST
+        // Création d'un formulaire dynamique et soumettez les données via POST
         const form = document.createElement('form');
         form.method = 'POST';
         form.action = `profil.php?userId= + ${followedId}`; // L'action vers laquelle les données seront envoyées
 
-        // Ajoutez les champs à la requête
+        // Ajout des champs à la requête
         const inputFollowedId = document.createElement('input');
         inputFollowedId.type = 'hidden';
         inputFollowedId.name = 'followedId';
@@ -802,7 +800,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         form.appendChild(inputFollowedId);
         form.appendChild(inputFollowerId);
 
-        // Ajoutez le formulaire au body et soumettez-le
+        // Ajout du formulaire au body et puis soumission
         document.body.appendChild(form);
         form.submit();
 

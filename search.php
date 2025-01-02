@@ -120,6 +120,17 @@
             padding-top: 5px;
             padding-left: 5px;
         }
+        button.liked i {
+            color: #1E90FF; /* Change la couleur en rouge pour "bleu" */
+        }
+
+        button i {
+            color: #555; /* Par défaut, couleur gris clair */
+        }
+        
+        .liked {
+            color: #1E90FF;
+        }
     </style>
     <script src="https://code.jquery.com/jquery-3.3.1.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
 
@@ -433,39 +444,40 @@
             alert("Vous devez vous connecter pour visiter ce profil.");
         }
 
-        function likePost(button, id) {
-            const postId = id; // ID du post
-            const userId = <?php echo $_SESSION['user_id'] ?? 0 ?>;
+        function handleLikeClick(button) {
+            const postId = button.dataset.postId;
+            const userIdPost = button.dataset.userId;
+            const userLiker = <?php echo $_SESSION['user_id'] ?? 0 ?>;  // ID de l'utilisateur connecté
+            
+            if (!postId || !userIdPost || !userLiker) {
+                alert("Erreur : Impossible de traiter le like.");
+                return;
+            }
+
+            // Envoi de la requête AJAX pour ajouter ou retirer le like
             $.post("ajax/postInfo.php", {
                 postId: postId,
-                userId: userId,
+                userLiker: userLiker,
+                userIdPost: userIdPost,
                 postLike: true
-            }).done(function(result){
+            }).done(function(result) {
                 let data = JSON.parse(result);
-                if(data.success) {
-                    Swal.fire({
-                        title: 'Succès',
-                        text: data.message,
-                        icon: 'success',
-                        confirmButtonText: 'OK'
-                    }).then((result) => {
-                        if (result.isConfirmed) {
-                            // window.location.href = document.location.href;
-                        }
-                    });
+
+                if (data.success) {
+                    // Si le like a été ajouté ou supprimé, change la couleur du bouton
+                    if (data.isLiked) {
+                        button.classList.add('liked');  // Change la couleur pour montrer que c'est aimé
+                    } else {
+                        button.classList.remove('liked');  // Retire la couleur de "liked" si ce n'est plus aimé
+                    }
                 } else {
-                    Swal.fire({
-                        text: data.message,
-                        icon: 'warning',
-                        confirmButtonText: 'OK'
-                    }).then((result) => {
-                        if (result.isConfirmed) {
-                            // window.location.href = document.location.href;
-                        } 
-                    });
+                    alert(data.message);
                 }
-            })
+            }).fail(function() {
+                alert("Erreur lors du traitement de la requête.");
+            });
         }
+
 
     </script>
 </body>
