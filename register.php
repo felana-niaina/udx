@@ -64,7 +64,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             <h2>Bienvenue sur Underdex !</h2>
             <p>Ton compte est désormais créé :</p>
             <p><strong>Nom d’utilisateur :</strong> $username</p>
-            <p><strong>Mot de passe :</strong> *********** (flooter)</p>
+            <p><strong>Mot de passe :</strong> ***********</p>
             <p>Tu peux désormais utiliser notre Service et profiter de toutes les fonctionnalités membre. Tu peux également consulter l’espace FAQ pour te familiariser avec notre Service.</p>
             <p>Cordialement,<br> L'équipe Underdex</p>
             ";
