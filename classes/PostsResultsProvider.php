@@ -108,7 +108,7 @@ class PostsResultsProvider {
                 $resultsHtml .= "
                                             </h4>
                                              <!-- Icone Like -->
-                                            <button class='btn'>
+                                            <button class='btn' onclick='likePost(this, $id)'>
                                                 <i class='bi bi-hand-thumbs-up'></i>
                                             </button>
 
@@ -373,7 +373,35 @@ class PostsResultsProvider {
         }
     }
 
+    public function likePost($likerId, $postId) {
+        try {
+            // Vérifier si l'utilisateur suit déjà cet utilisateur
+            $sql = "SELECT COUNT(*) FROM likers WHERE likerId = :likerId AND postId = :postId";
+            $stmt = $this->con->prepare($sql);
+            $stmt->bindParam(':likerId', $likerId);
+            $stmt->bindParam(':postId', $postId);
+            $stmt->execute();
 
+            $count = $stmt->fetchColumn();
+
+            // Si l'utilisateur suit déjà le suivi
+            if ($count > 0) {
+                return ['success' => false, 'message' => 'Vous suivez liker ce poste.'];
+            }
+
+
+            $sql = "INSERT INTO likers (likerId, postId) VALUES (:likerId, :postId)";
+            $stmt = $this->con->prepare($sql);
+            $stmt->bindParam(':likerId', $likerId);
+            $stmt->bindParam(':postId', $postId);
+            $stmt->execute();
+    
+            return json_encode(['success' => true, 'message' => 'Félicitations ! Vous avez liker ce poste.']);
+    
+        } catch (PDOException $e) {
+            return json_encode(['success' => false, 'message' => 'Erreur de base de données : ' . $e->getMessage()]);
+        }
+    }
     
 }
 ?>

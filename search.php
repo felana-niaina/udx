@@ -433,6 +433,39 @@
             alert("Vous devez vous connecter pour visiter ce profil.");
         }
 
+        function likePost(button, id) {
+            const postId = id; // ID du post
+            const userId = <?php echo $_SESSION['user_id'] ?? 0 ?>;
+            $.post("ajax/postInfo.php", {
+                postId: postId,
+                userId: userId,
+                postLike: true
+            }).done(function(result){
+                let data = JSON.parse(result);
+                if(data.success) {
+                    Swal.fire({
+                        title: 'Succès',
+                        text: data.message,
+                        icon: 'success',
+                        confirmButtonText: 'OK'
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            // window.location.href = document.location.href;
+                        }
+                    });
+                } else {
+                    Swal.fire({
+                        text: data.message,
+                        icon: 'warning',
+                        confirmButtonText: 'OK'
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            // window.location.href = document.location.href;
+                        } 
+                    });
+                }
+            })
+        }
 
     </script>
 </body>

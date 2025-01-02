@@ -17,6 +17,10 @@ if(isset($_POST["productId"])){
     $userId = $_POST["userId"];
     $commentText = $_POST["comment"];
     echo $ResultsProvider->saveComment($postId, $userId, $commentText);
+} elseif (isset($_POST['postLike']) && $_SESSION['user_id'] == $_POST["userId"] ) {
+    $postId = $_POST["postId"];
+    $userId = $_POST["userId"];
+    echo $ResultsProvider->likePost($userId, $postId);
 } else{
     echo "no info passed to page";
 }
