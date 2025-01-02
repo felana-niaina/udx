@@ -666,9 +666,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
                     <!-- Followers Section -->
                     <div class="followers">
-                        <p><span>Followers:</span> 1,024</p>
+                        <p><span>Followers:</span> <? echo $userFollowers ?></p>
+                        <p><span>Points:</span> <? echo $userFollowed * 2 + $postNumber ?></p>
                         <?php if (!$userIdParam): ?>
-                            <p><span>Points:</span> 8,024</p>
+                            
                         <?php endif; ?>
                     </div>
                 </div>
