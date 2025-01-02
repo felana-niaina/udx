@@ -118,17 +118,12 @@ class PostsResultsProvider {
 
 
                 // Vérifiez si l'utilisateur est connecté
-                $profileLink = $isUserConnected
-                ? "$this->siteUrl/udx/profil.php?id=$userId&name=" . urlencode($username)
-                : "javascript:void(0);";
+                $profileLink ="$this->siteUrl/udx/profil.php?id=$userId&name=" . urlencode($username);
 
-                $onclickEvent = $isUserConnected
-                    ? ""
-                    : "onclick=\"showLoginPopup()\"";
 
                 // Ajouter le résultat au HTML
                 $resultsHtml .= "<div class='d-flex mb-3'>
-                                    <a href='$profileLink' $onclickEvent><img src='$profilePicture' class='profile-photo' /></a>
+                                    <a href='$profileLink'><img src='$profilePicture' class='profile-photo' /></a>
                                     <div class='text'>
                                         <span>$username</span>
                                         <div class='d-flex'>

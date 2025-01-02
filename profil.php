@@ -1,8 +1,36 @@
 <?php
 session_start();
 
-if(!$_SESSION['user_id']) {
-    header('Location: index.php');
+if (!isset($_SESSION['user_id'])) {
+    echo "<!DOCTYPE html>
+    <html lang='fr'>
+        <head>
+            <meta charset='UTF-8'>
+            <meta name='viewport' content='width=device-width, initial-scale=1.0'>
+            <script src='https://cdn.jsdelivr.net/npm/sweetalert2@11'></script>
+        </head>
+        <body>
+            <script>
+                document.addEventListener('DOMContentLoaded', function() {
+                    Swal.fire({
+                        title: 'Accès interdit',
+                        text: 'Connectez-vous pour accéder à ce profil.',
+                        icon: 'warning',
+                        showCloseButton: true, // Ajouter un bouton
+                        showCancelButton: true,
+                        confirmButtonText: 'Se connecter',
+                        cancelButtonText: 'S\'inscrire'
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            window.location.href = 'login.php';
+                        } else if (result.dismiss === Swal.DismissReason.cancel) {
+                            window.location.href = 'register.php';
+                        }
+                    });
+                });
+            </script>
+        </body>
+    </html>";
     exit;
 }
 
@@ -712,6 +740,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
 <script src="https://code.jquery.com/jquery-1.10.2.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.4.1/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/fancybox/3.3.5/jquery.fancybox.min.js"></script>
+    <script src="https://unpkg.com/masonry-layout@4/dist/masonry.pkgd.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
 

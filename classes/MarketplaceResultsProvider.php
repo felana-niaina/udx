@@ -87,17 +87,11 @@ class MarketplaceResultsProvider {
                 $title = $this->trimField($title, 120);
                 $description = $this->trimField($description, 230);
                 
-                $profileLink = $isUserConnected
-                ? "$this->siteUrl/udx/profil.php?id=$userId&name=" . urlencode($username)
-                : "javascript:void(0);";
-
-                $onclickEvent = $isUserConnected
-                    ? ""
-                    : "onclick=\"showLoginPopup()\"";
+                $profileLink ="$this->siteUrl/udx/profil.php?id=$userId&name=" . urlencode($username);
 
                 // Ajouter le résultat au HTML
 				$resultsHtml .= " <div class='d-flex mb-12 marketResult'>
-                    <a href='$profileLink' $onclickEvent><img src='$profilePicture' class='profile-photo'></a>
+                    <a href='$profileLink'><img src='$profilePicture' class='profile-photo'></a>
                     <div class='text'>
                         <div>
                             <h6 class='price'>$username</h6>

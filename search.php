@@ -132,83 +132,7 @@
             color: #1E90FF;
         }
 
-        /* Style pour le modal */
-        .modal.logConfirm {
-            display: none; 
-            position: fixed;
-            z-index: 1000;
-            left: 0;
-            top: 0;
-            width: 100%;
-            height: 100%;
-            overflow: auto;
-            background-color: rgba(0, 0, 0, 0.5); /* Fond semi-transparent */
-        }
-
-        /* Contenu du modal */
-        .modal-content.contentConfirm {
-            background-color: #fff;
-            margin: 15% auto;
-            padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
-            width: 80%;
-            max-width: 400px;
-            text-align: center;
-        }
-
-        /* Bouton de fermeture */
-        .close.closeConfirm {
-            color: #aaa;
-            float: right;
-            font-size: 28px;
-            font-weight: bold;
-            cursor: pointer;
-        }
-
-        .close:hover,
-        .close:focus {
-            color: #000;
-            text-decoration: none;
-            cursor: pointer;
-        }
-
-        /* Boutons */
-        .modal.logConfirm button {
-            margin: 10px 5px;
-            padding: 10px 15px;
-            font-size: 16px;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            transition: background-color 0.3s;
-        }
-
-        .modal.logConfirm button:hover {
-            background-color: #ddd;
-        }
-
-        /* Bouton Se connecter */
-        .modal.logConfirm button:first-of-type {
-            background-color: #007BFF; /* Couleur bleue */
-            color: white;
-            font-weight: bold;
-        }
-
-        .modal.logConfirm button:first-of-type:hover {
-            background-color: #0056b3; /* Bleu plus foncé pour le hover */
-        }
-
-        /* Bouton S'inscrire */
-        .modal.logConfirm button:last-of-type {
-            background-color: #28A745; /* Couleur verte */
-            color: white;
-            font-weight: bold;
-        }
-
-        .modal.logConfirm button:last-of-type:hover {
-            background-color: #1c7430; /* Vert plus foncé pour le hover */
-        }
+        
     </style>
     <script src="https://code.jquery.com/jquery-3.3.1.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
 
@@ -408,15 +332,7 @@
             </div>
         </div>
 
-        <div id="loginModal" class="modal logConfirm">
-            <div class="modal-content contentConfirm">
-                <span class="close closeConfirm" onclick="closeLoginModal()">&times;</span>
-                <h2>Connectez-vous</h2>
-                <p>Connectez-vous pour avoir accès au profil.</p>
-                <button onclick="redirectToLogin()">Se connecter</button>
-                <button onclick="redirectToRegister()">S'inscrire</button>
-            </div>
-        </div>
+    
 
 
     </div>
@@ -528,28 +444,6 @@
         });
 
         
-        function showLoginPopup() {
-            document.getElementById("loginModal").style.display = "block";
-        }
-
-        function closeLoginModal() {
-            document.getElementById("loginModal").style.display = "none";
-        }
-
-        function redirectToLogin() {
-            window.location.href = "login.php";
-        }
-
-        function redirectToRegister() {
-            window.location.href = "register.php";
-        }
-
-        window.onclick = function(event) {
-            let modal = document.getElementById("loginModal");
-            if (event.target === modal) {
-                modal.style.display = "none";
-            }
-        };
         function handleLikeClick(button) {
             const postId = button.dataset.postId;
             const userIdPost = button.dataset.userId;
