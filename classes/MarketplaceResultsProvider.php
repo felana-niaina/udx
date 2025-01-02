@@ -74,14 +74,13 @@ class MarketplaceResultsProvider {
             while ($row = $query->fetch(PDO::FETCH_ASSOC)) {
                 $id = $row["id"];
                 $userId = $row["userId"]; 
-                $profilePicture = $row["profile_photo"] ?: "https://via.placeholder.com/150";
+                $profilePicture = is_null($row['profile_photo']) || $row['profile_photo'] == '' ? "https://via.placeholder.com/150" : $this->siteUrl. '/udx/' .$row['profile_photo'];
                 $username = $row["username"];
                 $title = $row["title"];
                 $picture = $row["picture"];
                 $description = $row["description"];
                 $price = $row["price"];
                 $isFeatured = $row["isFeatured"];
-                $profilePicture = $row["profile_photo"] ?: "https://via.placeholder.com/150";
 
                 // Truncation des champs title et description si nécessaire
                 $title = $this->trimField($title, 120);
@@ -158,7 +157,7 @@ class MarketplaceResultsProvider {
                 $description = $row["description"];
                 $keywords = $row["keywords"];
                 $price = $row["price"] . " €";
-                $image = is_null($row['picture']) || $row['picture'] == '' ? "https://via.placeholder.com/150" : $this->siteUrl. '/' .$row['picture'];
+                $image = is_null($row['picture']) || $row['picture'] == '' ? "https://via.placeholder.com/150" : $this->siteUrl. '/udx/' .$row['picture'];
                 $date = $row["createdDate"];
 
                 // Truncation des champs title et description si nécessaire
