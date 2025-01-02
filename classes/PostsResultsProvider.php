@@ -17,7 +17,7 @@ class PostsResultsProvider {
         }
 
         $this->con = $con;
-        $this->siteUrl = 'http://'.$_SERVER['SERVER_NAME'] ;
+        $this->siteUrl = 'http://'.$_SERVER['SERVER_NAME'] . '/udx' ;
     }
 
     // Méthode pour obtenir le nombre de résultats
@@ -87,7 +87,7 @@ class PostsResultsProvider {
 
                 // Vérifiez si l'utilisateur est connecté
                 $profileLink = $isUserConnected
-                ? "$this->siteUrl/udx/profil.php?userId=$userId"
+                ? "$this->siteUrl/profil.php?userId=$userId"
                 : "javascript:void(0);";
 
                 $onclickEvent = $isUserConnected
@@ -310,7 +310,7 @@ class PostsResultsProvider {
                 $username = $row['username'];
 
                 $resultsHtml .= "<div class='d-flex mb-12 comment-list'>
-                    <a href='$this->siteUrl/udx/profil.php/$id'><img src='$profilePicture' class='profile-photo'></a>
+                    <a href='$this->siteUrl/profil.php?userId=$id'><img src='$profilePicture' class='profile-photo'></a>
                     <div class='text'>
                         <div>
                             <span class='price'>$username a écrit : </span><br/>
@@ -400,6 +400,20 @@ class PostsResultsProvider {
     
         } catch (PDOException $e) {
             return json_encode(['success' => false, 'message' => 'Erreur de base de données : ' . $e->getMessage()]);
+        }
+    }
+
+    public function getPostsNumberByUser($userId){
+        try {
+            $sql = "SELECT COUNT(*) FROM posts WHERE userId = :userId";
+            $stmt = $this->con->prepare($sql);
+            $stmt->bindParam(':userId', $userId);
+            $stmt->execute();
+            
+            return $stmt->fetchColumn();
+        } catch (PDOException $e) {
+            echo "Erreur lors de la récupération des données : " . $e->getMessage();
+            return null;
         }
     }
     

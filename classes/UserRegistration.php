@@ -310,7 +310,7 @@ class UserRegistration {
     }
 
 
-    function updateFollowers($followedId, $followerId) {
+    public function updateFollowers($followedId, $followerId) {
         try {
             // Vérifier si l'utilisateur suit déjà cet utilisateur
             $sql = "SELECT COUNT(*) FROM followers WHERE followerId = :followerId AND followedId = :followedId";
@@ -342,7 +342,33 @@ class UserRegistration {
         }
     }
 
-
+    public function getFollowerNumber($followedId) {
+        try {
+            $sql = "SELECT COUNT(*) FROM followers WHERE followedId = :followedId";
+            $stmt = $this->con->prepare($sql);
+            $stmt->bindParam(':followedId', $followedId);
+            $stmt->execute();
+            
+            return $stmt->fetchColumn();
+        } catch (PDOException $e) {
+            echo "Erreur lors de la récupération des données : " . $e->getMessage();
+            return null;
+        }
+    }
     
+    public function getFollowedNumber($followerId) {
+        try {
+            $sql = "SELECT COUNT(*) FROM followers WHERE followerId = :followerId";
+            $stmt = $this->con->prepare($sql);
+            $stmt->bindParam(':followerId', $followerId);
+            $stmt->execute();
+            
+            return $stmt->fetchColumn();
+        } catch (PDOException $e) {
+            echo "Erreur lors de la récupération des données : " . $e->getMessage();
+            return null;
+        }
+    }
+
 }
 ?>

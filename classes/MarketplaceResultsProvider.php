@@ -17,7 +17,7 @@ class MarketplaceResultsProvider {
         }
 
         $this->con = $con;
-        $this->siteUrl = 'http://'.$_SERVER['SERVER_NAME'] ;
+        $this->siteUrl = 'http://'.$_SERVER['SERVER_NAME'] . '/udx' ;
     }
 
     // Méthode pour obtenir le nombre de résultats
@@ -74,7 +74,7 @@ class MarketplaceResultsProvider {
             while ($row = $query->fetch(PDO::FETCH_ASSOC)) {
                 $id = $row["id"];
                 $userId = $row["userId"]; 
-                $profilePicture = is_null($row['profile_photo']) || $row['profile_photo'] == '' ? "https://via.placeholder.com/150" : $this->siteUrl. '/udx/' .$row['profile_photo'];
+                $profilePicture = is_null($row['profile_photo']) || $row['profile_photo'] == '' ? "https://via.placeholder.com/150" : $this->siteUrl. '/' .$row['profile_photo'];
                 $username = $row["username"];
                 $title = $row["title"];
                 $picture = $row["picture"];
@@ -88,7 +88,7 @@ class MarketplaceResultsProvider {
 
                 // Ajouter le résultat au HTML
 				$resultsHtml .= " <div class='d-flex mb-12 marketResult'>
-                    <a href='$this->siteUrl/udx/profil.php?userId=$userId'><img src='$profilePicture' class='profile-photo'></a>
+                    <a href='$this->siteUrl/profil.php?userId=$userId'><img src='$profilePicture' class='profile-photo'></a>
                     <div class='text'>
                         <div>
                             <h6 class='price'>$username</h6>
@@ -100,7 +100,7 @@ class MarketplaceResultsProvider {
                     }
 
                     if($isUserConnected) {
-                        $resultsHtml .=             "<button class='btn see-market-image' data-bs-toggle='modal' data-bs-target='#seePictureModal' data-picture='$this->siteUrl/udx/$picture' data-id=`$id`>
+                        $resultsHtml .=             "<button class='btn see-market-image' data-bs-toggle='modal' data-bs-target='#seePictureModal' data-picture='$this->siteUrl/$picture' data-id=`$id`>
                                 <i class='bi bi-images'></i>
                             </button>
                             <button class='btn contact-product-owner' data-bs-toggle='modal' data-bs-target='#contactModal' data-user-id='$userId' data-id=`$id`>
@@ -157,7 +157,7 @@ class MarketplaceResultsProvider {
                 $description = $row["description"];
                 $keywords = $row["keywords"];
                 $price = $row["price"] . " €";
-                $image = is_null($row['picture']) || $row['picture'] == '' ? "https://via.placeholder.com/150" : $this->siteUrl. '/udx/' .$row['picture'];
+                $image = is_null($row['picture']) || $row['picture'] == '' ? "https://via.placeholder.com/150" : $this->siteUrl. '/' .$row['picture'];
                 $date = $row["createdDate"];
 
                 // Truncation des champs title et description si nécessaire
