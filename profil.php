@@ -20,7 +20,7 @@ error_reporting(E_ALL);
 $database = new DatabaseConnector();
 $con = $database->getConnection();
 
-$userIdParam = isset($_GET['userId']) ? $_GET['userId'] : null;
+$userIdParam = isset($_GET['id']) ? $_GET['id'] : null;
 $connectedUserId = isset($_SESSION['user_id']) ? $_SESSION['user_id'] : null;
 
 if ($userIdParam) {

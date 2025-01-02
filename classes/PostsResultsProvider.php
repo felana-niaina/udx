@@ -119,7 +119,7 @@ class PostsResultsProvider {
 
                 // Vérifiez si l'utilisateur est connecté
                 $profileLink = $isUserConnected
-                ? "$this->siteUrl/udx/profil.php?userId=$userId"
+                ? "$this->siteUrl/udx/profil.php?id=$userId&name=" . urlencode($username)
                 : "javascript:void(0);";
 
                 $onclickEvent = $isUserConnected
