@@ -3,6 +3,7 @@ session_start(); // Utilisé pour gérer les sessions utilisateur
 // Inclusion des classes nécessaires
 include_once 'classes/DatabaseConnector.php';
 include_once 'classes/UserRegistration.php';
+require_once 'constants.php';
 
 // Créer une instance de la classe DatabaseConnector
 $database = new DatabaseConnector();
@@ -20,7 +21,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $errorMessage = "Nom d'utilisateur et mot de passe requis.";
     } else {
 
-        $secretKey = "6LcM1KwqAAAAAFlhbUhMOPjRs0wIXDl714hdW0-U";
+        $secretKey = SECRET_KEY;
         $responseKey = $_POST['g-recaptcha-response'];
         $userIP = $_SERVER['REMOTE_ADDR'];
 
@@ -201,7 +202,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 </div>
 
                 <div class="form-group text-center">
-                    <div class="g-recaptcha" data-sitekey="6LcM1KwqAAAAALXt6P390xL_B_Q3aORXNM4rfO8A"></div>
+                    <div class="g-recaptcha" data-sitekey="<?php echo SITE_KEY ?>"></div>
                 </div>
                 <?php if( trim($errorMessage) !== "" ) { ?>
                 <div class="alert alert-danger" role="alert">

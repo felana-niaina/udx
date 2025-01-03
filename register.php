@@ -2,6 +2,7 @@
 // Inclusion des classes nécessaires
 include_once 'classes/DatabaseConnector.php';
 include_once 'classes/UserRegistration.php';
+require_once 'constants.php';
 
 require 'phpmailer/src/Exception.php';
 require 'phpmailer/src/PHPMailer.php';
@@ -18,7 +19,7 @@ $errorMessage = "";
 // Vérifier si le formulaire a été soumis
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     // Récupérer les données du formulaire
-    $secretKey = "6LcM1KwqAAAAAFlhbUhMOPjRs0wIXDl714hdW0-U";
+    $secretKey = SECRET_KEY;
     $responseKey = $_POST['g-recaptcha-response'];
     $userIP = $_SERVER['REMOTE_ADDR'];
 
@@ -70,15 +71,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
                 // Paramétrage SMTP
                 $mail->isSMTP();
-                $mail->Host = 'smtp.gmail.com';  // Hébergement du serveur SMTP
+                $mail->Host = EMAIL_SMTP;  // Hébergement du serveur SMTP
                 $mail->SMTPAuth = true;
-                $mail->Username = 'nirina.felananiaina@gmail.com';  // Votre email
-                $mail->Password = 'euyx nwvt qqvl iwkv';  // Mot de passe d'application
+                $mail->Username = LOGIN_SMTP;  // Votre email
+                $mail->Password = PASS_SMTP;  // Mot de passe d'application
                 $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
                 $mail->Port = 587;
 
                 // Expéditeur et destinataire
-                $mail->setFrom('nirina.felananiaina@gmail.com', 'Underdex');  // L'email expéditeur
+                $mail->setFrom(LOGIN_SMTP, 'Underdex');  // L'email expéditeur
                 $mail->addAddress($email, $username);  // L'email destinataire de l'utilisateur
 
                 // Sujet et corps du message
@@ -313,7 +314,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                             <small class="form-text">Les mots de passe doivent correspondre.</small>
                         </div>
                         <div class="form-group text-center">
-                            <div class="g-recaptcha" data-sitekey="6LcM1KwqAAAAALXt6P390xL_B_Q3aORXNM4rfO8A"></div>
+                            <div class="g-recaptcha" data-sitekey="<?php echo SITE_KEY ?>"></div>
                         </div>
                         <?php if( trim($errorMessage) !== "" ) { ?>
                         <div class="alert alert-danger" role="alert">
