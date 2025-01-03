@@ -580,8 +580,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     <!-- Buttons Container (Send Message & Follow) -->
                     <div class="buttons-container">
                         <?php if ($userIdParam && $connectedUserId != $userIdParam) { ?>
-                            <button data-toggle="modal" data-target="#messageModal"><i class="fas fa-envelope"></i> Send Message</button>
-                            <button 
+                            <?php if( isset($_SESSION['user_id']) && $_SESSION['user_id'] > 0) { ?>
+                                <button data-toggle="modal" data-target="#messageModal"><i class="fas fa-envelope"></i> Send Message</button>
+                            <?php } ?>
+                                <button 
                                 class="follow-btn" 
                                 onclick="handleFollowClick(this)" 
                                 data-followed-id="<?php echo $userIdParam; ?>" 
@@ -721,10 +723,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             Swal.fire({
                 text: 'Inscrivez-vous pour avoir accès à son profil.',
                 icon: 'warning',
-                showCloseButton: true, // Ajouter un bouton
+                showCloseButton: false, // Ajouter un bouton
                 showCancelButton: true,
                 confirmButtonText: 'Se connecter',
-                cancelButtonText: 'S\'inscrire'
+                cancelButtonText: 'S\'inscrire',
+                allowOutsideClick: false
             }).then((result) => {
                 if (result.isConfirmed) {
                     window.location.href = 'login.php';
