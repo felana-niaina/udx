@@ -13,83 +13,112 @@ use PHPMailer\PHPMailer\Exception;
 // Créer une instance de la classe DatabaseConnector
 $database = new DatabaseConnector();
 $con = $database->getConnection();
+$errorMessage = "";
 
 // Vérifier si le formulaire a été soumis
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     // Récupérer les données du formulaire
-    $username = htmlspecialchars(trim($_POST['username'] ?? ''));
-    $email = htmlspecialchars(trim($_POST['email'] ?? ''));
-    $password = htmlspecialchars(trim($_POST['password'] ?? ''));
+    $secretKey = "6LcM1KwqAAAAAFlhbUhMOPjRs0wIXDl714hdW0-U";
+    $responseKey = $_POST['g-recaptcha-response'];
+    $userIP = $_SERVER['REMOTE_ADDR'];
 
-    // Vérifier si tous les champs sont remplis
-    if (empty($username) || empty($email) || empty($password)) {
-        echo "Tous les champs sont obligatoires.";
-        exit;
-    }
+    // Verify reCAPTCHA response
+    $url = "https://www.google.com/recaptcha/api/siteverify";
+    $data = [
+        'secret' => $secretKey,
+        'response' => $responseKey,
+        'remoteip' => $userIP
+    ];
 
-    // Vérifier si l'adresse email est valide
-    if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
-        echo "L'adresse email est invalide.";
-        exit;
-    }
+    // Make the POST request to Google's API
+    $options = [
+        'http' => [
+            'header'  => "Content-type: application/x-www-form-urlencoded\r\n",
+            'method'  => 'POST',
+            'content' => http_build_query($data)
+        ]
+    ];
+    $context  = stream_context_create($options);
+    $result = file_get_contents($url, false, $context);
+    $response = json_decode($result);
 
-    // Créer une instance de la classe UserRegistration
-    $user = new UserRegistration($con);
+    if ($response->success) {
+        $username = htmlspecialchars(trim($_POST['username'] ?? ''));
+        $email = htmlspecialchars(trim($_POST['email'] ?? ''));
+        $password = htmlspecialchars(trim($_POST['password'] ?? ''));
 
-    // Inscription de l'utilisateur
-    if ($user->registerUser($username, $email, $password)) {
-        // Envoi de l'email de confirmation avec PHPMailer
-        try {
-            $mail = new PHPMailer(true);
-
-            // Paramétrage SMTP
-            $mail->isSMTP();
-            $mail->Host = 'smtp.gmail.com';  // Hébergement du serveur SMTP
-            $mail->SMTPAuth = true;
-            $mail->Username = 'nirina.felananiaina@gmail.com';  // Votre email
-            $mail->Password = 'euyx nwvt qqvl iwkv';  // Mot de passe d'application
-            $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
-            $mail->Port = 587;
-
-            // Expéditeur et destinataire
-            $mail->setFrom('nirina.felananiaina@gmail.com', 'Underdex');  // L'email expéditeur
-            $mail->addAddress($email, $username);  // L'email destinataire de l'utilisateur
-
-            // Sujet et corps du message
-            $mail->Subject = 'Bienvenue sur Underdex !';
-
-            // Message HTML du mail
-            $mail->isHTML(true);
-            $mail->Body = "
-            <h2>Bienvenue sur Underdex !</h2>
-            <p>Ton compte est désormais créé :</p>
-            <p><strong>Nom d’utilisateur :</strong> $username</p>
-            <p><strong>Mot de passe :</strong> ***********</p>
-            <p>Tu peux désormais utiliser notre Service et profiter de toutes les fonctionnalités membre. Tu peux également consulter l’espace FAQ pour te familiariser avec notre Service.</p>
-            <p>Cordialement,<br> L'équipe Underdex</p>
-            ";
-
-            // Envoi de l'email
-            $mail->send();
-        } catch (Exception $e) {
-            // Si l'envoi échoue, affichage de l'erreur
-            echo "Le message n'a pas pu être envoyé. Erreur: {$mail->ErrorInfo}";
+        // Vérifier si tous les champs sont remplis
+        if (empty($username) || empty($email) || empty($password)) {
+            $errorMessage =  "Tous les champs sont obligatoires.";
+            exit;
         }
-        
-        echo "<script>
-            document.addEventListener('DOMContentLoaded', function() {
-                Swal.fire({
-                    title: 'Succès',
-                    text: 'Bienvenue sur Underdex ! remplissez votre profil et faîtes connaissances avec la communauté !  !',
-                    icon: 'success',
-                    confirmButtonText: 'OK'
-                }).then((result) => {
-                    if (result.isConfirmed) {
-                        window.location.href = 'settings.php';
-                    }
+
+        // Vérifier si l'adresse email est valide
+        if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+            $errorMessage =  "L'adresse email est invalide.";
+            exit;
+        }
+
+        // Créer une instance de la classe UserRegistration
+        $user = new UserRegistration($con);
+
+        // Inscription de l'utilisateur
+        if ($user->registerUser($username, $email, $password)) {
+            // Envoi de l'email de confirmation avec PHPMailer
+            try {
+                $mail = new PHPMailer(true);
+
+                // Paramétrage SMTP
+                $mail->isSMTP();
+                $mail->Host = 'smtp.gmail.com';  // Hébergement du serveur SMTP
+                $mail->SMTPAuth = true;
+                $mail->Username = 'nirina.felananiaina@gmail.com';  // Votre email
+                $mail->Password = 'euyx nwvt qqvl iwkv';  // Mot de passe d'application
+                $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
+                $mail->Port = 587;
+
+                // Expéditeur et destinataire
+                $mail->setFrom('nirina.felananiaina@gmail.com', 'Underdex');  // L'email expéditeur
+                $mail->addAddress($email, $username);  // L'email destinataire de l'utilisateur
+
+                // Sujet et corps du message
+                $mail->Subject = 'Bienvenue sur Underdex !';
+
+                // Message HTML du mail
+                $mail->isHTML(true);
+                $mail->Body = "
+                <h2>Bienvenue sur Underdex !</h2>
+                <p>Ton compte est désormais créé :</p>
+                <p><strong>Nom d’utilisateur :</strong> $username</p>
+                <p><strong>Mot de passe :</strong> ***********</p>
+                <p>Tu peux désormais utiliser notre Service et profiter de toutes les fonctionnalités membre. Tu peux également consulter l’espace FAQ pour te familiariser avec notre Service.</p>
+                <p>Cordialement,<br> L'équipe Underdex</p>
+                ";
+
+                // Envoi de l'email
+                $mail->send();
+            } catch (Exception $e) {
+                // Si l'envoi échoue, affichage de l'erreur
+                $errorMessage = "Le message n'a pas pu être envoyé. Erreur: {$mail->ErrorInfo}";
+            }
+            
+            echo "<script>
+                document.addEventListener('DOMContentLoaded', function() {
+                    Swal.fire({
+                        title: 'Succès',
+                        text: 'Bienvenue sur Underdex ! remplissez votre profil et faîtes connaissances avec la communauté !  !',
+                        icon: 'success',
+                        confirmButtonText: 'OK'
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            window.location.href = 'settings.php';
+                        }
+                    });
                 });
-            });
-        </script>";
+            </script>";
+        }
+    } else {
+        $errorMessage = "reCAPTCHA verification failed. Please try again.";
     }
 }
 ?>
@@ -283,7 +312,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                             <input type="password" class="form-control" id="confirmPassword" name="confirmPassword" placeholder="Confirmez votre mot de passe" required>
                             <small class="form-text">Les mots de passe doivent correspondre.</small>
                         </div>
-
+                        <div class="form-group text-center">
+                            <div class="g-recaptcha" data-sitekey="6LcM1KwqAAAAALXt6P390xL_B_Q3aORXNM4rfO8A"></div>
+                        </div>
+                        <?php if( trim($errorMessage) !== "" ) { ?>
+                        <div class="alert alert-danger" role="alert">
+                            <?php echo $errorMessage; ?>
+                        </div>
+                        <?php } ?>
                         <!-- Case à cocher pour accepter les CGU et CGV -->
                         <div class="form-check">
                             <input class="form-check-input" type="checkbox" id="acceptCGU" required>
@@ -305,7 +341,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.4.1/dist/js/bootstrap.bundle.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-
+<script src="https://www.google.com/recaptcha/api.js" async defer></script>
 
 </body>
 </html>

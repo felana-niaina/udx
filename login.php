@@ -9,6 +9,7 @@ $database = new DatabaseConnector();
 $con = $database->getConnection();
 
 $userRegistration = new UserRegistration($con);
+$errorMessage = "";
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $username = trim($_POST['username'] ?? '');
@@ -18,18 +19,47 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (empty($username) || empty($password)) {
         $errorMessage = "Nom d'utilisateur et mot de passe requis.";
     } else {
-        try {
-            // Appeler la méthode de connexion
-            if ($userRegistration->loginUser($username, $password)) {
-                // Redirection en cas de succès
-                header('Location: settings.php');
-                exit;
-            } else {
-                // Erreur d'authentification
-                $errorMessage = "Nom d'utilisateur ou mot de passe incorrect.";
+
+        $secretKey = "6LcM1KwqAAAAAFlhbUhMOPjRs0wIXDl714hdW0-U";
+        $responseKey = $_POST['g-recaptcha-response'];
+        $userIP = $_SERVER['REMOTE_ADDR'];
+
+        // Verify reCAPTCHA response
+        $url = "https://www.google.com/recaptcha/api/siteverify";
+        $data = [
+            'secret' => $secretKey,
+            'response' => $responseKey,
+            'remoteip' => $userIP
+        ];
+
+        // Make the POST request to Google's API
+        $options = [
+            'http' => [
+                'header'  => "Content-type: application/x-www-form-urlencoded\r\n",
+                'method'  => 'POST',
+                'content' => http_build_query($data)
+            ]
+        ];
+        $context  = stream_context_create($options);
+        $result = file_get_contents($url, false, $context);
+        $response = json_decode($result);
+
+        if ($response->success) {
+            try {
+                // Appeler la méthode de connexion
+                if ($userRegistration->loginUser($username, $password)) {
+                    // Redirection en cas de succès
+                    header('Location: settings.php');
+                    exit;
+                } else {
+                    // Erreur d'authentification
+                    $errorMessage = "Nom d'utilisateur ou mot de passe incorrect.";
+                }
+            } catch (PDOException $e) {
+                $errorMessage = "Erreur de base de données : " . $e->getMessage();
             }
-        } catch (PDOException $e) {
-            $errorMessage = "Erreur de base de données : " . $e->getMessage();
+        } else {
+            $errorMessage = "reCAPTCHA verification failed. Please try again.";
         }
     }
 }
@@ -170,6 +200,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     <input type="password" class="form-control" id="password" placeholder="Entrez votre mot de passe" name="password" required>
                 </div>
 
+                <div class="form-group text-center">
+                    <div class="g-recaptcha" data-sitekey="6LcM1KwqAAAAALXt6P390xL_B_Q3aORXNM4rfO8A"></div>
+                </div>
+                <?php if( trim($errorMessage) !== "" ) { ?>
+                <div class="alert alert-danger" role="alert">
+                    <?php echo $errorMessage; ?>
+                </div>
+                <?php } ?>
                 <!-- Case à cocher pour accepter les CGU et CGV -->
                 <div class="form-check">
                     <input class="form-check-input" type="checkbox" id="acceptCGU" required>
@@ -189,6 +227,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <!-- Bootstrap JS & jQuery -->
 <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.4.1/dist/js/bootstrap.bundle.min.js"></script>
-
+<script src="https://www.google.com/recaptcha/api.js" async defer></script>
 </body>
 </html>
