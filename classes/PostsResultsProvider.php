@@ -82,7 +82,7 @@ class PostsResultsProvider {
                                         WHERE posts.title LIKE :term 
                                         OR posts.description LIKE :term 
                                         OR posts.keywords LIKE :term
-                                        ORDER BY isFeatured, posts.clicks DESC
+                                        ORDER BY isFeatured DESC, posts.likes DESC, posts.clicks DESC, createdDate DESC
                                         LIMIT :fromLimit, :pageSize");
                                         
             $searchTerm = "%" . $term . "%";
@@ -426,7 +426,7 @@ class PostsResultsProvider {
                 $stmtDelete->bindParam(':id', $like['id']);
                 $stmtDelete->execute();
                 $this->substractLikerNumber($postId);
-                
+
                 return ['success' => true, 'isLiked' => false];
 
             } else {
