@@ -291,7 +291,7 @@
                         <!-- Formulaire pour répondre à l'article -->
                         <form id="contactForm" method="post" enctype="multipart/form-data">
                             <input type="hidden" name="marketplace_id" value="sendMessage">
-                            <input type="hidden" name="userId" id="userId" value="" >
+                            <input type="hidden" name="userId" id="productOwnerId" value="" >
                             <input type="hidden" name="senderId" id="senderId" value="<?php echo $_SESSION['user_id'] ?>">
                             <div class="mb-3">
                                 <label for="subject" class="form-label">Objet du message</label>
@@ -414,9 +414,9 @@
             document.querySelectorAll('.contact-product-owner').forEach((button) => {
                 button.addEventListener('click', function () {
                     let element = document.querySelector('.contact-product-owner');
-                    const receiverId = element.getAttribute('data-user-id'); // ID du propriétaire du produit                 
+                    const receiverId = this.getAttribute('data-user-id'); // ID du propriétaire du produit                 
                     // Met à jour la valeur de l'input caché pour le champ userId
-                    const hiddenInput = document.getElementById("userId");
+                    const hiddenInput = document.getElementById("productOwnerId");
                     if (hiddenInput) {
                         hiddenInput.setAttribute('value', receiverId); // Met à jour la valeur de l'input
                     } else {
