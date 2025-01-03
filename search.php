@@ -450,7 +450,20 @@
             const userLiker = <?php echo $_SESSION['user_id'] ?? 0 ?>;  // ID de l'utilisateur connecté
             
             if (!postId || !userIdPost || !userLiker) {
-                alert("Erreur : Impossible de traiter le like.");
+                Swal.fire({
+                    text: 'Inscrivez-vous pour liker.',
+                    icon: 'warning',
+                    showCloseButton: true, // Ajouter un bouton
+                    showCancelButton: true,
+                    confirmButtonText: 'Se connecter',
+                    cancelButtonText: 'S\'inscrire'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        window.location.href = 'login.php';
+                    } else if (result.dismiss === Swal.DismissReason.cancel) {
+                        window.location.href = 'register.php';
+                    }
+                });
                 return;
             }
 
@@ -465,16 +478,32 @@
 
                 if (data.success) {
                     // Si le like a été ajouté ou supprimé, change la couleur du bouton
+                    $text = data.isLiked ? 'Vous avez liker le post' : 'Vous avez unliker le post';
                     if (data.isLiked) {
                         button.classList.add('liked');  // Change la couleur pour montrer que c'est aimé
                     } else {
                         button.classList.remove('liked');  // Retire la couleur de "liked" si ce n'est plus aimé
                     }
+                    Swal.fire({
+                        text: $text,
+                        icon: 'success',
+                        showCloseButton: true, // Ajouter un bouton
+                        showCancelButton: false,
+                        showConfirmButton: false,
+                        confirmButtonText: false
+                    });
                 } else {
                     alert(data.message);
                 }
             }).fail(function() {
-                alert("Erreur lors du traitement de la requête.");
+                Swal.fire({
+                    text: 'Erreur lors du traitement de la requête.',
+                    icon: 'warning',
+                    showCloseButton: true, // Ajouter un bouton
+                    showCancelButton: true,
+                    confirmButtonText: 'Se connecter',
+                    cancelButtonText: 'S\'inscrire'
+                })
             });
         }
 
