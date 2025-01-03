@@ -27,6 +27,7 @@
   $marketPlaceProvider = new MarketplaceResultsProvider($con);
   $postsProvider = new PostsResultsProvider($con);
   $messageProvider = new MessageResultsProvider($con);
+  $BillingResultsProvider = new BillingResultsProvider($con);
 
   // Récupérer l'ID utilisateur à partir de la session
   $userId = $_SESSION['user_id'];
@@ -61,6 +62,8 @@
   $phone = $userInfo['phone'] ?? '';
   $location = $userInfo['location'] ?? '';
 
+  $userBilling = $BillingResultsProvider->getBillingMethodByUser($userId);
+  $userBillingNumber = count($userBilling);
   //update information
   if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     // Vérifier quel formulaire a été soumis
@@ -234,7 +237,6 @@
     // Add billing method
     elseif ($formId === 'billingMethod') {
       if($userId && $_POST['cardHolder'] && $_POST['cardNumber'] && $_POST['expirationDate'] && $_POST['cvv']) {
-        $BillingResultsProvider = new BillingResultsProvider($con);
         $expirationDate = new DateTime($_POST['expirationDate']);
         $expirationDate->modify('last day of this month');
         if ($BillingResultsProvider->createBillingMethohd($userId,$_POST['cardHolder'], $_POST['cardNumber'], $expirationDate->format('Y-m-d'), $_POST['cvv'])) {
@@ -262,7 +264,22 @@
       $listAdType = array_map(function ($item) {
         return $item['contentTable'];
       }, $AdsProvider->getAdsType());
-      if($userId && $_POST['adsTypeId'] && (int)$_POST['contentId'] > 0 && $_POST['budget'] && in_array($_POST['contentAdType'], $listAdType)) {
+      if($userBillingNumber < 1) {
+        echo "<script>
+              document.addEventListener('DOMContentLoaded', function() {
+                  Swal.fire({
+                      text: 'Vous devez avez avoir un methode de paiement avant de parametrer la pub !',
+                      icon: 'warning',
+                      confirmButtonText: 'OK'
+                  }).then((result) => {
+                      if (result.isConfirmed) {
+                          window.location.href = 'settings.php';
+                      }
+                  });
+              });
+          </script>";
+      }
+      elseif($userId && $_POST['adsTypeId'] && (int)$_POST['contentId'] > 0 && $_POST['budget'] && in_array($_POST['contentAdType'], $listAdType)) {
         if ($AdsProvider->addAds($userId,$_POST['adsTypeId'], $_POST['contentId'], $_POST['budget'], $_POST['ad_id'])) {
           if($userAd && ($adType->contentTable === 'posts')) {
             $postsProvider->updatePostFeatured($userId, $userAd->contentId, 0);
@@ -588,6 +605,9 @@
           font-size : 1rem !important;
         }
         /* End Style for message */
+        .table-responsive{
+          font-size: 0.8rem
+        }
 
         /* Responsive */
         @media (max-width: 768px) {
@@ -868,12 +888,41 @@
               <hr>
               <div class="form-group">
                 <label class="d-block mb-0">Payment Method</label>
-                <div class="small text-muted mb-3">You have not added a payment method</div>
+                <div class="small text-muted mb-3">
+                <?php if($userBillingNumber < 1) { ?>
+                You have not added a payment method
+                <?php } ?>
+                </div>
                 <button class="btn btn-info" type="button" data-toggle="modal" data-target="#paymentModal">Ajouter une carte bancaire</button>
               </div>
               <div class="form-group mb-0">
+                <?php if($userBillingNumber < 1) { ?>
                 <label class="d-block">Payment History</label>
                 <div class="border border-gray-500 bg-gray-200 p-3 text-center font-size-sm">You have not made any payment.</div>
+                <?php } else { ?>
+                <div class="table-responsive" style="font-size: 0.8rem"> 
+                  <table class="table">
+                    <thead>
+                      <tr>
+                        <th scope="col">Card Holder</th>
+                        <th scope="col">Card Number</th>
+                        <th scope="col">Expiration Date</th>
+                        <th scope="col">CryptoVisuel</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <?php foreach ($userBilling as $key => $bill) { ?>
+                        <tr>
+                          <td><?php echo $bill['cardHolder'] ?></td>
+                          <td><?php echo $bill['cardNumber'] ?></td>
+                          <td><?php echo $bill['expirationDate'] ?></td>
+                          <td><?php echo $bill['cryptoVisuel'] ?></td>
+                        </tr>
+                      <?php } ?>
+                    </tbody>
+                  </table>
+                </div>
+                <?php }?>
               </div>
             </div>
 
