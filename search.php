@@ -58,7 +58,7 @@
         exit("please enter a search term > 0");
     }
 
-    $type = isset($_GET["type"]) ? $_GET["type"] : "sites";
+    $type = isset($_GET["type"]) ? $_GET["type"] : "posts";
     $page = isset($_GET["page"]) ? $_GET["page"] : 1;
 
 ?>
@@ -157,11 +157,6 @@
             </div>
             <div class="tabsContainer">
                 <ul class="tabList">
-                    <li class="<?php echo $type == 'sites' ? 'active' : '' ?>">
-                        <a href="<?php echo "search.php?term=$term&type=sites"; ?>">
-                            Web
-                        </a>
-                    </li>
 					<li class="<?php echo $type == 'posts' ? 'active' : '' ?>">
                         <a href="<?php echo "search.php?term=$term&type=posts"; ?>">
                             Posts
