@@ -75,7 +75,7 @@ class MarketplaceResultsProvider {
                 $id = $row["id"];
                 $userId = $row["userId"]; 
                 $profilePicture = $row["profile_photo"] ?: "https://via.placeholder.com/150";
-                $username = $row["username"];
+                $username = urlencode($row["username"]);
                 $title = $row["title"];
                 $picture = $row["picture"];
                 $description = $row["description"];
@@ -87,7 +87,7 @@ class MarketplaceResultsProvider {
                 $title = $this->trimField($title, 120);
                 $description = $this->trimField($description, 230);
                 
-                $profileLink ="$this->siteUrl/profil.php?id=$userId&name=" . urlencode($username);
+                $profileLink ="$this->siteUrl/profil.php?name=$username";
 
                 // Ajouter le résultat au HTML
 				$resultsHtml .= " <div class='d-flex mb-12 marketResult'>

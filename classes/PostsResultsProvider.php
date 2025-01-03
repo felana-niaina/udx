@@ -118,7 +118,7 @@ class PostsResultsProvider {
 
 
                 // Vérifiez si l'utilisateur est connecté
-                $profileLink ="$this->siteUrl/profil.php?id=$userId&name=" . urlencode($username);
+                $profileLink ="$this->siteUrl/profil.php?name=" . urlencode($username);
 
 
                 // Ajouter le résultat au HTML
@@ -338,10 +338,10 @@ class PostsResultsProvider {
                 $id = $row["userId"];
                 $comment = $row["commentText"];
                 $profilePicture = $row["profile_photo"] ?: "https://via.placeholder.com/150";
-                $username = $row['username'];
+                $username = urlencode($row['username']);
 
                 $resultsHtml .= "<div class='d-flex mb-12 comment-list'>
-                    <a href='$this->siteUrl/profil.php/$id'><img src='$profilePicture' class='profile-photo'></a>
+                    <a href='$this->siteUrl/profil.php?name=$username'><img src='$profilePicture' class='profile-photo'></a>
                     <div class='text'>
                         <div>
                             <span class='price'>$username a écrit : </span><br/>

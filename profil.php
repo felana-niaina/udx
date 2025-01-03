@@ -1,39 +1,6 @@
 <?php
 session_start();
 
-if (!isset($_SESSION['user_id'])) {
-    echo "<!DOCTYPE html>
-    <html lang='fr'>
-        <head>
-            <meta charset='UTF-8'>
-            <meta name='viewport' content='width=device-width, initial-scale=1.0'>
-            <script src='https://cdn.jsdelivr.net/npm/sweetalert2@11'></script>
-        </head>
-        <body>
-            <script>
-                document.addEventListener('DOMContentLoaded', function() {
-                    Swal.fire({
-                        title: 'Accès interdit',
-                        text: 'Connectez-vous pour accéder à ce profil.',
-                        icon: 'warning',
-                        showCloseButton: true, // Ajouter un bouton
-                        showCancelButton: true,
-                        confirmButtonText: 'Se connecter',
-                        cancelButtonText: 'S\'inscrire'
-                    }).then((result) => {
-                        if (result.isConfirmed) {
-                            window.location.href = 'login.php';
-                        } else if (result.dismiss === Swal.DismissReason.cancel) {
-                            window.location.href = 'register.php';
-                        }
-                    });
-                });
-            </script>
-        </body>
-    </html>";
-    exit;
-}
-
 include_once 'classes/DatabaseConnector.php';
 include_once 'classes/UserRegistration.php';
 include_once 'classes/MarketplaceResultsProvider.php';
@@ -47,8 +14,13 @@ error_reporting(E_ALL);
 // Créer une instance de la classe DatabaseConnector
 $database = new DatabaseConnector();
 $con = $database->getConnection();
+$userRegistration = new UserRegistration($con);
+$userIdParam = null;
+if(isset($_GET['name']) && trim($_GET['name']) !== '' ) {
+    $visitor = $userRegistration->getUserByName(trim($_GET['name']));
+    $userIdParam= $visitor['id'];
+}
 
-$userIdParam = isset($_GET['id']) ? $_GET['id'] : null;
 $connectedUserId = isset($_SESSION['user_id']) ? $_SESSION['user_id'] : null;
 
 if ($userIdParam) {
@@ -57,7 +29,6 @@ if ($userIdParam) {
     $userId = $connectedUserId; // Sinon, on utilise l'ID de l'utilisateur connecté
 }
 
-$userRegistration = new UserRegistration($con);
 $PostsResultsProvider = new PostsResultsProvider($con);
 $messageResult = new MessageResultsProvider($con);
 $userInfo = $userRegistration->getUserInfo($userId);
@@ -744,6 +715,26 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <script src="https://unpkg.com/masonry-layout@4/dist/masonry.pkgd.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
+<?php if( !isset($_SESSION['user_id']) || $_SESSION['user_id'] < 0) { ?>
+    <script>
+        $(document).ready(function() {
+            Swal.fire({
+                text: 'Inscrivez-vous pour avoir accès à son profil.',
+                icon: 'warning',
+                showCloseButton: true, // Ajouter un bouton
+                showCancelButton: true,
+                confirmButtonText: 'Se connecter',
+                cancelButtonText: 'S\'inscrire'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    window.location.href = 'login.php';
+                } else if (result.dismiss === Swal.DismissReason.cancel) {
+                    window.location.href = 'register.php';
+                }
+            });
+        });
+    </script>
+<?php } ?>
 
 <script>
     function showPostForm() {
@@ -834,8 +825,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         document.body.appendChild(form);
         form.submit();
 
-}
-
+    }
     
 </script>
 

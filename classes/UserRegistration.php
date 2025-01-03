@@ -393,6 +393,26 @@ class UserRegistration {
             return 0;
         }
     }
+
+    public function getUserByName($userName) {
+        try {
+            $sql = "SELECT id, fullname, username ,profileTitle, bio, url, phone, location, cover_photo, profile_photo FROM users WHERE username = :username";
+            $stmt = $this->con->prepare($sql);
+            $stmt->bindParam(':username', $userName);
+            $stmt->execute();
+            
+            $user = $stmt->fetch(PDO::FETCH_ASSOC);
+            
+            if ($user) {
+                return $user;
+            } else {
+                return null;  // L'utilisateur n'a pas été trouvé
+            }
+        } catch (PDOException $e) {
+            echo "Erreur lors de la récupération des données utilisateur : " . $e->getMessage();
+            return null;
+        }
+    }
     
     
 }
