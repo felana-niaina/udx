@@ -87,7 +87,7 @@ class MarketplaceResultsProvider {
                 $title = $this->trimField($title, 120);
                 $description = $this->trimField($description, 230);
                 
-                $profileLink ="$this->siteUrl/udx/profil.php?id=$userId&name=" . urlencode($username);
+                $profileLink ="$this->siteUrl/profil.php?id=$userId&name=" . urlencode($username);
 
                 // Ajouter le résultat au HTML
 				$resultsHtml .= " <div class='d-flex mb-12 marketResult'>
@@ -103,7 +103,7 @@ class MarketplaceResultsProvider {
                     }
 
                     if($isUserConnected) {
-                        $resultsHtml .=             "<button class='btn see-market-image' data-bs-toggle='modal' data-bs-target='#seePictureModal' data-picture='$this->siteUrl/udx/$picture' data-id=`$id`>
+                        $resultsHtml .=             "<button class='btn see-market-image' data-bs-toggle='modal' data-bs-target='#seePictureModal' data-picture='$this->siteUrl/$picture' data-id=`$id`>
                                 <i class='bi bi-images'></i>
                             </button>
                             <button class='btn contact-product-owner' data-bs-toggle='modal' data-bs-target='#contactModal' data-user-id='$userId' data-id=`$id`>

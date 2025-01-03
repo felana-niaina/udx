@@ -118,7 +118,7 @@ class PostsResultsProvider {
 
 
                 // Vérifiez si l'utilisateur est connecté
-                $profileLink ="$this->siteUrl/udx/profil.php?id=$userId&name=" . urlencode($username);
+                $profileLink ="$this->siteUrl/profil.php?id=$userId&name=" . urlencode($username);
 
 
                 // Ajouter le résultat au HTML
@@ -341,7 +341,7 @@ class PostsResultsProvider {
                 $username = $row['username'];
 
                 $resultsHtml .= "<div class='d-flex mb-12 comment-list'>
-                    <a href='$this->siteUrl/udx/profil.php/$id'><img src='$profilePicture' class='profile-photo'></a>
+                    <a href='$this->siteUrl/profil.php/$id'><img src='$profilePicture' class='profile-photo'></a>
                     <div class='text'>
                         <div>
                             <span class='price'>$username a écrit : </span><br/>

@@ -63,8 +63,8 @@ $messageResult = new MessageResultsProvider($con);
 $userInfo = $userRegistration->getUserInfo($userId);
 $coverPhoto = is_null($userInfo['cover_photo']) ? 'uploads/default_cover.jpg' : $userInfo['cover_photo'];
 $profilePhoto = is_null($userInfo['profile_photo']) ? 'https://via.placeholder.com/150' : $userInfo['profile_photo'];
-$coverPhoto = 'http://'.$_SERVER['SERVER_NAME'] .'/udx/'. $coverPhoto;
-$profilePhoto = 'http://'.$_SERVER['SERVER_NAME'] .'/udx/'. $profilePhoto;
+$coverPhoto = 'http://'.$_SERVER['SERVER_NAME'] .'/'. $coverPhoto;
+$profilePhoto = 'http://'.$_SERVER['SERVER_NAME'] .'/'. $profilePhoto;
 
 $followersCount = $userRegistration->countFollowers($userId);
 $points = $userRegistration->calculatePoints($userId);
