@@ -914,7 +914,7 @@
                       <?php foreach ($userBilling as $key => $bill) { ?>
                         <tr>
                           <td><?php echo $bill['cardHolder'] ?></td>
-                          <td><?php echo $bill['cardNumber'] ?></td>
+                          <td><?php echo substr_replace($bill['cardNumber'], str_repeat('*', 8), -8) ?></td>
                           <td><?php echo $bill['expirationDate'] ?></td>
                           <td><?php echo $bill['cryptoVisuel'] ?></td>
                         </tr>
