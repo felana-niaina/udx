@@ -185,17 +185,20 @@ class PostsResultsProvider {
         }
     }
 
-    public function getPostsByUser($userId){
+    public function getPostsByUser($userId, $page, $pageSize = 10){
         try {
+            $fromLimit = ($page - 1) * $pageSize;
             $query = $this->con->prepare("SELECT * 
                                           FROM posts
-                                          WHERE userId = :userId
+                                          WHERE userId = :userId 
+                                          LIMIT :fromLimit, :pageSize
                                         ");
-            $query->execute([
-                'userId' => $userId
-            ]);
+            $query->bindParam(":userId", $userId);
+            $query->bindParam(":fromLimit", $fromLimit, PDO::PARAM_INT);
+            $query->bindParam(":pageSize", $pageSize, PDO::PARAM_INT);
+            $query->execute();
 
-            $resultsHtml = "<div class='list-group'>";
+            $resultsHtml = "";
             while ($row = $query->fetch(PDO::FETCH_ASSOC)) {
                 $id = $row["id"];
                 $title = $row["title"];
@@ -219,9 +222,25 @@ class PostsResultsProvider {
                     </div>
                 </div>";
             }
-            $resultsHtml .= "</div>"; // Fermer la div des résultats
 
             return $resultsHtml;
+
+        } catch (PDOException $e) {
+            echo "Erreur dans la requête : " . $e->getMessage();
+            return 0;
+        }
+    }
+
+    public function getTotalPostsByUser($userId) {
+        try {
+            $query = $this->con->prepare("SELECT * 
+                                          FROM posts
+                                          WHERE userId = :userId 
+                                        ");
+            $query->bindParam(":userId", $userId);
+            $query->execute();
+
+            return $query->fetchAll();
 
         } catch (PDOException $e) {
             echo "Erreur dans la requête : " . $e->getMessage();

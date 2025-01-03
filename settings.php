@@ -64,6 +64,9 @@
 
   $userBilling = $BillingResultsProvider->getBillingMethodByUser($userId);
   $userBillingNumber = count($userBilling);
+
+  $totalUserPosts = $postsProvider->getTotalPostsByUser($userId);
+  $totalPostPageNumber = ceil(count($totalUserPosts) / 10);
   //update information
   if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     // Vérifier quel formulaire a été soumis
@@ -777,9 +780,28 @@
             <div class="tab-pane" id="posts">
               <h6>POSTS</h6>
               <hr>
+              <div class='list-group' id="listUserPost">
               <?php 
-                echo $postsProvider->getPostsByUser($_SESSION['user_id']);
+                echo $postsProvider->getPostsByUser($_SESSION['user_id'], 1, 10);
               ?>
+              </div>
+              <?php if(count($totalUserPosts) > 10) { ?>
+              <div class="text-center">
+                <nav aria-label="...">
+                  <ul class="pagination">
+                    <li class="page-item disabled prevNext" id="prevButton" data-number="1">
+                      <a class="page-link" href="#" tabindex="-1">Previous</a>
+                    </li>
+                    <?php for ($i=0; $i < $totalPostPageNumber ; $i++) { ?>
+                      <li class="page-item <?php echo ($i == 0) ? 'active' : '' ?>" data-number="<?php echo $i+1 ?>"><a class="page-link" href="#"><?php echo $i+1 ?></a></li>
+                    <?php } ?>
+                    <li class="page-item prevNext" id="nextButton" data-number="2" >
+                      <a class="page-link" href="#" >Next</a>
+                    </li>
+                  </ul>
+                </nav>
+              </div>
+              <?php } ?>
             </div>
 
             <div class="tab-pane" id="messages">
@@ -1434,14 +1456,41 @@
         $('#postCategory').val(category);
       });
 
-      /* $('#sendMessageForm').submit(function(e) {
-        e.preventDefault();
-        $.post("ajax/postMessage.php", {
-          data: $('#sendMessageForm').serialize()
-        }).done(function(result){
+      $(document).on('click', '.page-item', function(e) {
+        let totalPage = <?php echo $totalPostPageNumber; ?>;
+        if(!$(this).hasClass('disabled')) {
+          let pageNumber = $(this).data('number');
+          $('.page-item').removeClass('active');
+          $(this).addClass('active');
 
-        });
-      }); */
+          if($(this).hasClass('prevNext')) {
+            $('[data-number="' + pageNumber + '"]').addClass('active');
+            $(this).removeClass('active');
+          }
+
+          $.post("ajax/postInfo.php", {
+            postPagination: true,
+            pageNumber : pageNumber
+          }).done(function(result){
+            $('#listUserPost').html(result);
+            if(pageNumber > 1) {
+              $('#prevButton').data('number', pageNumber - 1);
+              $('#prevButton').removeClass('disabled');
+            } else {
+              $('#prevButton').data('number', 0);
+              $('#prevButton').addClass('disabled');
+            }
+
+            if(pageNumber == totalPage) {
+              $('#nextButton').data('number', pageNumber);
+              $('#nextButton').addClass('disabled');
+            } else {
+              $('#nextButton').data('number', pageNumber + 1);
+              $('#nextButton').removeClass('disabled');
+            }            
+          });
+        }
+      })
     })
 
 

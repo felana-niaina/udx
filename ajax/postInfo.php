@@ -23,6 +23,8 @@ if(isset($_POST["productId"])){
     $postId = $_POST['postId'];
     echo json_encode($ResultsProvider->toggleLikePost($likerId, $likedId, $postId));
 
+} elseif (isset($_POST['postPagination']) && isset($_POST['pageNumber']) ){ 
+    echo $ResultsProvider->getPostsByUser($_SESSION['user_id'], $_POST['pageNumber']);
 } else{
     echo "no info passed to page";
 }
