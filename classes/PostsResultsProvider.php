@@ -425,7 +425,8 @@ class PostsResultsProvider {
 
                 $stmtDelete->bindParam(':id', $like['id']);
                 $stmtDelete->execute();
-
+                $this->substractLikerNumber($postId);
+                
                 return ['success' => true, 'isLiked' => false];
 
             } else {
@@ -439,6 +440,7 @@ class PostsResultsProvider {
                 $stmtInsert->bindParam(':postId', $postId);
 
                 $stmtInsert->execute();
+                $this->addLikerNumber($postId);
 
                 return ['success' => true, 'isLiked' => true];
 
@@ -449,6 +451,40 @@ class PostsResultsProvider {
         }
     }
     
+    private function addLikerNumber($postId) {
+        try {
+            $sql = "UPDATE posts 
+                    SET likes = likes + 1
+                    WHERE id = :postId";
+            $stmt = $this->con->prepare($sql);
+            
+            $stmt->bindParam(':postId', $postId);
+            // Exécuter la requête d'update
+            $stmt->execute();
+            return true;
+
+        } catch (PDOException $e) {
+            echo "Erreur lors de l'incrémentation du like : " . $e->getMessage();
+            return false;
+        }
+    }
+
+    private function substractLikerNumber($postId) {
+        try {
+            $sql = "UPDATE posts 
+                    SET likes = IF(likes = 0, 0, likes - 1)
+                    WHERE id = :postId";
+            $stmt = $this->con->prepare($sql);
+            $stmt->bindParam(':postId', $postId);
+            // Exécuter la requête d'update
+            $stmt->execute();
+            return true;
+
+        } catch (PDOException $e) {
+            echo "Erreur lors de la décrémentation du like : " . $e->getMessage();
+            return false;
+        }
+    }
     
 }
 ?>
