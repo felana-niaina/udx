@@ -504,6 +504,24 @@ class PostsResultsProvider {
             return false;
         }
     }
+
+    public function getPostInfo($postId) {
+        try {
+            $sql = "SELECT *, users.email FROM posts 
+                    INNER JOIN users ON posts.userId = users.id
+                    WHERE posts.id = :postId";
+            $stmt = $this->con->prepare($sql);
+            
+            $stmt->bindParam(':postId', $postId);
+            // Exécuter la requête d'update
+            $stmt->execute();
+            return $stmt->fetchObject();
+
+        } catch (PDOException $e) {
+            echo "Erreur lors de la récupération de l'info : " . $e->getMessage();
+            return false;
+        }
+    }
     
 }
 ?>

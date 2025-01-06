@@ -396,7 +396,7 @@ class UserRegistration {
 
     public function getUserByName($userName) {
         try {
-            $sql = "SELECT id, fullname, username ,profileTitle, bio, url, phone, location, cover_photo, profile_photo FROM users WHERE username = :username";
+            $sql = "SELECT id, email, fullname, username ,profileTitle, bio, url, phone, location, cover_photo, profile_photo FROM users WHERE username = :username";
             $stmt = $this->con->prepare($sql);
             $stmt->bindParam(':username', $userName);
             $stmt->execute();

@@ -4,7 +4,7 @@ session_start();
 
 include_once '../classes/DatabaseConnector.php';
 include_once '../classes/PostsResultsProvider.php';
-include_once '../classes/UserRegistration.php';
+
 $database = new DatabaseConnector();
 $con = $database->getConnection();
 $ResultsProvider = new PostsResultsProvider($con);
@@ -24,11 +24,10 @@ if(isset($_POST["productId"])){
     $result = $ResultsProvider->saveComment($postId, $userId, $commentText);
     if($result['success']) {
         // Send email into post owner
-        $UserProvider = new UserRegistration($con);
-        $UserInfo = $UserProvider->getUserInfo($userId);
-        $username = $UserInfo['username'];
+        $postInfo = $ResultsProvider->getPostInfo($postId);
+        $username = $_SESSION['user_username'];
         $paragraphe = "L'utilisateur $username a commenté votre post dans le Feed !";
-        sendMail($UserInfo['email'], "Nouveau commentaire sur Underdex !", $paragraphe);
+        sendMail($postInfo->email, "Nouveau commentaire sur Underdex !", $paragraphe);
     }
     echo json_encode($result);
 }elseif (isset($_POST['postLike'])){
@@ -39,11 +38,10 @@ if(isset($_POST["productId"])){
     $result = $ResultsProvider->toggleLikePost($likerId, $likedId, $postId);
     if($result['success'] && $result['isLiked']) {
         // Send email into post owner
-        $UserProvider = new UserRegistration($con);
-        $UserInfo = $UserProvider->getUserInfo($likerId);
-        $username = $UserInfo['username'];
+        $postInfo = $ResultsProvider->getPostInfo($postId);
+        $username = $_SESSION['user_username'];
         $paragraphe = "L'utilisateur $username vous a donné un like dans le Feed !";
-        sendMail($UserInfo['email'], "Nouveau like sur Underdex !", $paragraphe);
+        sendMail($postInfo->email, "Nouveau like sur Underdex !", $paragraphe);
     }
     echo json_encode($result);
 
