@@ -4,13 +4,6 @@ include_once 'classes/DatabaseConnector.php';
 include_once 'classes/UserRegistration.php';
 require_once 'constants.php';
 
-require 'phpmailer/src/Exception.php';
-require 'phpmailer/src/PHPMailer.php';
-require 'phpmailer/src/SMTP.php';
-
-use PHPMailer\PHPMailer\PHPMailer;
-use PHPMailer\PHPMailer\Exception;
-
 // Créer une instance de la classe DatabaseConnector
 $database = new DatabaseConnector();
 $con = $database->getConnection();
@@ -67,37 +60,38 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         if ($user->registerUser($username, $email, $password)) {
             // Envoi de l'email de confirmation avec PHPMailer
             try {
-                $mail = new PHPMailer(true);
-
-                // Paramétrage SMTP
-                $mail->isSMTP();
-                $mail->Host = EMAIL_SMTP;  // Hébergement du serveur SMTP
-                $mail->SMTPAuth = true;
-                $mail->Username = LOGIN_SMTP;  // Votre email
-                $mail->Password = PASS_SMTP;  // Mot de passe d'application
-                $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
-                $mail->Port = 587;
-
-                // Expéditeur et destinataire
-                $mail->setFrom(LOGIN_SMTP, 'Underdex');  // L'email expéditeur
-                $mail->addAddress($email, $username);  // L'email destinataire de l'utilisateur
-
-                // Sujet et corps du message
-                $mail->Subject = 'Bienvenue sur Underdex !';
-
-                // Message HTML du mail
-                $mail->isHTML(true);
-                $mail->Body = "
+                $to      = $email;
+                $subject = 'Bienvenue sur Underdex !';
+                $message = "
+                <html>
+                <head>
+                    <title>Bienvenue sur my site!</title>
+                </head>
                 <h2>Bienvenue sur Underdex !</h2>
-                <p>Ton compte est désormais créé :</p>
-                <p><strong>Nom d’utilisateur :</strong> $username</p>
-                <p><strong>Mot de passe :</strong> ***********</p>
-                <p>Tu peux désormais utiliser notre Service et profiter de toutes les fonctionnalités membre. Tu peux également consulter l’espace FAQ pour te familiariser avec notre Service.</p>
-                <p>Cordialement,<br> L'équipe Underdex</p>
+                <p>Vous pouvez désormais interagir avec la communauté !</p>
+                <p>
+                    - Profiter d’un profil complet et enrichie.<br>
+                    - Publier vos posts dans la rubrique Feed.<br>
+                    - Vendre des articles sans frais dans la Marketplace.<br>
+                    - Echanger par messages avec d’autres membres.
+                </p>
+                <p>Et plus encore...</p>
+                <p>Nous ésperons que notre application vous soit utile et nous vous souhaitons de passer d’agréables moment sur Underdex !</p>
+                <p>Cordialement,<br> Underdex Team</p>
+                </body>
+                </html>
                 ";
+                // Set headers for HTML content
+                $headers = "MIME-Version: 1.0" . "\r\n";
+                $headers .= "Content-type: text/html; charset=UTF-8" . "\r\n";
 
-                // Envoi de l'email
-                $mail->send();
+                // Additional headers
+                $headers .= "From: udx@underdex.com" . "\r\n";
+                $headers .= "Reply-To: udx@underdex.com" . "\r\n";
+                $headers .= "X-Mailer: PHP/" . phpversion();
+
+                mail($to, $subject, $message, $headers);
+                
             } catch (Exception $e) {
                 // Si l'envoi échoue, affichage de l'erreur
                 $errorMessage = "Le message n'a pas pu être envoyé. Erreur: {$mail->ErrorInfo}";
