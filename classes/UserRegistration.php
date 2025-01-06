@@ -131,7 +131,7 @@ class UserRegistration {
     // Méthode pour récupérer les informations de l'utilisateur
     public function getUserInfo($userId) {
         try {
-            $sql = "SELECT fullname, username ,profileTitle, bio, url, phone, location, cover_photo, profile_photo FROM users WHERE id = :userId";
+            $sql = "SELECT email, fullname, username ,profileTitle, bio, url, phone, location, cover_photo, profile_photo FROM users WHERE id = :userId";
             $stmt = $this->con->prepare($sql);
             $stmt->bindParam(':userId', $userId);
             $stmt->execute();

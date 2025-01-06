@@ -313,11 +313,11 @@ class PostsResultsProvider {
     
             $query->execute();
     
-            echo json_encode(["success" => true, "message" => "Commentaire enregistré avec succès."]);
+            return ["success" => true, "message" => "Commentaire enregistré avec succès."];
         } catch (PDOException $e) {
-            echo json_encode(["success" => false, "message" => "Erreur : " . $e->getMessage()]);
+            return ["success" => false, "message" => "Erreur : " . $e->getMessage()];
         } catch (Exception $e) {
-            echo json_encode(["success" => false, "message" => $e->getMessage()]);
+            return ["success" => false, "message" => $e->getMessage()];
         }
     }
 
