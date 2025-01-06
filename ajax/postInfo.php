@@ -26,37 +26,9 @@ if(isset($_POST["productId"])){
         // Send email into post owner
         $UserProvider = new UserRegistration($con);
         $UserInfo = $UserProvider->getUserInfo($userId);
-        try {
-            $to       = $UserInfo['email'];
-            $username =  $UserInfo['username'];
-            $subject  = 'Nouveau commentaire sur Underdex !';
-            $message  = "
-            <html>
-            <head>
-                <title>Nouveau commentaire sur Underdex !</title>
-            </head>
-            <p>Bonjour, </p>
-            <p>L'utilisateur $username a commenté votre post dans le Feed !</p>
-            <p>Allez jeter un coup d’Oeil sur ce qui s’est passé !</p>
-            <p>Cordialement,<br> Underdex Team</p>
-            </body>
-            </html>
-            ";
-            // Set headers for HTML content
-            $headers = "MIME-Version: 1.0" . "\r\n";
-            $headers .= "Content-type: text/html; charset=UTF-8" . "\r\n";
-
-            // Additional headers
-            $headers .= "From: udx@underdex.com" . "\r\n";
-            $headers .= "Reply-To: udx@underdex.com" . "\r\n";
-            $headers .= "X-Mailer: PHP/" . phpversion();
-
-            mail($to, $subject, $message, $headers);
-            
-        } catch (Exception $e) {
-            // Si l'envoi échoue, affichage de l'erreur
-            $errorMessage = "Le message n'a pas pu être envoyé. Erreur: {$mail->ErrorInfo}";
-        }
+        $username = $UserInfo['username'];
+        $paragraphe = "L'utilisateur $username a commenté votre post dans le Feed !";
+        sendMail($UserInfo['email'], "Nouveau commentaire sur Underdex !", $paragraphe);
     }
     echo json_encode($result);
 }elseif (isset($_POST['postLike'])){
@@ -64,7 +36,16 @@ if(isset($_POST["productId"])){
     $likerId = $_POST['userLiker'];
     $likedId = $_POST['userIdPost'];
     $postId = $_POST['postId'];
-    echo json_encode($ResultsProvider->toggleLikePost($likerId, $likedId, $postId));
+    $result = $ResultsProvider->toggleLikePost($likerId, $likedId, $postId);
+    if($result['success'] && $result['isLiked']) {
+        // Send email into post owner
+        $UserProvider = new UserRegistration($con);
+        $UserInfo = $UserProvider->getUserInfo($likerId);
+        $username = $UserInfo['username'];
+        $paragraphe = "L'utilisateur $username vous a donné un like dans le Feed !";
+        sendMail($UserInfo['email'], "Nouveau like sur Underdex !", $paragraphe);
+    }
+    echo json_encode($result);
 
 } elseif (isset($_POST['postPagination']) && isset($_POST['pageNumber']) ){ 
     echo $ResultsProvider->getPostsByUser($_SESSION['user_id'], $_POST['pageNumber']);
@@ -73,3 +54,35 @@ if(isset($_POST["productId"])){
 }
 
 $con = null;
+die();
+
+function sendMail($to, $subject, $paragraphe) {
+    try {
+        $message  = "
+        <html>
+        <head>
+            <title>$subject!</title>
+        </head>
+        <p>Bonjour, </p>
+        <p>$paragraphe</p>
+        <p>Allez jeter un coup d’Oeil sur ce qui s’est passé !</p>
+        <p>Cordialement,<br> Underdex Team</p>
+        </body>
+        </html>
+        ";
+        // Set headers for HTML content
+        $headers = "MIME-Version: 1.0" . "\r\n";
+        $headers .= "Content-type: text/html; charset=UTF-8" . "\r\n";
+
+        // Additional headers
+        $headers .= "From: udx@underdex.com" . "\r\n";
+        $headers .= "Reply-To: udx@underdex.com" . "\r\n";
+        $headers .= "X-Mailer: PHP/" . phpversion();
+
+        return mail($to, $subject, $message, $headers);
+        
+    } catch (Exception $e) {
+        // Si l'envoi échoue, affichage de l'erreur
+        return "Le message n'a pas pu être envoyé. Erreur: {$mail->ErrorInfo}";
+    }
+}
