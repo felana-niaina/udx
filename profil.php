@@ -162,6 +162,35 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $result = $messageResult->sendMessage($fromUserId,$toUserId, $message, $subject);
 
         if ($result) {
+            // Send email
+            try {
+                $username = $_SESSION['user_username'];
+                $message  = "
+                <html>
+                <head>
+                    <title>Nouveau message sur Underdex !</title>
+                </head>
+                <p>Bonjour, </p>
+                <p>L'utilisateur $username vous a envoyé un message sur Underdex !</p>
+                <p>Cordialement,<br> Underdex Team</p>
+                </body>
+                </html>
+                ";
+                // Set headers for HTML content
+                $headers = "MIME-Version: 1.0" . "\r\n";
+                $headers .= "Content-type: text/html; charset=UTF-8" . "\r\n";
+        
+                // Additional headers
+                $headers .= "From: udx@underdex.com" . "\r\n";
+                $headers .= "Reply-To: udx@underdex.com" . "\r\n";
+                $headers .= "X-Mailer: PHP/" . phpversion();
+        
+                mail($visitor['email'], "Nouveau message sur Underdex !", $message, $headers);
+                
+            } catch (Exception $e) {
+                // Si l'envoi échoue, affichage de l'erreur
+                return "Le message n'a pas pu être envoyé. Erreur: {$mail->ErrorInfo}";
+            }
             echo "<script>
                     document.addEventListener('DOMContentLoaded', function() {
                         Swal.fire({
@@ -177,11 +206,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         } else {
             echo "Échec de l'envoie du message.";
         }
-    }
-}
+    } 
 
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    if(isset($_POST['followedId']) && isset($_POST['followerId']) ){
+    elseif(isset($_POST['followedId']) && isset($_POST['followerId']) ){
         // Récupérer les données POST
         $followedId = $_POST['followedId'];
         $followerId = $_POST['followerId'];
@@ -189,6 +216,38 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         try {
             $result = $userRegistration->updateFollowers($followedId, $followerId);
             if ($result) {
+                // Send email
+                try {
+                    $username = $_SESSION['user_username'];
+                    $message  = "
+                    <html>
+                    <head>
+                        <title>Nouveau follower sur Underdex !</title>
+                    </head>
+                    <p>Bonjour, </p>
+                    <p>L’utilisateur $username vous suit désormais sur Underdex !</p>
+                    <p>Vous avez du succès, félicitations !</p>
+                    <p>Cordialement,<br> Underdex Team</p>
+                    </body>
+                    </html>
+                    ";
+                    // Set headers for HTML content
+                    $headers = "MIME-Version: 1.0" . "\r\n";
+                    $headers .= "Content-type: text/html; charset=UTF-8" . "\r\n";
+            
+                    // Additional headers
+                    $headers .= "From: udx@underdex.com" . "\r\n";
+                    $headers .= "Reply-To: udx@underdex.com" . "\r\n";
+                    $headers .= "X-Mailer: PHP/" . phpversion();
+            
+                    mail($visitor['email'], "Nouveau follower sur Underdex !", $message, $headers);
+                    
+                } catch (Exception $e) {
+                    // Si l'envoi échoue, affichage de l'erreur
+                    echo "Le message n'a pas pu être envoyé. Erreur: {$mail->ErrorInfo}";
+                }
+
+                $profilName = trim($_GET['name']);
                 echo "<script>
                         document.addEventListener('DOMContentLoaded', function() {
                             Swal.fire({
@@ -198,7 +257,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                 confirmButtonText: 'Fermer'
                             }).then(function() {
                                 // Redirection vers le profil de l'utilisateur suivi
-                                window.location.href = 'profil.php?userId=' + {$followedId};
+                                window.location.href = 'profil.php?name=$profilName';
                             });
                         });
                     </script>";
@@ -210,7 +269,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             echo json_encode(['success' => false, 'message' => 'Erreur de connexion à la base de données : ' . $e->getMessage()]);
         }
     }
-    
 }
 
 
@@ -798,6 +856,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         // Récupérer les IDs des utilisateurs depuis les attributs data
         const followedId = button.dataset.followedId;
         const followerId = button.dataset.followerId;
+        const profilName = '<?php echo $_GET["name"] ?? "" ?>';
 
         // Assurer que les données sont présentes
         if (!followedId || !followerId) {
@@ -808,8 +867,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         // Création d'un formulaire dynamique et soumettez les données via POST
         const form = document.createElement('form');
         form.method = 'POST';
-        form.action = `profil.php?userId= + ${followedId}`; // L'action vers laquelle les données seront envoyées
-
+        form.action = `profil.php?name=${profilName}`; // L'action vers laquelle les données seront envoyées
         // Ajout des champs à la requête
         const inputFollowedId = document.createElement('input');
         inputFollowedId.type = 'hidden';
