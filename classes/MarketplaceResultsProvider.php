@@ -190,7 +190,7 @@ class MarketplaceResultsProvider {
         }
     }
 
-    public function createProduct($userId, $name, $description, $price, $tags, $picture = NULL){
+    public function createProduct($userId, $name, $description, $price, $tags, $city, $category, $picture = NULL){
         try {
             $targetFile = '';
             if(!is_null($picture)) {
@@ -208,7 +208,7 @@ class MarketplaceResultsProvider {
                 }
             }
 
-            $sql = "INSERT INTO marketplace (title, description, price, keywords, picture ,userId) VALUES (:title, :description, :price, :keywords, :picture, :userId)";
+            $sql = "INSERT INTO marketplace (title, description, price, keywords, picture ,userId, city, category) VALUES (:title, :description, :price, :keywords, :picture, :userId, :city, :category)";
             $stmt = $this->con->prepare($sql);
             $stmt->bindParam(':title', $name);
             $stmt->bindParam(':description', $description);
@@ -216,6 +216,8 @@ class MarketplaceResultsProvider {
             $stmt->bindParam(':keywords', $tags);
             $stmt->bindParam(':picture', $targetFile);
             $stmt->bindParam(':userId', $userId);
+            $stmt->bindParam(':city', $city);
+            $stmt->bindParam(':category', $category);
             $stmt->execute();
             $productId = $this->con->lastInsertId();
             if ($productId) {
@@ -368,6 +370,17 @@ class MarketplaceResultsProvider {
         } catch (PDOException $e) {
             echo "Erreur lors de la mise à jour du produit : " . $e->getMessage();
             return false;
+        }
+    }
+
+    public function getCategoryList(){
+        try {
+            $query = $this->con->prepare("SELECT * FROM productCategory");
+            $query->execute();
+            return $query->fetchAll();
+        } catch (PDOException $e) {
+            echo "Erreur lors de la récupération des catégories : " . $e->getMessage();
+            return [];
         }
     }
 }

@@ -31,6 +31,7 @@ if ($userIdParam) {
 
 $PostsResultsProvider = new PostsResultsProvider($con);
 $messageResult = new MessageResultsProvider($con);
+$MarketplaceResultsProvider = new MarketplaceResultsProvider($con);
 $userInfo = $userRegistration->getUserInfo($userId);
 $coverPhoto = is_null($userInfo['cover_photo']) ? 'uploads/default_cover.jpg' : $userInfo['cover_photo'];
 $profilePhoto = is_null($userInfo['profile_photo']) ? 'https://via.placeholder.com/150' : $userInfo['profile_photo'];
@@ -131,10 +132,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     // Publication d'un nouveau produit
     elseif ($formId === 'publishProduct') {
-        if($userId && $_POST['productName'] && $_POST['productDescription'] && $_POST['productPrice'] && $_POST['productTags']) {
+        if($userId && $_POST['productName'] && $_POST['productDescription'] && $_POST['productPrice'] && $_POST['productTags'] && $_POST['productCity'] && $_POST['productCaterogy']) {
             $productPicture = isset($_FILES['productPicture']) ? $_FILES['productPicture'] : NULL;
-            $MarketplaceResultsProvider = new MarketplaceResultsProvider($con);
-            if ($MarketplaceResultsProvider->createProduct($userId,$_POST['productName'], $_POST['productDescription'], $_POST['productPrice'], $_POST['productTags'], $productPicture)) {
+            if ($MarketplaceResultsProvider->createProduct($userId,$_POST['productName'], $_POST['productDescription'], $_POST['productPrice'], $_POST['productTags'], $_POST['productCity'], $_POST['productCaterogy'], $productPicture)) {
               echo "<script>
                   document.addEventListener('DOMContentLoaded', function() {
                       Swal.fire({
@@ -698,6 +698,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         <div class="form-group">
                             <input type="number" class="form-control mt-2" placeholder="Prix" name="productPrice"  required>
                         </div>
+                        <!-- Ville -->
+                        <div class="form-group">
+                            <input type="text" class="form-control" id="ville" placeholder="Ville" name="productCity" required>
+                        </div>
+                        
+                        <!-- Category -->
+                        <select class="form-control" id="productCaterogy" name="productCaterogy" required>
+                        <option value="" disabled selected>-- Select an option --</option>
+                        <?php foreach ($MarketplaceResultsProvider->getCategoryList() as $key => $value) { ?>
+                            <option value="<?php echo $value['id'] ?>"><?php echo $value['title'] ?></option>
+                        <?php } ?>
+                        </select>
+
                         <div class="form-group">
                             <input type="text" class="form-control mt-2" placeholder="Tags" name="productTags"  required>
                         </div>

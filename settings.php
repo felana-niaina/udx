@@ -124,10 +124,10 @@
 
     // Ajout nouveau produit dans marketplace
     elseif ($formId === 'newProduct') {
-      if($userId && $_POST['productName'] && $_POST['productDescription'] && $_POST['productPrice'] && $_POST['productTags']) {
+      if($userId && $_POST['productName'] && $_POST['productDescription'] && $_POST['productPrice'] && $_POST['productTags'] && $_POST['productCity'] && $_POST['productCaterogy']) {
         $productPicture = isset($_FILES['productPicture']) ? $_FILES['productPicture'] : NULL;
         $MarketplaceResultsProvider = new MarketplaceResultsProvider($con);
-        if ($MarketplaceResultsProvider->createProduct($userId,$_POST['productName'], $_POST['productDescription'], $_POST['productPrice'], $_POST['productTags'], $productPicture)) {
+        if ($MarketplaceResultsProvider->createProduct($userId,$_POST['productName'], $_POST['productDescription'], $_POST['productPrice'], $_POST['productTags'], $_POST['productCity'], $_POST['productCaterogy'], $productPicture)) {
           echo "<script>
               document.addEventListener('DOMContentLoaded', function() {
                   Swal.fire({
@@ -1133,6 +1133,20 @@
                     <label for="price">Prix</label>
                     <input type="text" class="form-control" id="price" placeholder="Prix de l'article" name="productPrice" required>
                 </div>
+
+                <!-- Ville -->
+                <div class="form-group">
+                    <label for="ville">Ville</label>
+                    <input type="text" class="form-control" id="ville" placeholder="Ville" name="productCity" required>
+                </div>
+                
+                <!-- Category -->
+                <select class="form-control" id="productCaterogy" name="productCaterogy" required>
+                  <option value="" disabled selected>-- Select an option --</option>
+                  <?php foreach ($marketPlaceProvider->getCategoryList() as $key => $value) { ?>
+                    <option value="<?php echo $value['id'] ?>"><?php echo $value['title'] ?></option>
+                  <?php } ?>
+                </select>
 
                 <!-- Mots-clés -->
                 <div class="form-group">
