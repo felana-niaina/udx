@@ -657,9 +657,113 @@
                 margin-bottom: 20px;
             }
         }
-		
-		
+        
+        /* Menu en bas (footer) pour les écrans mobiles (version blanche) */
+        .bottom-menu {
+          display: none;
+          position: fixed;
+          bottom: 0;
+          left: 0;
+          width: 100%;
+          background-color: #ffffff; /* Fond blanc */
+          box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.1); /* Légère ombre pour le contraste */
+          z-index: 999;
+          border-top: 1px solid #e0e0e0; /* Bordure supérieure légère */
+        }
 
+        .bottom-menu ul {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          margin: 0;
+          padding: 0;
+          list-style: none;
+        }
+
+        .bottom-menu ul li {
+          text-align: center;
+          width: 20%; /* 5 éléments, donc chaque bloc occupe 20% */
+        }
+
+        .bottom-menu ul li a {
+          display: flex;
+          flex-direction: column;
+          justify-content: center;
+          align-items: center;
+          padding: 10px 0;
+          color: #333333; /* Texte gris foncé */
+          text-decoration: none;
+          font-size: 14px;
+          transition: background-color 0.3s, transform 0.2s;
+        }
+
+        .bottom-menu ul li a i {
+          font-size: 24px; /* Taille de l'icône */
+          margin-bottom: 5px;
+          color: #555555; /* Couleur des icônes gris moyen */
+        }
+
+        .bottom-menu ul li a span {
+          font-size: 12px;
+          color: #555555; /* Couleur du texte gris moyen */
+        }
+
+        .bottom-menu ul li a:hover {
+          background-color: #f0f0f0; /* Fond gris clair au survol */
+          transform: translateY(-3px); /* Légère élévation au survol */
+        }
+
+        /* Afficher le menu uniquement pour les écrans mobiles */
+        @media (max-width: 768px) {
+          .bottom-menu {
+              display: block;
+          }
+        }
+        /* Style for notification list */ 
+        .notification-item {
+            padding: 15px;
+            background-color: #fff;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            transition: background-color 0.3s ease;
+        }
+
+        .notification-item:hover {
+            background-color: #f1f1f1;
+        }
+
+        .notification-title {
+            font-size: 16px;
+            font-weight: bold;
+        }
+
+        .notification-date {
+            font-size: 12px;
+            color: #888;
+            margin-bottom: 5px;
+        }
+
+        .notification-content {
+            font-size: 14px;
+            color: #555;
+        }
+
+        .notification-icon {
+            font-size: 20px;
+            margin-right: 10px;
+        }
+
+        .section-header {
+            font-size: 18px;
+            margin-top: 30px;
+            margin-bottom: 15px;
+            color: #555;
+            border-bottom: 2px solid #ddd;
+            padding-bottom: 5px;
+        }
+        /* End Style for notification list */ 
     </style>
 </head>
 <body>
@@ -733,13 +837,19 @@
                 <a href="#security" data-toggle="tab" class="nav-link has-icon"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-shield"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg></a>
               </li>
               <li class="nav-item">
-                <a href="#notification" data-toggle="tab" class="nav-link has-icon"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-bell"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path><path d="M13.73 21a2 2 0 0 1-3.46 0"></path></svg></a>
+                <a href="#notifications" data-toggle="tab" class="nav-link has-icon"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-bell"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path><path d="M13.73 21a2 2 0 0 1-3.46 0"></path></svg></a>
               </li>
               <li class="nav-item">
-                <a href="#billing" data-toggle="tab" class="nav-link has-icon"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-credit-card"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"></rect><line x1="1" y1="10" x2="23" y2="10"></line></svg></a>
+                <a href="#posts" data-toggle="tab" class="nav-link has-icon"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-bell"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path><path d="M13.73 21a2 2 0 0 1-3.46 0"></path></svg></a>
               </li>
               <li class="nav-item">
-                <a href="#pub" data-toggle="tab" class="nav-link has-icon"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-eur"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"></rect><line x1="1" y1="10" x2="23" y2="10"></line></svg></a>
+                <a href="#marketplace" data-toggle="tab" class="nav-link has-icon"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-bell"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path><path d="M13.73 21a2 2 0 0 1-3.46 0"></path></svg></a>
+              </li>
+              <li class="nav-item">
+                <a href="#billing" data-toggle="tab" class="nav-link has-icon"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-eur"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"></rect><line x1="1" y1="10" x2="23" y2="10"></line></svg></a>
+              </li>
+              <li class="nav-item">
+                <a href="#ads" data-toggle="tab" class="nav-link has-icon"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-eur"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"></rect><line x1="1" y1="10" x2="23" y2="10"></line></svg></a>
               </li>
             </ul>
           </div>
@@ -892,6 +1002,67 @@
             <div class="tab-pane" id="notifications">
               <h6>NOTIFICATIONS</h6>
               <hr>
+              <div class="container">
+                  <!-- Messages Section -->
+                  <div>
+                      <h5 class="section-header"><i class="fas fa-envelope notification-icon"></i>Messages</h5>
+                      <div class="notification-item">
+                          <p class="notification-title">John Doe sent you a message</p>
+                          <p class="notification-date">2025-01-01</p>
+                          <p class="notification-content">"Hi, could we schedule a meeting tomorrow?"</p>
+                      </div>
+                      <div class="notification-item">
+                          <p class="notification-title">Anna sent you a message</p>
+                          <p class="notification-date">2025-01-02</p>
+                          <p class="notification-content">"Don't forget about the project deadline."</p>
+                      </div>
+                  </div>
+
+                  <!-- Likes Section -->
+                  <div>
+                      <h5 class="section-header"><i class="fas fa-thumbs-up notification-icon"></i>Likes</h5>
+                      <div class="notification-item">
+                          <p class="notification-title">Mark liked your post</p>
+                          <p class="notification-date">2025-01-01</p>
+                          <p class="notification-content">"How to stay productive in 2025"</p>
+                      </div>
+                      <div class="notification-item">
+                          <p class="notification-title">Sophia liked your comment</p>
+                          <p class="notification-date">2025-01-02</p>
+                          <p class="notification-content">"This article is very informative!"</p>
+                      </div>
+                  </div>
+
+                  <!-- Comments Section -->
+                  <div>
+                      <h5 class="section-header"><i class="fas fa-comment notification-icon"></i>Commentaires</h5>
+                      <div class="notification-item">
+                          <p class="notification-title">Alex commented on your post</p>
+                          <p class="notification-date">2025-01-01</p>
+                          <p class="notification-content">"Great insights, thanks for sharing!"</p>
+                      </div>
+                      <div class="notification-item">
+                          <p class="notification-title">Emily replied to your comment</p>
+                          <p class="notification-date">2025-01-02</p>
+                          <p class="notification-content">"I completely agree with you."</p>
+                      </div>
+                  </div>
+
+                  <!-- Followers Section -->
+                  <div>
+                      <h5 class="section-header"><i class="fas fa-user-plus notification-icon"></i>Followers</h5>
+                      <div class="notification-item">
+                          <p class="notification-title">Chris started following you</p>
+                          <p class="notification-date">2025-01-01</p>
+                          <p class="notification-content">"Chris is now following your updates."</p>
+                      </div>
+                      <div class="notification-item">
+                          <p class="notification-title">Taylor started following you</p>
+                          <p class="notification-date">2025-01-02</p>
+                          <p class="notification-content">"Taylor is now following your updates."</p>
+                      </div>
+                  </div>
+              </div>
               <form>
                 <div class="form-group">
                   <label class="d-block mb-0">Security Alerts</label>
