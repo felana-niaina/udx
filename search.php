@@ -5,6 +5,7 @@
     include("classes/MarketplaceResultsProvider.php"); 
     include("classes/PostsResultsProvider.php"); 
     include("classes/ImageResultsProvider.php");
+    include("classes/UserRegistration.php");
 
     // Créer une instance de la classe DatabaseConnector
     $database = new DatabaseConnector();
@@ -12,6 +13,7 @@
 
     $postsResults = new PostsResultsProvider($con);
     $messageResult = new MessageResultsProvider($con);
+    $userResult = new UserRegistration($con);
     
     $isUserConnected = false;
     session_start();
@@ -22,7 +24,7 @@
     $postId = $userId = $commentText = null;
     if ($_SERVER["REQUEST_METHOD"] === "POST") {
         $formPost = isset($_POST["marketplace_id"]) ? $_POST["marketplace_id"] : false;
-        if($formPost === "sendMessage")
+        if($formPost === "sendMessage" && $_POST["senderId"] == $_SESSION['user_id'] )
         {
             $toUserId = $_POST['userId'];
             $fromUserId = $_POST["senderId"];
@@ -32,6 +34,35 @@
             $result = $messageResult->sendMessage($fromUserId,$toUserId, $message, $subject);
 
             if ($result) {
+                try {
+                    $userInfo = $userResult->getUserInfo($toUserId);
+                    $username = $_SESSION['user_username'];
+                    $message  = "
+                    <html>
+                    <head>
+                        <title>Nouveau message sur Underdex !</title>
+                    </head>
+                    <p>Bonjour, </p>
+                    <p>L'utilisateur $username vous a envoyé un message sur Underdex !</p>
+                    <p>Cordialement,<br> Underdex Team</p>
+                    </body>
+                    </html>
+                    ";
+                    // Set headers for HTML content
+                    $headers = "MIME-Version: 1.0" . "\r\n";
+                    $headers .= "Content-type: text/html; charset=UTF-8" . "\r\n";
+            
+                    // Additional headers
+                    $headers .= "From: udx@underdex.com" . "\r\n";
+                    $headers .= "Reply-To: udx@underdex.com" . "\r\n";
+                    $headers .= "X-Mailer: PHP/" . phpversion();
+            
+                    mail($userInfo['email'], "Nouveau message sur Underdex !", $message, $headers);
+                    
+                } catch (Exception $e) {
+                    // Si l'envoi échoue, affichage de l'erreur
+                    return "Le message n'a pas pu être envoyé. Erreur: {$mail->ErrorInfo}";
+                }
                 echo "<script>
                         document.addEventListener('DOMContentLoaded', function() {
                             Swal.fire({
