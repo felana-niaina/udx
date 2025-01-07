@@ -26,6 +26,7 @@
     
     <!-- Style -->
     <link rel="stylesheet" href="css/style.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
 
     <style>
         /* Assurez-vous que le body et html couvrent toute la hauteur */
@@ -43,6 +44,59 @@
             justify-content: space-between;  /* Équilibre l'espace entre les éléments */
         }
 
+        .bottom-menu {
+            display: none;
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            background-color: #1c1c1c;
+            z-index: 999;
+        }
+
+        .bottom-menu ul {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin: 0;
+            padding: 0;
+            list-style: none;
+        }
+
+        .bottom-menu ul li {
+            text-align: center;
+            width: 20%;
+        }
+
+        .bottom-menu ul li a {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 10px 0;
+            color: white;
+            text-decoration: none;
+            font-size: 14px;
+            height: 60px;
+            transition: background-color 0.3s, transform 0.2s;
+        }
+
+        .bottom-menu ul li a i {
+            font-size: 24px;
+            margin-bottom: 5px;
+        }
+
+        .bottom-menu ul li a:hover {
+            background-color: #575757;
+            transform: translateY(-3px);
+        }
+
+        @media (max-width: 768px) {
+            .bottom-menu {
+                display: block;
+            }
+        }
+
         /* Si la recherche ou d'autres éléments créent un débordement */
         .searchContainer {
             margin-bottom: 0;  /* Assurez-vous qu'il n'y a pas de marges indésirables */
@@ -56,6 +110,70 @@
         /* Retirer les marges du header ou de toute autre section qui pourrait laisser un espace en bas */
         .site-navbar {
             margin-bottom: 0;
+        }
+
+        .notification-badge {
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            background-color: red;
+            color: white;
+            border-radius: 50%;
+            padding: 2px 6px;
+            font-size: 12px;
+            font-weight: bold;
+        }
+
+        .fas.fa-bell {
+            position: relative;
+        }
+
+        .notification-badge-message {
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            background-color: red;
+            color: white;
+            border-radius: 50%;
+            padding: 2px 6px;
+            font-size: 12px;
+            font-weight: bold;
+        }
+
+        .fas.fa-comment {
+            position: relative;
+        }
+
+        .notification-badge-feed {
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            background-color: red;
+            color: white;
+            border-radius: 50%;
+            padding: 2px 6px;
+            font-size: 12px;
+            font-weight: bold;
+        }
+
+        .fas.fa-stream {
+            position: relative;
+        }
+
+        .notification-badge-marketplace {
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            background-color: red;
+            color: white;
+            border-radius: 50%;
+            padding: 2px 6px;
+            font-size: 12px;
+            font-weight: bold;
+        }
+
+        .fas.fa-store {
+            position: relative;
         }
     </style>
 </head>
@@ -82,7 +200,9 @@
                 <div class="col-9 text-right">
                     <span class="d-inline-block d-lg-block">
                         <a href="#" class="text-black site-menu-toggle js-menu-toggle py-5">
-                            <span class="icon-menu h3 text-white"></span>
+                            <span class="far fa-bell h3 text-white position-relative">
+                                <span class="notification-badge">1</span> <!-- Le nombre de notifications -->
+                            </span>
                         </a>
                     </span>
 
@@ -96,7 +216,9 @@
                             <li><a href="login.php" class="nav-link" style="font-size: 15px;">Se connecter</a></li>
                             <li><a href="register.php" class="nav-link" style="font-size: 15px;">S'inscrire gratuitement</a></li>
                             <?php else : ?>
-                            <li><a href="settings.php" class="nav-link" style="font-size: 15px;">Profil</a></li>
+                            <li><a href="settings.php" class="nav-link" style="font-size: 15px;">Notifications<span class="notification-badge">1</span></a></li>
+                            <li><a href="profil.php" class="nav-link" style="font-size: 15px;">Mon Profil</a></li>
+							<li><a href="settings.php" class="nav-link" style="font-size: 15px;">Paramètres</a></li>
                             <?php endif ?>
                             <li class="active"><a href="services.html" class="nav-link">Services</a></li>
                             <li><a href="register.php" class="nav-link" style="font-size: 16px;">Vendre sur la Marketplace</a></li>
