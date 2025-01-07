@@ -250,6 +250,44 @@
         </div>
     </div>
 
+    <div class="bottom-menu">
+        <ul>
+		<!-- TEMPLATE NOTIFICATIONS START   -->
+		<!-- TEMPLATE NOTIFICATIONS END   -->
+		    <li>
+                <a href="settings.php#notifications"> <!-- L'utilisateut doit être redirigé automatiquement vers la page de notifications  -->
+                    <i class="fas fa-stream">
+                        <span class="notification-badge-feed">10</span> <!-- Le nombre de notifications doit s'afficher ici -->
+                    </i>
+                    <span>Feed</span>
+                </a>
+            </li>
+		    <li>
+                <a href="settings.php#notifications"> <!-- L'utilisateut doit être redirigé automatiquement vers la page de notifications  -->
+                    <i class="fas fa-store">
+                        <span class="notification-badge-feed">10</span> <!-- Le nombre de notifications doit s'afficher ici -->
+                    </i>
+                    <span>Marketplace</span>
+                </a>
+            </li>
+            <li>
+                <a href="settings.php#notifications"> <!-- L'utilisateut doit être redirigé automatiquement vers la page de notifications  -->
+                    <i class="fas fa-comment">
+                        <span class="notification-badge-message">3</span> <!-- Le nombre de notifications doit s'afficher ici -->
+                    </i>
+                    <span>Messages</span>
+                </a>
+            </li>
+			<?php if(!$isUserConnected) : ?>
+            <li><a href="register.php"><i class="fas fa-user"></i><span>S'inscrire</span></a></li>
+            <li><a href="login.php"><i class="fas fa-sign-in-alt"></i><span>Connexion</span></a></li>
+			<?php else : ?>
+			<li><a href="profil.php"><i class="fas fa-user"></i><span>Profil</span></a></li>
+            <li><a href="settings.php"><i class="fas fa-cogs"></i><span>Paramètres</span></a></li>
+			<?php endif ?>
+        </ul>
+    </div>
+
     <script src="js/jquery-3.3.1.min.js"></script>
     <script src="js/popper.min.js"></script>
     <script src="js/bootstrap.min.js"></script>
