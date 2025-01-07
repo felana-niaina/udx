@@ -101,6 +101,8 @@ class PostsResultsProvider {
                 $username = $row["username"];
                 $profilePicture = $row["profile_photo"] ?: "https://via.placeholder.com/150";
                 $commentList = $this->getPostComments($id);
+                $commentNumber = $this->countPostComments($id);
+                $postLike = $row['likes'];
 
                 // Truncation des champs title et description si nécessaire
                 $title = $this->trimField($title, 120);
@@ -140,12 +142,20 @@ class PostsResultsProvider {
                                                 data-user-id='$userId'
                                                 onclick='handleLikeClick(this)'
                                             >
-                                                <i class='bi bi-hand-thumbs-up'></i>
+                                                <i class='bi bi-hand-thumbs-up'></i>";
+                if($postLike > 0) {
+                    $resultsHtml .= "<span class='like-number'>$postLike like(s)</span>";
+                }                               
+                $resultsHtml .= "                                
                                             </button>
 
                                             <!-- Icone Commentaire -->
                                             <button class='btn'  onclick='toggleCommentArea(this, $id)'>
-                                                <i class='bi bi-chat-dots'></i>
+                                                <i class='bi bi-chat-dots'></i>";
+                if($commentNumber > 0) {
+                    $resultsHtml .= "<span class='comment-number'>$commentNumber comment(s)</span>";
+                }
+                $resultsHtml .= "
                                             </button>
 
                                         </div>
@@ -520,6 +530,22 @@ class PostsResultsProvider {
         } catch (PDOException $e) {
             echo "Erreur lors de la récupération de l'info : " . $e->getMessage();
             return false;
+        }
+    }
+
+    private function countPostComments($postId) {
+        try {
+            $query = $this->con->prepare("SELECT COUNT(*) 
+                                          FROM comments 
+                                          WHERE postId = :postId
+                                        ");
+            $query->bindParam(":postId", $postId, PDO::PARAM_INT);
+            $query->execute();
+            return $query->fetchColumn();
+
+        } catch (PDOException $e) {
+            echo "Erreur dans la requête : " . $e->getMessage();
+            return 0;
         }
     }
     

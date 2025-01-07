@@ -143,6 +143,7 @@
         }
         .btn{
             margin-top: -5px;
+            --bs-btn-padding-x : 0.30rem !important;
         }
         .comment-list{
             margin-bottom: 10px;
@@ -162,7 +163,10 @@
         .liked {
             color: #1E90FF;
         }
-
+        .like-number, .comment-number{
+            font-size: 0.8rem;
+            padding-top: 5px;
+        }
         
     </style>
     <script src="https://code.jquery.com/jquery-3.3.1.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
