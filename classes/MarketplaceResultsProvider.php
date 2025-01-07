@@ -82,6 +82,7 @@ class MarketplaceResultsProvider {
                 $price = $row["price"];
                 $isFeatured = $row["isFeatured"];
                 $profilePicture = $row["profile_photo"] ?: "https://via.placeholder.com/150";
+                $ville = $row['city'];
 
                 // Truncation des champs title et description si nécessaire
                 $title = $this->trimField($title, 120);
@@ -117,7 +118,7 @@ class MarketplaceResultsProvider {
                     $resultsHtml .=     "</div>
                         <div>
                             <span class='description'>$description</span><br/>
-                            <span class='price'>$price €</span>
+                            <span class='price'>$price € - $ville</span>
                         </div>
                     </div>
                 </div>";
