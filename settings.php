@@ -320,6 +320,42 @@
     elseif ($formId === 'messageReply') {
       if($_POST['parent_id'] > 0 && trim($_POST['content'] !== "")) {
         if ($messageProvider->sendMessage($userId, NULL, $_POST['content'], NULL,$_POST['parent_id'])) {
+          $exchange = $messageProvider->getMessageDetailsByParendId($_POST['parent_id']);
+          if($exchange) {
+              $receiverId = $exchange->fromUserId == $userId ? $exchange->toUserId : $exchange->fromUserId;
+              if($userId !== $receiverId ) {
+                // send email to receiverId
+                $receiverInfo = $userRegistration->getUserInfo($receiverId);
+                try {
+                  $username = $_SESSION['user_username'];
+                  $message  = "
+                  <html>
+                  <head>
+                      <title>Nouveau message sur Underdex !</title>
+                  </head>
+                  <p>Bonjour, </p>
+                  <p>L'utilisateur $username vous a envoyé un message sur Underdex !</p>
+                  <p>Cordialement,<br> Underdex Team</p>
+                  </body>
+                  </html>
+                  ";
+                  // Set headers for HTML content
+                  $headers = "MIME-Version: 1.0" . "\r\n";
+                  $headers .= "Content-type: text/html; charset=UTF-8" . "\r\n";
+          
+                  // Additional headers
+                  $headers .= "From: udx@underdex.com" . "\r\n";
+                  $headers .= "Reply-To: udx@underdex.com" . "\r\n";
+                  $headers .= "X-Mailer: PHP/" . phpversion();
+          
+                  mail($receiverInfo['email'], "Nouveau message sur Underdex !", $message, $headers);
+                  
+                } catch (Exception $e) {
+                    // Si l'envoi échoue, affichage de l'erreur
+                    return "Le message n'a pas pu être envoyé. Erreur: {$mail->ErrorInfo}";
+                }
+              }
+          }
           echo "<script>
               document.addEventListener('DOMContentLoaded', function() {
                   Swal.fire({
