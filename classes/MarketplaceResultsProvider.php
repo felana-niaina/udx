@@ -162,6 +162,8 @@ class MarketplaceResultsProvider {
                 $price = $row["price"] . " €";
                 $image = is_null($row['picture']) || $row['picture'] == '' ? "https://via.placeholder.com/150" : $this->siteUrl. '/' .$row['picture'];
                 $date = $row["createdDate"];
+                $ville = $row['city'];
+                $category = $row['category'];
 
                 // Truncation des champs title et description si nécessaire
                 $title = $this->trimField($title, 120);
@@ -175,7 +177,7 @@ class MarketplaceResultsProvider {
                     <p class='product-price'>$price</p>
                     <p class='product-description'>$description</p>
                     <div class='product-actions' id='actionProduct-$id'>
-                        <a href='#' class='editProduct' data-toggle='modal' data-target='#productModal' data-title='$title' data-description='$description.' data-price='$price' data-keywords='$keywords' data-image='$image' data-date='$date' data-id='$id'>Modifier</a> | <a href='#' class='removeProductButton' data-toggle='modal' data-target='#removeProductModal' data-title='$title' data-id='$id'>Supprimer</a>
+                        <a href='#' class='editProduct' data-toggle='modal' data-target='#productModal' data-title='$title' data-description='$description.' data-price='$price' data-keywords='$keywords' data-image='$image' data-date='$date' data-id='$id' data-city='$ville' data-category='$category'>Modifier</a> | <a href='#' class='removeProductButton' data-toggle='modal' data-target='#removeProductModal' data-title='$title' data-id='$id'>Supprimer</a>
                     </div>
                 </div>
               </div>";
@@ -230,7 +232,7 @@ class MarketplaceResultsProvider {
         }
     }
 
-    public function updateProduct($productId, $userId, $name, $description, $price, $tags, $picture) {
+    public function updateProduct($productId, $userId, $name, $description, $price, $tags, $city, $category, $picture = NULL) {
         try {
             $targetFile = '';
     
@@ -272,7 +274,9 @@ class MarketplaceResultsProvider {
                     description = :description, 
                     price = :price, 
                     keywords = :keywords,
-                    userId = :userId" .
+                    userId = :userId,
+                    city = :city,
+                    category = :category " .
                     (!empty($targetFile) ? ", picture = :picture" : "") . 
                 " WHERE id = :productId";
     
@@ -282,6 +286,8 @@ class MarketplaceResultsProvider {
             $stmt->bindParam(':price', $price);
             $stmt->bindParam(':keywords', $tags);
             $stmt->bindParam(':userId', $userId);
+            $stmt->bindParam(':city', $city);
+            $stmt->bindParam(':category', $category);
             $stmt->bindParam(':productId', $productId);
     
             // Ajouter l'image à la requête seulement si elle a été modifiée

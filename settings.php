@@ -150,13 +150,13 @@
     elseif ($formId === 'updateProduct') {
       $selectedProduct = $marketPlaceProvider->getProductById($_POST['productId']);
       $currentPicture = $selectedProduct->picture;
-      if($userId && $_POST['productId'] && $_POST['productNameUpdated'] && $_POST['productDescriptionUpdated'] && $_POST['productPriceUpdated'] && $_POST['productTagsUpdated']) {
+      if($userId && $_POST['productId'] && $_POST['productNameUpdated'] && $_POST['productDescriptionUpdated'] && $_POST['productPriceUpdated'] && $_POST['productTagsUpdated'] && $_POST['productCity'] && $_POST['productCaterogy']) {
         $productPicture = isset($_FILES['productPictureUpdated']['tmp_name']) && !empty($_FILES['productPictureUpdated']['tmp_name']) 
             ? $_FILES['productPictureUpdated'] 
             : $currentPicture;
 
         $MarketplaceResultsProvider = new MarketplaceResultsProvider($con);
-        if ($MarketplaceResultsProvider->updateProduct($_POST['productId'],$userId,$_POST['productNameUpdated'], $_POST['productDescriptionUpdated'], $_POST['productPriceUpdated'], $_POST['productTagsUpdated'], $productPicture)) {
+        if ($MarketplaceResultsProvider->updateProduct($_POST['productId'],$userId,$_POST['productNameUpdated'], $_POST['productDescriptionUpdated'], $_POST['productPriceUpdated'], $_POST['productTagsUpdated'], $_POST['productCity'], $_POST['productCaterogy'], $productPicture)) {
           echo "<script>
               document.addEventListener('DOMContentLoaded', function() {
                   Swal.fire({
@@ -1070,6 +1070,23 @@
                             <textarea id="productPrice" class="form-control" placeholder="Prix de l'article" name="productPriceUpdated" required></textarea>
                         </div>
 
+                        <!-- Ville -->
+                        <div class="form-group">
+                            <label for="ville">Ville</label>
+                            <input type="text" class="form-control" id="updateVille" placeholder="Ville" name="productCity" required>
+                        </div>
+                        
+                        <!-- Category -->
+                        <div class="form-group">
+                          <label for="category">Categorie</label>
+                          <select class="form-control" id="updateProductCaterogy" name="productCaterogy" required>
+                            <option value="" disabled selected>-- Select an option --</option>
+                            <?php foreach ($marketPlaceProvider->getCategoryList() as $key => $value) { ?>
+                              <option value="<?php echo $value['id'] ?>"><?php echo $value['title'] ?></option>
+                            <?php } ?>
+                          </select>
+                        </div>
+
                         <!-- Mots-clés -->
                         <div class="form-group">
                             <label for="keywords">Mots-clés</label>
@@ -1141,12 +1158,15 @@
                 </div>
                 
                 <!-- Category -->
-                <select class="form-control" id="productCaterogy" name="productCaterogy" required>
-                  <option value="" disabled selected>-- Select an option --</option>
-                  <?php foreach ($marketPlaceProvider->getCategoryList() as $key => $value) { ?>
-                    <option value="<?php echo $value['id'] ?>"><?php echo $value['title'] ?></option>
-                  <?php } ?>
-                </select>
+                <div class="form-group">
+                  <label for="category">Categorie</label>
+                  <select class="form-control" id="productCaterogy" name="productCaterogy" required>
+                    <option value="" disabled selected>-- Select an option --</option>
+                    <?php foreach ($marketPlaceProvider->getCategoryList() as $key => $value) { ?>
+                      <option value="<?php echo $value['id'] ?>"><?php echo $value['title'] ?></option>
+                    <?php } ?>
+                  </select>
+                </div>
 
                 <!-- Mots-clés -->
                 <div class="form-group">
@@ -1362,6 +1382,8 @@
         var keywords = $(this).data('keywords');
         var image = $(this).data('image');
         var date = $(this).data('date');
+        var city = $(this).data('city');
+        var category = $(this).data('category');
 
         $('#productTitle').text(title);
         $('#productTags').text(keywords);
@@ -1369,6 +1391,8 @@
         $('#productId').text(id);
         $('#productDescription').text(description);
         $('#productDate').text(date);
+        $('#updateVille').val(city);
+        $('#updateProductCaterogy').val(category);
 
         // Préremplir un aperçu d'image si disponible
         if (image) {
