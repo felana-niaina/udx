@@ -4,10 +4,12 @@ session_start();
 
 include_once '../classes/DatabaseConnector.php';
 include_once '../classes/PostsResultsProvider.php';
+include_once '../classes/NotificationProvider.php';
 
 $database = new DatabaseConnector();
 $con = $database->getConnection();
 $ResultsProvider = new PostsResultsProvider($con);
+$NotifProvider = new NotificationProvider($con);
 
 if(isset($_POST["productId"])){
     // get post by Id
@@ -25,9 +27,12 @@ if(isset($_POST["productId"])){
     if($result['success']) {
         // Send email into post owner
         $postInfo = $ResultsProvider->getPostInfo($postId);
-        $username = $_SESSION['user_username'];
-        $paragraphe = "L'utilisateur $username a commenté votre post dans le Feed !";
-        sendMail($postInfo->email, "Nouveau commentaire sur Underdex !", $paragraphe);
+        $userNotifSetting = $NotifProvider->getUserSetting($postInfo->userId);
+        if(is_null($userNotifSetting) || $userNotifSetting->isComment == 1 ) {
+            $username = $_SESSION['user_username'];
+            $paragraphe = "L'utilisateur $username a commenté votre post dans le Feed !";
+            sendMail($postInfo->email, "Nouveau commentaire sur Underdex !", $paragraphe);
+        }
     }
     echo json_encode($result);
 }elseif (isset($_POST['postLike'])){
@@ -39,9 +44,12 @@ if(isset($_POST["productId"])){
     if($result['success'] && $result['isLiked']) {
         // Send email into post owner
         $postInfo = $ResultsProvider->getPostInfo($postId);
-        $username = $_SESSION['user_username'];
-        $paragraphe = "L'utilisateur $username vous a donné un like dans le Feed !";
-        sendMail($postInfo->email, "Nouveau like sur Underdex !", $paragraphe);
+        $userNotifSetting = $NotifProvider->getUserSetting($postInfo->userId);
+        if(is_null($userNotifSetting) || $userNotifSetting->isLiked == 1 ) {
+            $username = $_SESSION['user_username'];
+            $paragraphe = "L'utilisateur $username vous a donné un like dans le Feed !";
+            sendMail($postInfo->email, "Nouveau like sur Underdex !", $paragraphe);
+        }
     }
     echo json_encode($result);
 

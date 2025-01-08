@@ -6,6 +6,7 @@ include_once 'classes/UserRegistration.php';
 include_once 'classes/MarketplaceResultsProvider.php';
 include_once 'classes/PostsResultsProvider.php';
 include_once 'classes/MessageResultsProvider.php';
+include_once 'classes/NotificationProvider.php';
 
 ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
@@ -32,6 +33,7 @@ if ($userIdParam) {
 $PostsResultsProvider = new PostsResultsProvider($con);
 $messageResult = new MessageResultsProvider($con);
 $MarketplaceResultsProvider = new MarketplaceResultsProvider($con);
+$NotifProvider = new NotificationProvider($con);
 $userInfo = $userRegistration->getUserInfo($userId);
 $coverPhoto = is_null($userInfo['cover_photo']) ? 'uploads/default_cover.jpg' : $userInfo['cover_photo'];
 $profilePhoto = is_null($userInfo['profile_photo']) ? 'https://via.placeholder.com/150' : $userInfo['profile_photo'];
@@ -162,35 +164,39 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $result = $messageResult->sendMessage($fromUserId,$toUserId, $message, $subject);
 
         if ($result) {
-            // Send email
-            try {
-                $username = $_SESSION['user_username'];
-                $message  = "
-                <html>
-                <head>
-                    <title>Nouveau message sur Underdex !</title>
-                </head>
-                <p>Bonjour, </p>
-                <p>L'utilisateur $username vous a envoyé un message sur Underdex !</p>
-                <p>Cordialement,<br> Underdex Team</p>
-                </body>
-                </html>
-                ";
-                // Set headers for HTML content
-                $headers = "MIME-Version: 1.0" . "\r\n";
-                $headers .= "Content-type: text/html; charset=UTF-8" . "\r\n";
-        
-                // Additional headers
-                $headers .= "From: udx@underdex.com" . "\r\n";
-                $headers .= "Reply-To: udx@underdex.com" . "\r\n";
-                $headers .= "X-Mailer: PHP/" . phpversion();
-        
-                mail($visitor['email'], "Nouveau message sur Underdex !", $message, $headers);
-                
-            } catch (Exception $e) {
-                // Si l'envoi échoue, affichage de l'erreur
-                return "Le message n'a pas pu être envoyé. Erreur: {$mail->ErrorInfo}";
+            $userNotifSetting = $NotifProvider->getUserSetting($toUserId);
+            if(is_null($userNotifSetting) || $userNotifSetting->isMessage == 1 ) {
+                // Send email
+                try {
+                    $username = $_SESSION['user_username'];
+                    $message  = "
+                    <html>
+                    <head>
+                        <title>Nouveau message sur Underdex !</title>
+                    </head>
+                    <p>Bonjour, </p>
+                    <p>L'utilisateur $username vous a envoyé un message sur Underdex !</p>
+                    <p>Cordialement,<br> Underdex Team</p>
+                    </body>
+                    </html>
+                    ";
+                    // Set headers for HTML content
+                    $headers = "MIME-Version: 1.0" . "\r\n";
+                    $headers .= "Content-type: text/html; charset=UTF-8" . "\r\n";
+            
+                    // Additional headers
+                    $headers .= "From: udx@underdex.com" . "\r\n";
+                    $headers .= "Reply-To: udx@underdex.com" . "\r\n";
+                    $headers .= "X-Mailer: PHP/" . phpversion();
+            
+                    mail($visitor['email'], "Nouveau message sur Underdex !", $message, $headers);
+                    
+                } catch (Exception $e) {
+                    // Si l'envoi échoue, affichage de l'erreur
+                    return "Le message n'a pas pu être envoyé. Erreur: {$mail->ErrorInfo}";
+                }
             }
+            
             echo "<script>
                     document.addEventListener('DOMContentLoaded', function() {
                         Swal.fire({
@@ -216,35 +222,38 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         try {
             $result = $userRegistration->updateFollowers($followedId, $followerId);
             if ($result) {
-                // Send email
-                try {
-                    $username = $_SESSION['user_username'];
-                    $message  = "
-                    <html>
-                    <head>
-                        <title>Nouveau follower sur Underdex !</title>
-                    </head>
-                    <p>Bonjour, </p>
-                    <p>L’utilisateur $username vous suit désormais sur Underdex !</p>
-                    <p>Vous avez du succès, félicitations !</p>
-                    <p>Cordialement,<br> Underdex Team</p>
-                    </body>
-                    </html>
-                    ";
-                    // Set headers for HTML content
-                    $headers = "MIME-Version: 1.0" . "\r\n";
-                    $headers .= "Content-type: text/html; charset=UTF-8" . "\r\n";
-            
-                    // Additional headers
-                    $headers .= "From: udx@underdex.com" . "\r\n";
-                    $headers .= "Reply-To: udx@underdex.com" . "\r\n";
-                    $headers .= "X-Mailer: PHP/" . phpversion();
-            
-                    mail($visitor['email'], "Nouveau follower sur Underdex !", $message, $headers);
-                    
-                } catch (Exception $e) {
-                    // Si l'envoi échoue, affichage de l'erreur
-                    echo "Le message n'a pas pu être envoyé. Erreur: {$mail->ErrorInfo}";
+                $userNotifSetting = $NotifProvider->getUserSetting($visitor['id']);
+                if(is_null($userNotifSetting) || $userNotifSetting->isFollower == 1 ) {
+                    // Send email
+                    try {
+                        $username = $_SESSION['user_username'];
+                        $message  = "
+                        <html>
+                        <head>
+                            <title>Nouveau follower sur Underdex !</title>
+                        </head>
+                        <p>Bonjour, </p>
+                        <p>L’utilisateur $username vous suit désormais sur Underdex !</p>
+                        <p>Vous avez du succès, félicitations !</p>
+                        <p>Cordialement,<br> Underdex Team</p>
+                        </body>
+                        </html>
+                        ";
+                        // Set headers for HTML content
+                        $headers = "MIME-Version: 1.0" . "\r\n";
+                        $headers .= "Content-type: text/html; charset=UTF-8" . "\r\n";
+                
+                        // Additional headers
+                        $headers .= "From: udx@underdex.com" . "\r\n";
+                        $headers .= "Reply-To: udx@underdex.com" . "\r\n";
+                        $headers .= "X-Mailer: PHP/" . phpversion();
+                
+                        mail($visitor['email'], "Nouveau follower sur Underdex !", $message, $headers);
+                        
+                    } catch (Exception $e) {
+                        // Si l'envoi échoue, affichage de l'erreur
+                        echo "Le message n'a pas pu être envoyé. Erreur: {$mail->ErrorInfo}";
+                    }
                 }
 
                 $profilName = trim($_GET['name']);
