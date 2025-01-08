@@ -9,6 +9,7 @@
   include_once 'classes/BillingResultsProvider.php'; 
   include_once 'classes/AdsResultsProvider.php';
   include_once 'classes/MessageResultsProvider.php';
+  include_once 'classes/NotificationProvider.php';
 
   // Créer une instance de la classe DatabaseConnector
   $database = new DatabaseConnector();
@@ -28,6 +29,7 @@
   $postsProvider = new PostsResultsProvider($con);
   $messageProvider = new MessageResultsProvider($con);
   $BillingResultsProvider = new BillingResultsProvider($con);
+  $NotifProvider = new NotificationProvider($con);
 
   // Récupérer l'ID utilisateur à partir de la session
   $userId = $_SESSION['user_id'];
@@ -35,6 +37,7 @@
   // Récupérer les informations de l'utilisateur
   $userInfo = $userRegistration->getUserInfo($userId);
   $userAd = $AdsProvider->getUserAd($userId);
+  $userNotifSetting = $NotifProvider->getUserSetting($userId);
   if($userAd) {
     // find ads type $userAd->adsTypeId
     $adType = $AdsProvider->getAdType($userAd->adsTypeId);
@@ -1063,16 +1066,18 @@
                       </div>
                   </div>
               </div>
-              <form>
+              <form method="post" id="notificationForm">
+                <input type="hidden" name="form_id" value="notificationSetting">
+                <input type="hidden" name="user_id" value="<?php echo $_SESSION['user_id'] ?>">
                 <div class="form-group">
                   <label class="d-block mb-0">Security Alerts</label>
                   <div class="small text-muted mb-3">Receive security alert notifications via email</div>
                   <div class="custom-control custom-checkbox">
-                    <input type="checkbox" class="custom-control-input" id="customCheck1" checked="">
+                    <input type="checkbox" class="custom-control-input notifSetting" id="customCheck1" <?php echo !is_null($userNotifSetting) && $userNotifSetting->isVulnerability ? 'checked' : '' ?> name="setVulnerability">
                     <label class="custom-control-label" for="customCheck1">Email each time a vulnerability is found</label>
                   </div>
                   <div class="custom-control custom-checkbox">
-                    <input type="checkbox" class="custom-control-input" id="customCheck2" checked="">
+                    <input type="checkbox" class="custom-control-input notifSetting" id="customCheck2" <?php echo !is_null($userNotifSetting) && $userNotifSetting->isSummary ? 'checked' : '' ?> name="setSummary">
                     <label class="custom-control-label" for="customCheck2">Email a digest summary of vulnerability</label>
                   </div>
                 </div>
@@ -1082,28 +1087,28 @@
                     <li class="list-group-item has-icon">
                       Commentaires
                       <div class="custom-control custom-control-nolabel custom-switch ml-auto">
-                        <input type="checkbox" class="custom-control-input" id="customSwitch1" checked="">
+                        <input type="checkbox" class="custom-control-input notifSetting" id="customSwitch1" <?php echo !is_null($userNotifSetting) && $userNotifSetting->isComment ? 'checked' : '' ?> name="setComment">
                         <label class="custom-control-label" for="customSwitch1"></label>
                       </div>
                     </li>
                     <li class="list-group-item has-icon">
                       Likes
                       <div class="custom-control custom-control-nolabel custom-switch ml-auto">
-                        <input type="checkbox" class="custom-control-input" id="customSwitch2">
+                        <input type="checkbox" class="custom-control-input notifSetting" id="customSwitch2" <?php echo !is_null($userNotifSetting) && $userNotifSetting->isLiked ? 'checked' : '' ?> name="setLike">
                         <label class="custom-control-label" for="customSwitch2"></label>
                       </div>
                     </li>
                     <li class="list-group-item has-icon">
                       Messages
                       <div class="custom-control custom-control-nolabel custom-switch ml-auto">
-                        <input type="checkbox" class="custom-control-input" id="customSwitch3" checked="">
+                        <input type="checkbox" class="custom-control-input notifSetting" id="customSwitch3" <?php echo !is_null($userNotifSetting) && $userNotifSetting->isMessage ? 'checked' : '' ?> name="setMessage">
                         <label class="custom-control-label" for="customSwitch3"></label>
                       </div>
                     </li>
                     <li class="list-group-item has-icon">
                       Followers
                       <div class="custom-control custom-control-nolabel custom-switch ml-auto">
-                        <input type="checkbox" class="custom-control-input" id="customSwitch4" checked="">
+                        <input type="checkbox" class="custom-control-input notifSetting" id="customSwitch4" <?php echo !is_null($userNotifSetting) && $userNotifSetting->isFollower ? 'checked' : '' ?> name="setFollower">
                         <label class="custom-control-label" for="customSwitch4"></label>
                       </div>
                     </li>
@@ -1735,7 +1740,23 @@
             }            
           });
         }
-      })
+      });
+
+      $(document).on('change', '.notifSetting', function(e){
+        $.post("ajax/notification.php", {
+          data : $("#notificationForm").serialize()
+        }).done(function(result){
+          if(result) {
+            Swal.fire({
+              text: 'Modification effectuée avec succès',
+              icon: 'success',
+              showCloseButton: false,
+              showConfirmButton: false,
+              timer: 1000
+            })
+          }
+        })
+      });
     })
 
 
