@@ -42,7 +42,7 @@ class NotificationProvider {
         try {
             $existingSetting = $this->getUserSetting($userId);
             $isComment = isset($params['setComment']) ? 1 : 0;
-            $isLiked = isset($params['setLiked']) ? 1 : 0;
+            $isLiked = isset($params['setLike']) ? 1 : 0;
             $isFollower = isset($params['setFollower']) ? 1 : 0;
             $isMessage = isset($params['setMessage']) ? 1 : 0;
             $isVulnerability = isset($params['setVulnerability']) ? 1 : 0;
