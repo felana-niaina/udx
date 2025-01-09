@@ -27,11 +27,15 @@ if(isset($_POST["productId"])){
     if($result['success']) {
         // Send email into post owner
         $postInfo = $ResultsProvider->getPostInfo($postId);
-        $userNotifSetting = $NotifProvider->getUserSetting($postInfo->userId);
-        if(is_null($userNotifSetting) || $userNotifSetting->isComment == 1 ) {
-            $username = $_SESSION['user_username'];
-            $paragraphe = "L'utilisateur $username a commenté votre post dans le Feed !";
-            sendMail($postInfo->email, "Nouveau commentaire sur Underdex !", $paragraphe);
+        if(intval($userId) !== intval($postInfo->userId)) {
+            // insert notification
+            $NotifProvider->addNotification('comments', $postId, $userId, $postInfo->userId);
+            $userNotifSetting = $NotifProvider->getUserSetting($postInfo->userId);
+            if(is_null($userNotifSetting) || $userNotifSetting->isComment == 1 ) {
+                $username = $_SESSION['user_username'];
+                $paragraphe = "L'utilisateur $username a commenté votre post dans le Feed !";
+                sendMail($postInfo->email, "Nouveau commentaire sur Underdex !", $paragraphe);
+            }
         }
     }
     echo json_encode($result);
@@ -42,13 +46,18 @@ if(isset($_POST["productId"])){
     $postId = $_POST['postId'];
     $result = $ResultsProvider->toggleLikePost($likerId, $likedId, $postId);
     if($result['success'] && $result['isLiked']) {
-        // Send email into post owner
-        $postInfo = $ResultsProvider->getPostInfo($postId);
-        $userNotifSetting = $NotifProvider->getUserSetting($postInfo->userId);
-        if(is_null($userNotifSetting) || $userNotifSetting->isLiked == 1 ) {
-            $username = $_SESSION['user_username'];
-            $paragraphe = "L'utilisateur $username vous a donné un like dans le Feed !";
-            sendMail($postInfo->email, "Nouveau like sur Underdex !", $paragraphe);
+        if($likerId !== $likedId ) {
+            // insert notification
+            $NotifProvider->addNotification('likers', $postId, $likerId, $likedId);
+
+            // Send email into post owner
+            $postInfo = $ResultsProvider->getPostInfo($postId);
+            $userNotifSetting = $NotifProvider->getUserSetting($postInfo->userId);
+            if(is_null($userNotifSetting) || $userNotifSetting->isLiked == 1 ) {
+                $username = $_SESSION['user_username'];
+                $paragraphe = "L'utilisateur $username vous a donné un like dans le Feed !";
+                sendMail($postInfo->email, "Nouveau like sur Underdex !", $paragraphe);
+            }
         }
     }
     echo json_encode($result);

@@ -471,7 +471,7 @@ class PostsResultsProvider {
                 $stmtInsert->execute();
                 $this->addLikerNumber($postId);
 
-                return ['success' => true, 'isLiked' => true];
+                return ['success' => true, 'isLiked' => true, 'item' => $postId];
 
             }
           
