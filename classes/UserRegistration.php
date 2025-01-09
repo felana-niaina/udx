@@ -335,6 +335,7 @@ class UserRegistration {
     
             return ['success' => true, 
             'message' => 'Félicitations ! Vous suivez désormais cet utilisateur.',
+            'item' => $this->con->lastInsertId()
         ];
     
         } catch (PDOException $e) {

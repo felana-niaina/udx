@@ -224,7 +224,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         try {
             $result = $userRegistration->updateFollowers($followedId, $followerId);
-            if ($result) {
+            if ($result['success']) {
+                // insert notification
+                $NotifProvider->addNotification('followers', $result['item'], $followerId, $followedId);
+
                 $userNotifSetting = $NotifProvider->getUserSetting($visitor['id']);
                 if(is_null($userNotifSetting) || $userNotifSetting->isFollower == 1 ) {
                     // Send email
