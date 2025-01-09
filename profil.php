@@ -164,6 +164,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $result = $messageResult->sendMessage($fromUserId,$toUserId, $message, $subject);
 
         if ($result) {
+            // insert notification
+            $NotifProvider->addNotification('message', $result, $fromUserId, $toUserId);
+
             $userNotifSetting = $NotifProvider->getUserSetting($toUserId);
             if(is_null($userNotifSetting) || $userNotifSetting->isMessage == 1 ) {
                 // Send email

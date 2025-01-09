@@ -1,8 +1,15 @@
 <?php 
     $isUserConnected = false;
+    $notifNumber = 1;
     session_start();
     if(!empty($_SESSION)) {
         $isUserConnected = true;
+        include_once 'classes/DatabaseConnector.php';
+        include_once 'classes/NotificationProvider.php';
+        $database = new DatabaseConnector();
+        $con = $database->getConnection();
+        $NotifProvider = new NotificationProvider($con);
+        $notifNumber = 2;
     };
 ?>
 <!doctype html>
@@ -201,7 +208,7 @@
                     <span class="d-inline-block d-lg-block">
                         <a href="#" class="text-black site-menu-toggle js-menu-toggle py-5">
                             <span class="far fa-bell h3 text-white position-relative">
-                                <span class="notification-badge">1</span> <!-- Le nombre de notifications -->
+                                <span class="notification-badge"><? echo $notifNumber ?></span> <!-- Le nombre de notifications -->
                             </span>
                         </a>
                     </span>

@@ -51,7 +51,7 @@ class MessageResultsProvider {
                     // Exécuter la requête d'update
                     $stmt->execute();
                 }
-                return true;
+                return $messageId;
             }
             return false;
         } catch (PDOException $e) {

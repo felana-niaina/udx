@@ -322,14 +322,17 @@
     // reply message
     elseif ($formId === 'messageReply') {
       if($_POST['parent_id'] > 0 && trim($_POST['content'] !== "")) {
-        if ($messageProvider->sendMessage($userId, NULL, $_POST['content'], NULL,$_POST['parent_id'])) {
+        $messageResult = $messageProvider->sendMessage($userId, NULL, $_POST['content'], NULL,$_POST['parent_id']);
+        if ($messageResult) {
           $exchange = $messageProvider->getMessageDetailsByParendId($_POST['parent_id']);
           if($exchange) {
               $receiverId = $exchange->fromUserId == $userId ? $exchange->toUserId : $exchange->fromUserId;
               if($userId !== $receiverId ) {
+                // insert notification
+                $NotifProvider->addNotification('message', $messageResult, $userId, $receiverId);
                 // send email to receiverId
                 $receiverInfo = $userRegistration->getUserInfo($receiverId);
-                $receiverInfoSetting = $NotifProvider->getUserSetting($receiverInfo);
+                $receiverInfoSetting = $NotifProvider->getUserSetting($receiverId);
                 if(is_null($receiverInfoSetting) || $receiverInfoSetting->isMessage == 1 ) {
                   try {
                     $username = $_SESSION['user_username'];

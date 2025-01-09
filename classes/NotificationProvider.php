@@ -90,5 +90,26 @@ class NotificationProvider {
         }
     }
 
+    public function addNotification($type, $itemId, $fromUserId, $forUserId) {
+        try {
+            // insert
+            $sql = "INSERT INTO notifications (type, itemId, fromUserId, forUserId) VALUES (:type, :itemId, :fromUserId, :forUserId)";
+            $stmt = $this->con->prepare($sql);
+            $stmt->bindParam(':type', $type);
+            $stmt->bindParam(':itemId', $itemId);
+            $stmt->bindParam(':fromUserId', $fromUserId);
+            $stmt->bindParam(':forUserId', $forUserId);
+            $stmt->execute();
+            $notifId = $this->con->lastInsertId();
+            if ($notifId) {
+                return true;
+            }
+            return false;
+        } catch (PDOException $e) {
+            echo "Erreur lors de l'enregistrement : " . $e->getMessage();
+            return false;
+        }
+    }
+
 }
 ?>
