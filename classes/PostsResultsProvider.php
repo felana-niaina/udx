@@ -264,14 +264,16 @@ class PostsResultsProvider {
         return substr($string, 0, $characterLimit) . $dots;
     }
 
-    public function createPost($userId, $postTitle, $postDescription, $postCategory){
+    // public function createPost($userId, $postTitle, $postDescription, $postCategory){
+    public function createPost($userId, $postTitle, $postDescription){
         try {
-            $sql = "INSERT INTO posts (title, description, userId, categoryId) VALUES (:title, :description, :userId, :categoryId)";
+            // $sql = "INSERT INTO posts (title, description, userId, categoryId) VALUES (:title, :description, :userId, :categoryId)";
+            $sql = "INSERT INTO posts (title, description, userId) VALUES (:title, :description, :userId)";
             $stmt = $this->con->prepare($sql);
             $stmt->bindParam(':title', $postTitle);
             $stmt->bindParam(':description', $postDescription);
             $stmt->bindParam(':userId', $userId);
-            $stmt->bindParam(':categoryId', $postCategory);
+            // $stmt->bindParam(':categoryId', $postCategory);
             $stmt->execute();
             $postId = $this->con->lastInsertId();
             if ($postId) {
@@ -409,17 +411,19 @@ class PostsResultsProvider {
         }
     }
 
-    public function updatePost($userId, $postId, $title, $description, $keywords, $categoryId){
+    // public function updatePost($userId, $postId, $title, $description, $keywords, $categoryId){
+    public function updatePost($userId, $postId, $title, $description, $keywords){
         try {
             $sql = "UPDATE posts 
-                    SET title = :title, description = :description, keywords = :keywords, categoryId = :categoryId
+                    -- SET title = :title, description = :description, keywords = :keywords, categoryId = :categoryId
+                    SET title = :title, description = :description, keywords = :keywords
                     WHERE id = :postId AND userId = :userId";
             $stmt = $this->con->prepare($sql);
 
             $stmt->bindParam(':title', $title);
             $stmt->bindParam(':description', $description);
             $stmt->bindParam(':keywords', $keywords);
-            $stmt->bindParam(':categoryId', $categoryId);
+            // $stmt->bindParam(':categoryId', $categoryId);
             $stmt->bindParam(':postId', $postId);
             $stmt->bindParam(':userId', $userId);
 

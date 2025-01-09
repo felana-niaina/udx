@@ -112,8 +112,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     // Publication d'un nouveau post
     elseif ($formId === 'publishPost') {
-        if($userId && $_POST['postTitle'] && $_POST['postDescription'] && $_POST['postCategory']) {
-            if ($PostsResultsProvider->createPost($userId,$_POST['postTitle'], $_POST['postDescription'], $_POST['postCategory'])) {
+        // if($userId && $_POST['postTitle'] && $_POST['postDescription'] && $_POST['postCategory']) {
+        if($userId && $_POST['postTitle'] && $_POST['postDescription']) {
+            // if ($PostsResultsProvider->createPost($userId,$_POST['postTitle'], $_POST['postDescription'], $_POST['postCategory'])) {
+            if ($PostsResultsProvider->createPost($userId,$_POST['postTitle'], $_POST['postDescription'])) {
               echo "<script>
                   document.addEventListener('DOMContentLoaded', function() {
                       Swal.fire({
@@ -686,16 +688,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         <div class="form-group">
                             <textarea class="form-control" rows="4" placeholder="Description du post" name="postDescription" required></textarea>
                         </div>
-                        <div class="form-group row">
+                        <!-- <div class="form-group row">
                             <label for="postCategory" class="col-sm-2 col-form-label">Catégorie du post</label>
                             <div class="col-sm-10">
                                 <select id="postCategory" class="form-control" name="postCategory" required>
-                                    <?php foreach ($PostsResultsProvider->getPostCategories() as $key => $value) { ?>
+                                    <?php /*foreach ($PostsResultsProvider->getPostCategories() as $key => $value) { ?>
                                         <option value="<?php echo $value['id'] ?>"><?php echo $value['title'] ?></option>
-                                    <?php } ?>
+                                    <?php }*/  ?>
                                 </select>
                             </div>
-                        </div>
+                        </div> -->
                         <button type="submit" class="btn btn-primary mt-2">Publier</button>
                     </form>
                 </div>

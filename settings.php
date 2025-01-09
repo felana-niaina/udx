@@ -74,7 +74,6 @@
   if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     // Vérifier quel formulaire a été soumis
     $formId = $_POST['form_id'] ?? '';
-    // var_dump($_POST); die();
 
     if (isset($_POST['reset_changes'])) {
         // Si le bouton "Reset Changes" a été soumis, gérer la réinitialisation
@@ -402,7 +401,8 @@
     }
 
     elseif ($formId === 'updatePost' && isset($_POST['post_id']) && $userId) {
-      if ($postsProvider->updatePost($userId,$_POST['post_id'],$_POST['postTitle'], $_POST['postDescription'], $_POST['postKeyword'], $_POST['postCategory'])) {
+      // if ($postsProvider->updatePost($userId,$_POST['post_id'],$_POST['postTitle'], $_POST['postDescription'], $_POST['postKeyword'], $_POST['postCategory'])) {
+      if ($postsProvider->updatePost($userId,$_POST['post_id'],$_POST['postTitle'], $_POST['postDescription'], $_POST['postKeyword'])) {
         echo "<script>
             document.addEventListener('DOMContentLoaded', function() {
                 Swal.fire({
@@ -1417,13 +1417,13 @@
                   <div class="form-group">
                     <textarea class="form-control" rows="4" placeholder="Description du post" id="postDescription" name="postDescription" required></textarea>
                   </div>
-                  <div class="form-group">
+                  <!-- <div class="form-group">
                     <select id="postCategory" class="form-control" name="postCategory" required>
-                      <?php foreach ($postsProvider->getPostCategories() as $key => $value) { ?>
+                      <?php /* foreach ($postsProvider->getPostCategories() as $key => $value) { ?>
                           <option value="<?php echo $value['id'] ?>"><?php echo $value['title'] ?></option>
-                      <?php } ?>
+                      <?php } */ ?>
                     </select>
-                  </div>
+                  </div> -->
                   <div class="form-group">
                     <input type="text" class="form-control" placeholder="Keywords" id="post-keys" name="postKeyword" required>
                   </div>
@@ -1703,13 +1703,13 @@
         var description = $(this).data('body');
         var keyword = $(this).data('keyword');
         var id = $(this).data('id');
-        var category = $(this).data('category');
+        // var category = $(this).data('category');
         var date = $(this).data('date');
         $('#postTitle').val(title);
         $('#post-keys').val(keyword);
         $('#post_id').val(id);
         $('#postDescription').text(description);
-        $('#postCategory').val(category);
+        // $('#postCategory').val(category);
       });
 
       $(document).on('click', '.page-item', function(e) {
