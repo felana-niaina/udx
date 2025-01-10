@@ -10,7 +10,7 @@
         $database = new DatabaseConnector();
         $con = $database->getConnection();
         $UserProvider = new UserRegistration($con);
-        $lastLogout = $UserProvider->getLastConnexionByUser($_SESSION['user_id']);
+        $lastLogout = $UserProvider->getLastHistoryByUser($_SESSION['user_id'], 'logout');
         $logoutDate = $lastLogout['createdDate'] ?? '2024-01-01';
         $NotifProvider = new NotificationProvider($con);
         $notifNumber = 2;

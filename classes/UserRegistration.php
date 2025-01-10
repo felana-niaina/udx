@@ -436,11 +436,12 @@ class UserRegistration {
         }
     }
 
-    public function getLastConnexionByUser($userId) {
+    public function getLastHistoryByUser($userId, $action) {
         try {
-            $sql = "SELECT * FROM historyLog WHERE userId = :userId ORDER BY createdDate DESC LIMIT 0,1";
+            $sql = "SELECT * FROM historyLog WHERE userId = :userId AND action = :action ORDER BY createdDate DESC LIMIT 0,1";
             $stmt = $this->con->prepare($sql);
             $stmt->bindParam(':userId', $userId);
+            $stmt->bindParam(':action', $action);
             $stmt->execute();
             
             $log = $stmt->fetch(PDO::FETCH_ASSOC);
