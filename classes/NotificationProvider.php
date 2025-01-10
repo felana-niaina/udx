@@ -111,5 +111,26 @@ class NotificationProvider {
         }
     }
 
+    public function getNotificationByType($type, $userId){
+        try {
+            $sql = "SELECT COUNT(*) AS notifNumber FROM notifications WHERE forUserId = :userId AND type = :type";
+            $stmt = $this->con->prepare($sql);
+            $stmt->bindParam(':userId', $userId);
+            $stmt->bindParam(':type', $type);
+            $stmt->execute();
+            
+            $notifs = $stmt->fetchColumn();
+            
+            if ($notifs) {
+                return $notifs;
+            } else {
+                return 0;  // L'utilisateur n'a pas de pub
+            }
+        } catch (PDOException $e) {
+            echo "Erreur lors de la récupération des données utilisateur : " . $e->getMessage();
+            return 0;
+        }
+    }
+
 }
 ?>

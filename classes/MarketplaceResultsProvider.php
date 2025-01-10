@@ -389,5 +389,22 @@ class MarketplaceResultsProvider {
             return [];
         }
     }
+
+    public function getLastProducts($createdDate) {
+        try {
+            $query = $this->con->prepare("SELECT COUNT(*) AS productNumber
+                                          FROM marketplace
+                                          WHERE createdDate >= :createdDate
+                                        ");
+            $query->execute([
+                'createdDate' => $createdDate
+            ]);
+            return $query->fetchColumn();
+
+        } catch (PDOException $e) {
+            echo "Erreur dans la requête : " . $e->getMessage();
+            return 0;
+        }
+    }
 }
 ?>

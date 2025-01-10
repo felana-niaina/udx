@@ -552,6 +552,23 @@ class PostsResultsProvider {
             return 0;
         }
     }
+
+    public function getLastPosts($createdDate) {
+        try {
+            $query = $this->con->prepare("SELECT COUNT(*) AS postNumber
+                                          FROM posts
+                                          WHERE createdDate >= :createdDate
+                                        ");
+            $query->execute([
+                'createdDate' => $createdDate
+            ]);
+            return $query->fetchColumn();
+
+        } catch (PDOException $e) {
+            echo "Erreur dans la requête : " . $e->getMessage();
+            return 0;
+        }
+    }
     
 }
 ?>

@@ -7,12 +7,23 @@
         include_once 'classes/DatabaseConnector.php';
         include_once 'classes/UserRegistration.php';
         include_once 'classes/NotificationProvider.php';
+        include_once 'classes/PostsResultsProvider.php';
+        include_once 'classes/MarketplaceResultsProvider.php';
+
         $database = new DatabaseConnector();
         $con = $database->getConnection();
         $UserProvider = new UserRegistration($con);
+        $PostProvider = new PostsResultsProvider($con);
+        $NotifProvider = new NotificationProvider($con);
+        $MarketplaceProvider = new MarketplaceResultsProvider($con);
+
         $lastLogout = $UserProvider->getLastHistoryByUser($_SESSION['user_id'], 'logout');
         $logoutDate = $lastLogout['createdDate'] ?? '2024-01-01';
-        $NotifProvider = new NotificationProvider($con);
+
+        $postNotif = $PostProvider->getLastPosts($logoutDate);
+        $productNotif = $MarketplaceProvider->getLastProducts($logoutDate);
+        $messageNumber = $NotifProvider->getNotificationByType('message', $_SESSION['user_id']);
+        
         $notifNumber = 2;
     };
 ?>
@@ -266,17 +277,17 @@
 		<!-- TEMPLATE NOTIFICATIONS START   -->
 		<!-- TEMPLATE NOTIFICATIONS END   -->
 		    <li>
-                <a href="settings.php#notifications"> <!-- L'utilisateut doit être redirigé automatiquement vers la page de notifications  -->
+                <a href="search.php?term="> <!-- L'utilisateut doit être redirigé automatiquement vers la page de notifications  -->
                     <i class="fas fa-stream">
-                    <?php if($isUserConnected) : ?><span class="notification-badge-feed">10</span> <?php endif ?><!-- Le nombre de notifications doit s'afficher ici -->
+                    <?php if($isUserConnected && $postNotif > 0 ) : ?><span class="notification-badge-feed"><?php echo $postNotif ?></span> <?php endif ?><!-- Le nombre de notifications doit s'afficher ici -->
                     </i>
                     <span>Feed</span>
                 </a>
             </li>
 		    <li>
-                <a href="settings.php#notifications"> <!-- L'utilisateut doit être redirigé automatiquement vers la page de notifications  -->
+                <a href="search.php?term=&type=marketplace"> <!-- L'utilisateut doit être redirigé automatiquement vers la page de notifications  -->
                     <i class="fas fa-store">
-                        <?php if($isUserConnected) : ?><span class="notification-badge-feed">10</span> <?php endif ?><!-- Le nombre de notifications doit s'afficher ici -->
+                        <?php if($isUserConnected && $productNotif > 0 ) : ?><span class="notification-badge-feed"><?php echo $productNotif ?></span> <?php endif ?><!-- Le nombre de notifications doit s'afficher ici -->
                     </i>
                     <span>Marketplace</span>
                 </a>
@@ -284,7 +295,7 @@
             <li>
                 <a href="settings.php#notifications"> <!-- L'utilisateut doit être redirigé automatiquement vers la page de notifications  -->
                     <i class="fas fa-comment">
-                        <?php if($isUserConnected) : ?><span class="notification-badge-message">3</span> <?php endif ?><!-- Le nombre de notifications doit s'afficher ici -->
+                        <?php if($isUserConnected && $messageNumber > 0) : ?><span class="notification-badge-message"><?php echo $messageNumber ?></span> <?php endif ?><!-- Le nombre de notifications doit s'afficher ici -->
                     </i>
                     <span>Messages</span>
                 </a>
