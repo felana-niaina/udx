@@ -5,9 +5,13 @@
     if(!empty($_SESSION)) {
         $isUserConnected = true;
         include_once 'classes/DatabaseConnector.php';
+        include_once 'classes/UserRegistration.php';
         include_once 'classes/NotificationProvider.php';
         $database = new DatabaseConnector();
         $con = $database->getConnection();
+        $UserProvider = new UserRegistration($con);
+        $lastLogout = $UserProvider->getLastConnexionByUser($_SESSION['user_id']);
+        $logoutDate = $lastLogout['createdDate'] ?? '2024-01-01';
         $NotifProvider = new NotificationProvider($con);
         $notifNumber = 2;
     };
@@ -264,7 +268,7 @@
 		    <li>
                 <a href="settings.php#notifications"> <!-- L'utilisateut doit être redirigé automatiquement vers la page de notifications  -->
                     <i class="fas fa-stream">
-                        <span class="notification-badge-feed">10</span> <!-- Le nombre de notifications doit s'afficher ici -->
+                    <?php if($isUserConnected) : ?><span class="notification-badge-feed">10</span> <?php endif ?><!-- Le nombre de notifications doit s'afficher ici -->
                     </i>
                     <span>Feed</span>
                 </a>
@@ -272,7 +276,7 @@
 		    <li>
                 <a href="settings.php#notifications"> <!-- L'utilisateut doit être redirigé automatiquement vers la page de notifications  -->
                     <i class="fas fa-store">
-                        <span class="notification-badge-feed">10</span> <!-- Le nombre de notifications doit s'afficher ici -->
+                        <?php if($isUserConnected) : ?><span class="notification-badge-feed">10</span> <?php endif ?><!-- Le nombre de notifications doit s'afficher ici -->
                     </i>
                     <span>Marketplace</span>
                 </a>
@@ -280,7 +284,7 @@
             <li>
                 <a href="settings.php#notifications"> <!-- L'utilisateut doit être redirigé automatiquement vers la page de notifications  -->
                     <i class="fas fa-comment">
-                        <span class="notification-badge-message">3</span> <!-- Le nombre de notifications doit s'afficher ici -->
+                        <?php if($isUserConnected) : ?><span class="notification-badge-message">3</span> <?php endif ?><!-- Le nombre de notifications doit s'afficher ici -->
                     </i>
                     <span>Messages</span>
                 </a>

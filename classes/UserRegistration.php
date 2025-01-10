@@ -435,6 +435,26 @@ class UserRegistration {
             return false;
         }
     }
+
+    public function getLastConnexionByUser($userId) {
+        try {
+            $sql = "SELECT * FROM historyLog WHERE userId = :userId ORDER BY createdDate DESC LIMIT 0,1";
+            $stmt = $this->con->prepare($sql);
+            $stmt->bindParam(':userId', $userId);
+            $stmt->execute();
+            
+            $log = $stmt->fetch(PDO::FETCH_ASSOC);
+            
+            if ($log) {
+                return $log;
+            } else {
+                return null;  // L'utilisateur n'a pas été trouvé
+            }
+        } catch (PDOException $e) {
+            echo "Erreur lors de la récupération des données utilisateur : " . $e->getMessage();
+            return null;
+        }
+    }
     
 }
 ?>
