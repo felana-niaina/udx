@@ -136,9 +136,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     // Publication d'un nouveau produit
     elseif ($formId === 'publishProduct') {
-        if($userId && $_POST['productName'] && $_POST['productDescription'] && $_POST['productPrice'] && $_POST['productTags'] && $_POST['productCity'] && $_POST['productCaterogy']) {
+        // if($userId && $_POST['productName'] && $_POST['productDescription'] && $_POST['productPrice'] && $_POST['productTags'] && $_POST['productCity'] && $_POST['productCaterogy']) {
+        if($userId && $_POST['productName'] && $_POST['productDescription'] && $_POST['productPrice'] && $_POST['productCity'] && $_POST['productCaterogy']) {
             $productPicture = isset($_FILES['productPicture']) ? $_FILES['productPicture'] : NULL;
-            if ($MarketplaceResultsProvider->createProduct($userId,$_POST['productName'], $_POST['productDescription'], $_POST['productPrice'], $_POST['productTags'], $_POST['productCity'], $_POST['productCaterogy'], $productPicture)) {
+            if ($MarketplaceResultsProvider->createProduct($userId,$_POST['productName'], $_POST['productDescription'], $_POST['productPrice'], $_POST['productCity'], $_POST['productCaterogy'], $productPicture)) {
               echo "<script>
                   document.addEventListener('DOMContentLoaded', function() {
                       Swal.fire({
@@ -728,9 +729,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         <?php } ?>
                         </select>
 
-                        <div class="form-group">
+                        <!-- <div class="form-group">
                             <input type="text" class="form-control mt-2" placeholder="Tags" name="productTags"  required>
-                        </div>
+                        </div> -->
                         <div class="form-group">
                             <input type="file" class="form-control-file mt-2" name="productPicture"  accept="image/*" required>
                         </div>

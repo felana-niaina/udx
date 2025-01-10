@@ -159,7 +159,7 @@ class MarketplaceResultsProvider {
                 $id = $row["id"];
                 $title = $row["title"];
                 $description = $row["description"];
-                $keywords = $row["keywords"];
+                // $keywords = $row["keywords"];
                 $price = $row["price"] . " €";
                 $image = is_null($row['picture']) || $row['picture'] == '' ? "https://via.placeholder.com/150" : $this->siteUrl. '/' .$row['picture'];
                 $date = $row["createdDate"];
@@ -178,7 +178,7 @@ class MarketplaceResultsProvider {
                     <p class='product-price'>$price</p>
                     <p class='product-description'>$description</p>
                     <div class='product-actions' id='actionProduct-$id'>
-                        <a href='#' class='editProduct' data-toggle='modal' data-target='#productModal' data-title='$title' data-description='$description.' data-price='$price' data-keywords='$keywords' data-image='$image' data-date='$date' data-id='$id' data-city='$ville' data-category='$category'>Modifier</a> | <a href='#' class='removeProductButton' data-toggle='modal' data-target='#removeProductModal' data-title='$title' data-id='$id'>Supprimer</a>
+                        <a href='#' class='editProduct' data-toggle='modal' data-target='#productModal' data-title='$title' data-description='$description.' data-price='$price' data-image='$image' data-date='$date' data-id='$id' data-city='$ville' data-category='$category'>Modifier</a> | <a href='#' class='removeProductButton' data-toggle='modal' data-target='#removeProductModal' data-title='$title' data-id='$id'>Supprimer</a>
                     </div>
                 </div>
               </div>";
@@ -193,7 +193,7 @@ class MarketplaceResultsProvider {
         }
     }
 
-    public function createProduct($userId, $name, $description, $price, $tags, $city, $category, $picture = NULL){
+    public function createProduct($userId, $name, $description, $price, $city, $category, $picture = NULL){
         try {
             $targetFile = '';
             if(!is_null($picture)) {
@@ -211,12 +211,12 @@ class MarketplaceResultsProvider {
                 }
             }
 
-            $sql = "INSERT INTO marketplace (title, description, price, keywords, picture ,userId, city, category) VALUES (:title, :description, :price, :keywords, :picture, :userId, :city, :category)";
+            $sql = "INSERT INTO marketplace (title, description, price, picture ,userId, city, category) VALUES (:title, :description, :price, :picture, :userId, :city, :category)";
             $stmt = $this->con->prepare($sql);
             $stmt->bindParam(':title', $name);
             $stmt->bindParam(':description', $description);
             $stmt->bindParam(':price', $price);
-            $stmt->bindParam(':keywords', $tags);
+            // $stmt->bindParam(':keywords', $tags);
             $stmt->bindParam(':picture', $targetFile);
             $stmt->bindParam(':userId', $userId);
             $stmt->bindParam(':city', $city);
@@ -233,7 +233,7 @@ class MarketplaceResultsProvider {
         }
     }
 
-    public function updateProduct($productId, $userId, $name, $description, $price, $tags, $city, $category, $picture = NULL) {
+    public function updateProduct($productId, $userId, $name, $description, $price, $city, $category, $picture = NULL) {
         try {
             $targetFile = '';
     
@@ -274,7 +274,6 @@ class MarketplaceResultsProvider {
                     title = :title, 
                     description = :description, 
                     price = :price, 
-                    keywords = :keywords,
                     userId = :userId,
                     city = :city,
                     category = :category " .
@@ -285,7 +284,7 @@ class MarketplaceResultsProvider {
             $stmt->bindParam(':title', $name);
             $stmt->bindParam(':description', $description);
             $stmt->bindParam(':price', $price);
-            $stmt->bindParam(':keywords', $tags);
+            // $stmt->bindParam(':keywords', $tags);
             $stmt->bindParam(':userId', $userId);
             $stmt->bindParam(':city', $city);
             $stmt->bindParam(':category', $category);

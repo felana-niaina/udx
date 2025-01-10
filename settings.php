@@ -126,10 +126,10 @@
 
     // Ajout nouveau produit dans marketplace
     elseif ($formId === 'newProduct') {
-      if($userId && $_POST['productName'] && $_POST['productDescription'] && $_POST['productPrice'] && $_POST['productTags'] && $_POST['productCity'] && $_POST['productCaterogy']) {
+      if($userId && $_POST['productName'] && $_POST['productDescription'] && $_POST['productPrice'] && $_POST['productCity'] && $_POST['productCaterogy']) {
         $productPicture = isset($_FILES['productPicture']) ? $_FILES['productPicture'] : NULL;
         $MarketplaceResultsProvider = new MarketplaceResultsProvider($con);
-        if ($MarketplaceResultsProvider->createProduct($userId,$_POST['productName'], $_POST['productDescription'], $_POST['productPrice'], $_POST['productTags'], $_POST['productCity'], $_POST['productCaterogy'], $productPicture)) {
+        if ($MarketplaceResultsProvider->createProduct($userId,$_POST['productName'], $_POST['productDescription'], $_POST['productPrice'], $_POST['productCity'], $_POST['productCaterogy'], $productPicture)) {
           echo "<script>
               document.addEventListener('DOMContentLoaded', function() {
                   Swal.fire({
@@ -152,13 +152,13 @@
     elseif ($formId === 'updateProduct') {
       $selectedProduct = $marketPlaceProvider->getProductById($_POST['productId']);
       $currentPicture = $selectedProduct->picture;
-      if($userId && $_POST['productId'] && $_POST['productNameUpdated'] && $_POST['productDescriptionUpdated'] && $_POST['productPriceUpdated'] && $_POST['productTagsUpdated'] && $_POST['productCity'] && $_POST['productCaterogy']) {
+      if($userId && $_POST['productId'] && $_POST['productNameUpdated'] && $_POST['productDescriptionUpdated'] && $_POST['productPriceUpdated'] && $_POST['productCity'] && $_POST['productCaterogy']) {
         $productPicture = isset($_FILES['productPictureUpdated']['tmp_name']) && !empty($_FILES['productPictureUpdated']['tmp_name']) 
             ? $_FILES['productPictureUpdated'] 
             : $currentPicture;
 
         $MarketplaceResultsProvider = new MarketplaceResultsProvider($con);
-        if ($MarketplaceResultsProvider->updateProduct($_POST['productId'],$userId,$_POST['productNameUpdated'], $_POST['productDescriptionUpdated'], $_POST['productPriceUpdated'], $_POST['productTagsUpdated'], $_POST['productCity'], $_POST['productCaterogy'], $productPicture)) {
+        if ($MarketplaceResultsProvider->updateProduct($_POST['productId'],$userId,$_POST['productNameUpdated'], $_POST['productDescriptionUpdated'], $_POST['productPriceUpdated'], $_POST['productCity'], $_POST['productCaterogy'], $productPicture)) {
           echo "<script>
               document.addEventListener('DOMContentLoaded', function() {
                   Swal.fire({
@@ -1270,10 +1270,10 @@
                         </div>
 
                         <!-- Mots-clés -->
-                        <div class="form-group">
+                        <!-- <div class="form-group">
                             <label for="keywords">Mots-clés</label>
                             <textarea id="productTags" class="form-control" placeholder="Mots-clés pour l'article" name="productTagsUpdated" required></textarea>
-                        </div>
+                        </div> -->
 
                         <!-- pièce jointe -->
                         <div class="form-group">
@@ -1351,10 +1351,10 @@
                 </div>
 
                 <!-- Mots-clés -->
-                <div class="form-group">
+                <!-- <div class="form-group">
                     <label for="keywords">Mots-clés</label>
                     <input type="text" class="form-control" id="keywords" placeholder="Mots-clés pour l'article" name="productTags" required>
-                </div>
+                </div> -->
                 <div class="form-group">
                   <input type="file" class="form-control-file mt-2" name="productPicture"  accept="image/*" required>
                 </div>
@@ -1561,14 +1561,14 @@
         var description = $(this).data('description');
         var price = $(this).data('price');
         var id = $(this).data('id');
-        var keywords = $(this).data('keywords');
+        // var keywords = $(this).data('keywords');
         var image = $(this).data('image');
         var date = $(this).data('date');
         var city = $(this).data('city');
         var category = $(this).data('category');
 
         $('#productTitle').text(title);
-        $('#productTags').text(keywords);
+        // $('#productTags').text(keywords);
         $('#productPrice').text(price);
         $('#productId').text(id);
         $('#productDescription').text(description);
