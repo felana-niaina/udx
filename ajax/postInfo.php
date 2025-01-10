@@ -45,7 +45,7 @@ if(isset($_POST["productId"])){
     $likedId = $_POST['userIdPost'];
     $postId = $_POST['postId'];
     $result = $ResultsProvider->toggleLikePost($likerId, $likedId, $postId);
-    if($result['success'] && $result['isLiked']) {
+    if($result['success'] && $result['isLiked'] == 1) {
         if($likerId !== $likedId ) {
             // insert notification
             $NotifProvider->addNotification('likers', $postId, $likerId, $likedId);

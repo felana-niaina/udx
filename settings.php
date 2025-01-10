@@ -38,6 +38,9 @@
   $userInfo = $userRegistration->getUserInfo($userId);
   $userAd = $AdsProvider->getUserAd($userId);
   $userNotifSetting = $NotifProvider->getUserSetting($userId);
+  $messageNotification = $NotifProvider->getMessageNotification($userId);
+  $likeNotification = $NotifProvider->getLikeNotification($userId);
+
   if($userAd) {
     // find ads type $userAd->adsTypeId
     $adType = $AdsProvider->getAdType($userAd->adsTypeId);
@@ -1014,32 +1017,30 @@
               <div class="container">
                   <!-- Messages Section -->
                   <div>
+                    <?php if(!is_null($messageNotification) ) { ?>
                       <h5 class="section-header"><i class="fas fa-envelope notification-icon"></i>Messages</h5>
-                      <div class="notification-item">
-                          <p class="notification-title">John Doe sent you a message</p>
-                          <p class="notification-date">2025-01-01</p>
-                          <p class="notification-content">"Hi, could we schedule a meeting tomorrow?"</p>
-                      </div>
-                      <div class="notification-item">
-                          <p class="notification-title">Anna sent you a message</p>
-                          <p class="notification-date">2025-01-02</p>
-                          <p class="notification-content">"Don't forget about the project deadline."</p>
-                      </div>
+                      <?php foreach ($messageNotification as $key => $item) { ?>
+                        <div class="notification-item">
+                          <p class="notification-title"><?php echo $item['username'] ?> sent you a message</p>
+                          <p class="notification-date"><?php echo date('Y-m-d', strtotime($item['createdDate'])) ?></p>
+                          <p class="notification-content">"<?php echo $item['content'] ?>"</p>
+                        </div>
+                      <?php } ?>
+                    <?php } ?>
                   </div>
 
                   <!-- Likes Section -->
                   <div>
+                    <?php if(!is_null($likeNotification) ) { ?>
                       <h5 class="section-header"><i class="fas fa-thumbs-up notification-icon"></i>Likes</h5>
-                      <div class="notification-item">
-                          <p class="notification-title">Mark liked your post</p>
-                          <p class="notification-date">2025-01-01</p>
-                          <p class="notification-content">"How to stay productive in 2025"</p>
-                      </div>
-                      <div class="notification-item">
-                          <p class="notification-title">Sophia liked your comment</p>
-                          <p class="notification-date">2025-01-02</p>
-                          <p class="notification-content">"This article is very informative!"</p>
-                      </div>
+                      <?php foreach ($likeNotification as $key => $item) {  ?>
+                        <div class="notification-item">
+                          <p class="notification-title"><?php echo $item['username'] ?> liked your post</p>
+                          <p class="notification-date"><?php echo date('Y-m-d', strtotime($item['createdDate'])) ?></p>
+                          <p class="notification-content">"<?php echo $item['title'] ?>"</p>
+                        </div>
+                      <?php } ?>
+                    <?php } ?>
                   </div>
 
                   <!-- Comments Section -->

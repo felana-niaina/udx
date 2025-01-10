@@ -132,5 +132,57 @@ class NotificationProvider {
         }
     }
 
+    public function getMessageNotification($userId) {
+        try {
+            $type = 'message';
+            $sql = "SELECT users.username, notif.createdDate, sms.content FROM notifications AS notif
+                INNER JOIN message AS sms ON notif.itemId = sms.id
+                LEFT JOIN users ON notif.fromUserId = users.id
+                WHERE forUserId = :userId AND type = :type
+            ";
+            $stmt = $this->con->prepare($sql);
+            $stmt->bindParam(':userId', $userId);
+            $stmt->bindParam(':type', $type);
+            $stmt->execute();
+            
+            $notifs = $stmt->fetchAll();
+            
+            if ($notifs) {
+                return $notifs;
+            } else {
+                return null;  // L'utilisateur n'a pas de pub
+            }
+        } catch (PDOException $e) {
+            echo "Erreur lors de la récupération des données utilisateur : " . $e->getMessage();
+            return 0;
+        }
+    }
+
+    public function getLikeNotification($userId) {
+        try {
+            $type = 'likers';
+            $sql = "SELECT users.username, notif.createdDate, post.title FROM notifications AS notif
+                INNER JOIN posts AS post ON notif.itemId = post.id
+                LEFT JOIN users ON notif.fromUserId = users.id
+                WHERE notif.forUserId = :userId AND notif.type = :type
+            ";
+            $stmt = $this->con->prepare($sql);
+            $stmt->bindParam(':userId', $userId);
+            $stmt->bindParam(':type', $type);
+            $stmt->execute();
+            
+            $notifs = $stmt->fetchAll();
+            
+            if ($notifs) {
+                return $notifs;
+            } else {
+                return null;  // L'utilisateur n'a pas de pub
+            }
+        } catch (PDOException $e) {
+            echo "Erreur lors de la récupération des données utilisateur : " . $e->getMessage();
+            return 0;
+        }
+    }
+
 }
 ?>
