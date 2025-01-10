@@ -25,7 +25,7 @@ class UserRegistration {
                 session_start();
                 $_SESSION['user_id'] = $userId;
                 $_SESSION['user_username'] = $username;
-
+                $this->addToHistory($userId, 'login');
                 return true;
             }
             return false;
@@ -52,7 +52,7 @@ class UserRegistration {
                 session_start();
                 $_SESSION['user_id'] = $user['id'];
                 $_SESSION['user_username'] = $user['username'];
-
+                $this->addToHistory($user['id'], 'login');
                 return true;
             } else {
                 return false; // Identifiants incorrects
@@ -415,6 +415,26 @@ class UserRegistration {
         }
     }
     
+    public function addToHistory($userId, $action) {
+        try {
+            $sql = "INSERT INTO historyLog (userId, action) VALUES (:userId, :action)";
+            $stmt = $this->con->prepare($sql);
+            $stmt->bindParam(':userId', $userId);
+            $stmt->bindParam(':action', $action);
+            $stmt->execute();
+            
+             // Récupérer l'ID directement après l'insertion
+            $history = $this->con->lastInsertId();
+            if ($history) {
+                return true;
+            }
+            return false;
+
+        } catch (PDOException $e) {
+            echo "Erreur lors de l'enregistrement : " . $e->getMessage();
+            return false;
+        }
+    }
     
 }
 ?>
