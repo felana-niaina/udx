@@ -23,8 +23,11 @@
         $postNotif = $PostProvider->getLastPosts($logoutDate);
         $productNotif = $MarketplaceProvider->getLastProducts($logoutDate);
         $messageNumber = $NotifProvider->getNotificationByType('message', $_SESSION['user_id']);
+        $likeNumber = $NotifProvider->getNotificationByType('likers', $_SESSION['user_id']);
+        $followNumber = $NotifProvider->getNotificationByType('followers', $_SESSION['user_id']);
+        $commentNumber = $NotifProvider->getNotificationByType('comments', $_SESSION['user_id']);
         
-        $notifNumber = 2;
+        $notifNumber = $likeNumber + $followNumber + $commentNumber;
     };
 ?>
 <!doctype html>
@@ -236,9 +239,9 @@
                             <li class="active"><a href="about.html" class="nav-link">Démarrer</a></li>
                             <?php if(!$isUserConnected) : ?>
                             <li><a href="login.php" class="nav-link" style="font-size: 15px;">Se connecter</a></li>
-                            <li><a href="register.php" class="nav-link" style="font-size: 15px;">S'inscrire gratuitement</a></li>
+                            <li><a href="register.php" class="nav-link" style="font-size: 15px;">S'inscrire gratuitement<span class="notification-badge"><?php echo $notifNumber; ?></span></a></li>
                             <?php else : ?>
-                            <li><a href="settings.php" class="nav-link" style="font-size: 15px;">Notifications<span class="notification-badge">1</span></a></li>
+                            <li><a href="settings.php" class="nav-link" style="font-size: 15px;">Notifications<span class="notification-badge"><?php echo $notifNumber; ?></span></a></li>
                             <li><a href="profil.php" class="nav-link" style="font-size: 15px;">Mon Profil</a></li>
 							<li><a href="settings.php" class="nav-link" style="font-size: 15px;">Paramètres</a></li>
                             <?php endif ?>
