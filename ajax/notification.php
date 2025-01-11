@@ -16,6 +16,8 @@ if(isset($_POST['data'])) {
 
 if(isset($post["form_id"]) && $post['form_id'] === "notificationSetting" && ($post['user_id'] == $_SESSION['user_id'] ) ){
     echo $NotifProvider->setUserSetting($post['user_id'], $post);
-} 
+} elseif (isset($_POST['action']) && $_POST['action'] === 'resetnotif' && ($_POST['userId'] == $_SESSION['user_id']) ) {
+    echo $NotifProvider->removeUserNotification($_POST['userId']);
+}
 $con = null;
 die();

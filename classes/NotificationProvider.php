@@ -235,5 +235,30 @@ class NotificationProvider {
         }
     }
 
+    public function removeUserNotification($userId) {
+        try {
+            $liker = 'likers';
+            $comment = 'comments';
+            $follow = 'followers';
+            $sql = "DELETE from notifications 
+                    WHERE forUserId = :forUserId AND type IN ( :liker, :comment, :follow )";
+            $stmt = $this->con->prepare($sql);
+            $stmt->bindParam(':forUserId', $userId);
+            $stmt->bindParam(':liker', $liker);
+            $stmt->bindParam(':comment', $comment);
+            $stmt->bindParam(':follow', $follow);
+
+            // Exécuter la requête de suppression
+            $stmt->execute();
+            // Vérifier si des lignes ont été mises à jour
+            if ($stmt->rowCount() > 0) {
+                return true;
+            }
+            return false;
+        } catch (PDOException $e) {
+            echo "Erreur lors de la suppression du compte : " . $e->getMessage();
+        }
+    }
+
 }
 ?>
