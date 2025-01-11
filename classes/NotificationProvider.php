@@ -210,5 +210,30 @@ class NotificationProvider {
         }
     }
 
+    public function getFollowerNotification($userId) {
+        try {
+            $type = 'followers';
+            $sql = "SELECT users.username, notif.createdDate  FROM notifications AS notif
+                LEFT JOIN users ON notif.fromUserId = users.id
+                WHERE notif.forUserId = :userId AND notif.type = :type
+            ";
+            $stmt = $this->con->prepare($sql);
+            $stmt->bindParam(':userId', $userId);
+            $stmt->bindParam(':type', $type);
+            $stmt->execute();
+            
+            $notifs = $stmt->fetchAll();
+            
+            if ($notifs) {
+                return $notifs;
+            } else {
+                return null;  // L'utilisateur n'a pas de pub
+            }
+        } catch (PDOException $e) {
+            echo "Erreur lors de la récupération des données utilisateur : " . $e->getMessage();
+            return 0;
+        }
+    }
+
 }
 ?>

@@ -41,6 +41,7 @@
   $messageNotification = $NotifProvider->getMessageNotification($userId);
   $likeNotification = $NotifProvider->getLikeNotification($userId);
   $commentNotification = $NotifProvider->getCommentNotification($userId);
+  $followerNotification = $NotifProvider->getFollowerNotification($userId);
 
   if($userAd) {
     // find ads type $userAd->adsTypeId
@@ -1060,17 +1061,16 @@
 
                   <!-- Followers Section -->
                   <div>
+                    <?php if(!is_null($followerNotification) ) { ?>
                       <h5 class="section-header"><i class="fas fa-user-plus notification-icon"></i>Followers</h5>
+                      <?php foreach ($followerNotification as $key => $item) {  ?>
                       <div class="notification-item">
-                          <p class="notification-title">Chris started following you</p>
-                          <p class="notification-date">2025-01-01</p>
-                          <p class="notification-content">"Chris is now following your updates."</p>
+                          <p class="notification-title"><?php echo $item['username'] ?> started following you</p>
+                          <p class="notification-date"><?php echo date('Y-m-d', strtotime($item['createdDate'])) ?></p>
+                          <p class="notification-content">"<?php echo $item['username'] ?> is now following your updates."</p>
                       </div>
-                      <div class="notification-item">
-                          <p class="notification-title">Taylor started following you</p>
-                          <p class="notification-date">2025-01-02</p>
-                          <p class="notification-content">"Taylor is now following your updates."</p>
-                      </div>
+                      <?php } ?>
+                    <?php } ?>
                   </div>
               </div>
               <form method="post" id="notificationForm">
