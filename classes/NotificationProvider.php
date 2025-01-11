@@ -260,5 +260,27 @@ class NotificationProvider {
         }
     }
 
+    public function removeMessageNotification($userId, $itemId) {
+        try {
+            $type = 'message';
+            $sql = "DELETE from notifications 
+                    WHERE forUserId = :forUserId AND type = :type AND itemId = :itemId";
+            $stmt = $this->con->prepare($sql);
+            $stmt->bindParam(':forUserId', $userId);
+            $stmt->bindParam(':type', $type);
+            $stmt->bindParam(':itemId', $itemId);
+
+            // Exécuter la requête de suppression
+            $stmt->execute();
+            // Vérifier si des lignes ont été mises à jour
+            if ($stmt->rowCount() > 0) {
+                return true;
+            }
+            return false;
+        } catch (PDOException $e) {
+            echo "Erreur lors de la suppression du compte : " . $e->getMessage();
+        }
+    }
+
 }
 ?>
