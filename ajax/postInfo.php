@@ -29,7 +29,7 @@ if(isset($_POST["productId"])){
         $postInfo = $ResultsProvider->getPostInfo($postId);
         if(intval($userId) !== intval($postInfo->userId)) {
             // insert notification
-            $NotifProvider->addNotification('comments', $postId, $userId, $postInfo->userId);
+            $NotifProvider->addNotification('comments', $result['item'], $userId, $postInfo->userId);
             $userNotifSetting = $NotifProvider->getUserSetting($postInfo->userId);
             if(is_null($userNotifSetting) || $userNotifSetting->isComment == 1 ) {
                 $username = $_SESSION['user_username'];

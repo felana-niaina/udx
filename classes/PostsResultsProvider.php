@@ -325,7 +325,7 @@ class PostsResultsProvider {
     
             $query->execute();
     
-            return ["success" => true, "message" => "Commentaire enregistré avec succès."];
+            return ["success" => true, "message" => "Commentaire enregistré avec succès.", "item" => $this->con->lastInsertId()];
         } catch (PDOException $e) {
             return ["success" => false, "message" => "Erreur : " . $e->getMessage()];
         } catch (Exception $e) {

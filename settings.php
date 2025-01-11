@@ -40,6 +40,7 @@
   $userNotifSetting = $NotifProvider->getUserSetting($userId);
   $messageNotification = $NotifProvider->getMessageNotification($userId);
   $likeNotification = $NotifProvider->getLikeNotification($userId);
+  $commentNotification = $NotifProvider->getCommentNotification($userId);
 
   if($userAd) {
     // find ads type $userAd->adsTypeId
@@ -1045,17 +1046,16 @@
 
                   <!-- Comments Section -->
                   <div>
+                    <?php if(!is_null($commentNotification) ) { ?>
                       <h5 class="section-header"><i class="fas fa-comment notification-icon"></i>Commentaires</h5>
+                      <?php foreach ($commentNotification as $key => $item) {  ?>
                       <div class="notification-item">
-                          <p class="notification-title">Alex commented on your post</p>
-                          <p class="notification-date">2025-01-01</p>
-                          <p class="notification-content">"Great insights, thanks for sharing!"</p>
+                          <p class="notification-title"><?php echo $item['username'] ?> commented on your post</p>
+                          <p class="notification-date"><?php echo date('Y-m-d', strtotime($item['createdDate'])) ?></p>
+                          <p class="notification-content">"<?php echo $item['commentText'] ?>"</p>
                       </div>
-                      <div class="notification-item">
-                          <p class="notification-title">Emily replied to your comment</p>
-                          <p class="notification-date">2025-01-02</p>
-                          <p class="notification-content">"I completely agree with you."</p>
-                      </div>
+                      <?php } ?>
+                    <?php } ?>
                   </div>
 
                   <!-- Followers Section -->
