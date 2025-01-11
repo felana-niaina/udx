@@ -241,7 +241,7 @@
                             <li><a href="login.php" class="nav-link" style="font-size: 15px;">Se connecter</a></li>
                             <li><a href="register.php" class="nav-link" style="font-size: 15px;">S'inscrire gratuitement<span class="notification-badge"><?php echo $notifNumber; ?></span></a></li>
                             <?php else : ?>
-                            <li><a href="settings.php" class="nav-link" style="font-size: 15px;">Notifications<span class="notification-badge"><?php echo $notifNumber; ?></span></a></li>
+                            <li><a href="settings.php#notifications" class="nav-link" style="font-size: 15px;">Notifications<span class="notification-badge"><?php echo $notifNumber; ?></span></a></li>
                             <li><a href="profil.php" class="nav-link" style="font-size: 15px;">Mon Profil</a></li>
 							<li><a href="settings.php" class="nav-link" style="font-size: 15px;">Paramètres</a></li>
                             <?php endif ?>
@@ -296,7 +296,7 @@
                 </a>
             </li>
             <li>
-                <a href="settings.php#notifications"> <!-- L'utilisateut doit être redirigé automatiquement vers la page de notifications  -->
+                <a href="settings.php#messages"> <!-- L'utilisateut doit être redirigé automatiquement vers la page de notifications  -->
                     <i class="fas fa-comment">
                         <?php if($isUserConnected && $messageNumber > 0) : ?><span class="notification-badge-message"><?php echo $messageNumber ?></span> <?php endif ?><!-- Le nombre de notifications doit s'afficher ici -->
                     </i>
